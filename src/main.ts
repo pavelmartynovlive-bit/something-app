@@ -69,6 +69,7 @@ class PlayScene extends Phaser.Scene {
     }
     const ground = this.physics.add.staticGroup();
     const obstacles = this.physics.add.staticGroup();
+    const upperRoute = this.physics.add.staticGroup();
     const slab = (x: number, y: number, width: number, height: number, group = ground) => {
       group.add(this.add.rectangle(x + width / 2, y + height / 2, width, height, 0x788c7b));
       this.add.rectangle(x + width / 2, y + 4, width, 8, 0x96aa8c);
@@ -82,11 +83,24 @@ class PlayScene extends Phaser.Scene {
     slab(start, s.floorY, s.levelWidth - start, 180);
     s.obstacles.forEach((x, i) => slab(x, s.floorY - (i % 3 === 0 ? 48 : 34), 42, i % 3 === 0 ? 48 : 34, obstacles));
     this.sign(170, 'Котик ждёт →');
-    this.sign(6100, 'Тап — прыжок');
+    this.sign(4100, 'Прыжками — наверх ↑');
+    this.sign(5900, 'Нижний путь →');
+    for (const platform of s.routePlatforms) {
+      slab(platform.x, platform.y, platform.width, 18, upperRoute);
+      const body = (upperRoute.getChildren().at(-1) as Phaser.GameObjects.Rectangle).body as Phaser.Physics.Arcade.StaticBody;
+      // Односторонняя опора: края и низ никогда не блокируют автобег.
+      body.checkCollision.left = body.checkCollision.right = body.checkCollision.down = false;
+      if (platform.label) this.add.text(platform.x + 22, platform.y - 28, platform.label, { fontSize: '15px', color: '#3c594b' });
+    }
     this.sign(13100, 'Ещё немного →');
     this.tanya = this.physics.add.sprite(100, s.floorY - 25, 'tanya');
     this.tanya.setSize(26, 48).setOffset(7, 4).setMaxVelocity(500, 700);
     this.physics.add.collider(this.tanya, ground);
+    this.physics.add.collider(this.tanya, upperRoute, undefined, (_player, block) => {
+      const body = this.tanya.body as Phaser.Physics.Arcade.Body;
+      const platform = (block as Phaser.GameObjects.Rectangle).body as Phaser.Physics.Arcade.StaticBody;
+      return body.velocity.y >= 0 && body.prev.y + body.height <= platform.top + 4;
+    });
     // Платформы поддерживают сверху; удар сбоку не блокирует auto-run.
     this.physics.add.collider(this.tanya, obstacles, undefined, (_player, block) => {
       const body = this.tanya.body as Phaser.Physics.Arcade.Body;
@@ -102,8 +116,8 @@ class PlayScene extends Phaser.Scene {
     this.input.keyboard!.on('keydown', hideHint);
     this.events.once('shutdown', () => this.input.keyboard!.off('keydown', hideHint));
     const bottles = this.physics.add.staticGroup();
-    s.bottles.forEach(x => {
-      const bottle = bottles.create(x, s.floorY - 26, 'lipton') as Phaser.Physics.Arcade.Sprite;
+    s.bottles.forEach(point => {
+      const bottle = bottles.create(point.x, point.y, 'lipton') as Phaser.Physics.Arcade.Sprite;
       bottle.setSize(42, 52);
     });
     this.physics.add.overlap(this.tanya, bottles, (_player, item) => {
@@ -188,6 +202,9 @@ class PlayScene extends Phaser.Scene {
     const viewWidth = camera.width / camera.zoom;
     const target = Phaser.Math.Clamp(this.tanya.x - viewWidth * .35, 0, Math.max(0, s.levelWidth - viewWidth));
     camera.scrollX = Phaser.Math.Linear(camera.scrollX, target, 1 - Math.exp(-dt * 5));
+    // Небольшое вертикальное смещение сохраняет нижнюю страховочную дорожку в кадре.
+    const targetY = Phaser.Math.Clamp((this.tanya.y - (s.floorY - 24)) * .28, -90, 0);
+    camera.scrollY = Phaser.Math.Linear(camera.scrollY, targetY, 1 - Math.exp(-dt * 2.8));
     element('#distance').textContent = `${Math.min(100, Math.round(this.tanya.x / (s.levelWidth - 150) * 100))}% пути`;
     this.updateHud();
     if (Math.abs(this.tanya.x - (s.levelWidth - 150)) < 80 && grounded) this.feedCat();
@@ -311,7 +328,7 @@ class PlayScene extends Phaser.Scene {
   private resize() {
     this.cameras.main.setOrigin(0, 0);
     this.cameras.main.setZoom(this.scale.height / 540);
-    this.cameras.main.scrollY = 0;
+    this.cameras.main.scrollY = Phaser.Math.Clamp(this.cameras.main.scrollY, -90, 0);
     controls?.reset();
   }
   private sign(x: number, text: string) {
