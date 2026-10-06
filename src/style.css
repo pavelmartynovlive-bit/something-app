@@ -34,3 +34,5 @@ p { font-size: 14px; margin: 12px 0 20px; }
 button { border: 0; border-radius: 10px; padding: 14px 22px; background: #3e7054; color: white; font: 600 15px system-ui; cursor: pointer; touch-action: manipulation; }
 button:focus-visible { outline: 3px solid #e5b83d; outline-offset: 4px; }
 @media (max-height: 400px) { .energy-card { padding: 8px 12px; } .end-card { padding: 16px 28px; } }
+
+@media (max-width: 850px) { .hud-right { gap: 5px; } .goal { font-size: 12px; padding: 9px; } .energy-card { width: 150px; } #install { padding: 9px; } }

@@ -32,7 +32,11 @@ class PlayScene extends Phaser.Scene {
   private lastGround = -Infinity;
   private bufferedJump = -Infinity;
   private hitUntil = 0;
-  private exhaustedUntil = 0;
+  private slowUntil = 0;
+  private restRemaining = 0;
+  private foodCount = 0;
+  private scooters: { sprite: Phaser.Physics.Arcade.Sprite; spawnX: number; launched: boolean }[] = [];
+  private pigeons: { sprite: Phaser.Physics.Arcade.Sprite; flying: boolean; dangerRemaining: number }[] = [];
   private finished = false;
   private wasPortrait = false;
   constructor() { super('play'); }
@@ -42,7 +46,10 @@ class PlayScene extends Phaser.Scene {
     this.exhausted = false;
     this.checkpoint = 100;
     this.lastGround = this.bufferedJump = -Infinity;
-    this.hitUntil = this.exhaustedUntil = 0;
+    this.hitUntil = this.slowUntil = 0;
+    this.restRemaining = this.foodCount = 0;
+    this.scooters = [];
+    this.pigeons = [];
     this.finished = this.wasPortrait = false;
     this.grannies = [];
     ending.hidden = true;
@@ -115,6 +122,7 @@ class PlayScene extends Phaser.Scene {
       this.physics.add.overlap(this.tanya, sprite, () => this.hit(s.grannyDamage));
       this.grannies.push({ sprite, ...range });
     }
+    this.createNewObjects();
     const catX = s.levelWidth - 150;
     this.add.image(catX, s.floorY - 22, 'cat');
     this.add.text(catX, s.floorY - 75, 'Мяу…', { fontSize: '22px', color: '#29483e' }).setOrigin(.5);
@@ -146,10 +154,23 @@ class PlayScene extends Phaser.Scene {
     const up = Phaser.Input.Keyboard.JustDown(this.keys.UP);
     const touch = controls.consumeJump();
     if (space || up || touch) this.bufferedJump = now;
-    if (this.exhausted && now >= this.exhaustedUntil) this.changeEnergy(s.recoveryEnergy);
-    this.tanya.setVelocityX(this.exhausted ? s.tiredSpeed : s.speed).setFlipX(false);
-    if (now - this.bufferedJump <= s.jumpBufferMs && now - this.lastGround <= s.coyoteMs) {
-      this.tanya.setVelocityY(-s.jumpVelocity);
+    if (this.restRemaining > 0) {
+      this.restRemaining = Math.max(0, this.restRemaining - delta);
+      this.tanya.setVelocity(0, 0);
+      this.bufferedJump = -Infinity;
+      this.changeEnergy(s.benchEnergyPerSecond * dt);
+      if (this.restRemaining === 0) {
+        this.tanya.setTexture('tanya');
+        body.allowGravity = true;
+        this.tanya.setPosition(this.tanya.x, s.floorY - 25);
+        message('Отдохнули — побежали!', 1200);
+      }
+    } else {
+      this.changeEnergy(-s.energyDrainPerSecond * dt);
+      this.tanya.setVelocityX(now < this.slowUntil ? s.scooterSlowSpeed : this.exhausted ? s.tiredSpeed : s.speed).setFlipX(false);
+    }
+    if (this.restRemaining === 0 && now - this.bufferedJump <= s.jumpBufferMs && now - this.lastGround <= s.coyoteMs) {
+      this.tanya.setVelocityY(-(this.exhausted ? s.tiredJumpVelocity : s.jumpVelocity));
       this.bufferedJump = this.lastGround = -Infinity;
     }
     this.tanya.setAlpha(now < this.hitUntil ? (Math.floor(now / 100) % 2 ? .45 : 1) : 1);
@@ -157,6 +178,7 @@ class PlayScene extends Phaser.Scene {
       if (granny.sprite.x >= granny.right) granny.sprite.setVelocityX(-s.grannySpeed).setFlipX(true);
       if (granny.sprite.x <= granny.left) granny.sprite.setVelocityX(s.grannySpeed).setFlipX(false);
     }
+    this.updateNewObjects(dt);
     if (grounded && Math.abs(body.bottom - s.floorY) < 3) {
       for (const cp of s.checkpoints) if (this.tanya.x >= cp) this.checkpoint = Math.max(this.checkpoint, cp);
     }
@@ -174,8 +196,7 @@ class PlayScene extends Phaser.Scene {
     this.energy = Phaser.Math.Clamp(this.energy + amount, 0, 100);
     if (this.energy === 0 && !this.exhausted) {
       this.exhausted = true;
-      this.exhaustedUntil = this.time.now + s.exhaustedDurationMs;
-      message('Таня устала — скоро восстановится', 2500);
+      message('Таня устала — нужен Lipton или лавочка', 2500);
     }
     if (this.exhausted && this.energy > 0) {
       this.exhausted = false;
@@ -183,10 +204,11 @@ class PlayScene extends Phaser.Scene {
     }
   }
   private hit(damage: number) {
-    if (this.finished || this.time.now < this.hitUntil) return;
+    if (this.finished || this.restRemaining > 0 || this.time.now < this.hitUntil) return false;
     this.hitUntil = this.time.now + s.hitCooldownMs;
     this.changeEnergy(-damage);
     if (!this.exhausted) message(`Ой! −${damage} энергии`, 1000);
+    return true;
   }
   private respawn() {
     this.tanya.setPosition(this.checkpoint, s.floorY - 26).setVelocity(0, 0);
@@ -197,19 +219,94 @@ class PlayScene extends Phaser.Scene {
     this.cameras.main.scrollX = Math.max(0, this.checkpoint - this.cameras.main.width / this.cameras.main.zoom * .35);
   }
   private feedCat() {
+    const success = this.foodCount >= s.requiredFood;
+    element('#end-title').textContent = success ? 'Котик спасён ❤️' : 'Нужно ещё немного корма';
+    element('#end-description').textContent = success ? 'Таня дошла. Котик поел. Всё получилось.' : `Собрано ${this.foodCount}/5. Котику нужно минимум ${s.requiredFood} пакетика — попробуй ещё раз.`;
     this.finished = true;
     this.tanya.setVelocity(0, 0).setAlpha(1).setFlipX(false);
     controls.reset();
     this.physics.pause();
-    this.add.rectangle(s.levelWidth - 195, s.floorY - 7, 22, 10, 0xe5b83d);
-    message('Таня покормила котика', 1800);
+    if (success) this.add.rectangle(s.levelWidth - 195, s.floorY - 7, 22, 10, 0xe5b83d);
+    message(success ? 'Таня покормила котика' : 'Нужно ещё немного корма', 1800);
     this.time.delayedCall(1600, () => { ending.hidden = false; });
   }
   private updateHud() {
+    element('#food-count').textContent = `Корм ${this.foodCount}/5`;
     hudValue.textContent = `${Math.ceil(this.energy)}`;
     hudFill.style.width = `${this.energy}%`;
     hudFill.style.background = this.exhausted ? '#bd745b' : '#568968';
     energyTrack.setAttribute('aria-valuenow', `${Math.ceil(this.energy)}`);
+  }
+  private createNewObjects() {
+    const food = this.physics.add.staticGroup();
+    for (const point of s.food) food.create(point.x, point.y, 'food');
+    this.physics.add.overlap(this.tanya, food, (_player, item) => {
+      if (this.finished) return;
+      const packet = item as Phaser.Physics.Arcade.Sprite;
+      const label = this.add.text(packet.x, packet.y - 25, '+1 корм', { fontSize: '18px', color: '#326544' }).setOrigin(.5);
+      packet.destroy();
+      this.foodCount++;
+      this.tweens.add({ targets: label, y: label.y - 40, alpha: 0, duration: 750, onComplete: () => label.destroy() });
+      this.updateHud();
+    });
+    for (const x of s.scooters) {
+      const sprite = this.physics.add.sprite(x, s.floorY - 28, 'scooter').setImmovable(true);
+      (sprite.body as Phaser.Physics.Arcade.Body).allowGravity = false;
+      this.scooters.push({ sprite, spawnX: x, launched: false });
+      this.physics.add.overlap(this.tanya, sprite, () => {
+        if (this.hit(s.scooterDamage)) {
+          this.slowUntil = this.time.now + s.scooterSlowMs;
+          this.cameras.main.shake(90, .002);
+        }
+      });
+    }
+    for (const x of s.pigeons) {
+      const sprite = this.physics.add.sprite(x, s.floorY - 16, 'pigeons');
+      (sprite.body as Phaser.Physics.Arcade.Body).allowGravity = false;
+      const flock = { sprite, flying: false, dangerRemaining: 0 };
+      this.pigeons.push(flock);
+      this.physics.add.overlap(this.tanya, sprite, () => {
+        if ((!flock.flying || flock.dangerRemaining > 0) && this.hit(s.pigeonDamage)) this.cameras.main.shake(160, .004);
+      });
+    }
+    const benches = this.physics.add.staticGroup();
+    for (const x of s.benches) benches.create(x, s.floorY - 22, 'bench');
+    this.physics.add.overlap(this.tanya, benches, (_player, item) => {
+      const bench = item as Phaser.Physics.Arcade.Sprite;
+      const body = this.tanya.body as Phaser.Physics.Arcade.Body;
+      if (this.finished || this.restRemaining > 0 || bench.getData('used') || this.energy >= s.benchEnergyThreshold || !(body.blocked.down || body.touching.down)) return;
+      bench.setData('used', true);
+      this.restRemaining = s.benchDurationMs;
+      this.tanya.setPosition(bench.x, s.floorY - 25).setVelocity(0, 0).setTexture('tanya-sitting');
+      body.allowGravity = false;
+      controls.reset();
+      message('Отдыхаем на лавочке', s.benchDurationMs);
+    });
+  }
+  private updateNewObjects(dt: number) {
+    for (const scooter of this.scooters) {
+      if (!scooter.launched && scooter.spawnX - this.tanya.x < 650) {
+        scooter.launched = true;
+        scooter.sprite.setVelocityX(-s.scooterSpeed);
+      }
+      if (scooter.sprite.x < 0) scooter.sprite.setVelocityX(0).setVisible(false);
+    }
+    for (const flock of this.pigeons) {
+      if (!flock.flying && Math.abs(flock.sprite.x - this.tanya.x) < s.pigeonTriggerDistance) {
+        flock.flying = true;
+        flock.dangerRemaining = .45;
+        // Сначала вспархивают низко: без прыжка можно задеть стаю.
+        flock.sprite.setVelocity(35, -35);
+        this.tweens.add({ targets: flock.sprite, angle: 12, yoyo: true, repeat: 2, duration: 70 });
+      }
+      if (flock.flying) {
+        flock.dangerRemaining = Math.max(0, flock.dangerRemaining - dt);
+        if (flock.dangerRemaining === 0) {
+          (flock.sprite.body as Phaser.Physics.Arcade.Body).checkCollision.none = true;
+          flock.sprite.setVelocity(65, -260);
+        }
+      }
+    }
   }
   private resize() {
     this.cameras.main.setOrigin(0, 0);
@@ -249,7 +346,30 @@ class PlayScene extends Phaser.Scene {
     g.fillTriangle(14, 9, 15, 0, 24, 9).fillTriangle(29, 9, 40, 0, 40, 14);
     g.lineStyle(6, 0xd29a59).lineBetween(10, 34, 2, 20);
     g.fillStyle(0x4b483a).fillCircle(23, 15, 2).fillCircle(33, 15, 2);
-    g.generateTexture('cat', 48, 46);
+    g.generateTexture('cat', 48, 46).clear();
+    g.fillStyle(0xf0d2ac).fillCircle(20, 25, 10);
+    g.fillStyle(0x705745).fillRect(10, 15, 20, 6);
+    g.fillStyle(0x446b55).fillRoundedRect(8, 33, 23, 15, 4);
+    g.fillStyle(0x29483e).fillRect(23, 44, 17, 7);
+    g.generateTexture('tanya-sitting', 40, 56).clear();
+    g.fillStyle(0xb99c70).fillRoundedRect(2, 2, 32, 36, 4);
+    g.fillStyle(0xefe4ce).fillRect(5, 12, 26, 16);
+    g.fillStyle(0x705745).fillCircle(18, 19, 6);
+    g.generateTexture('food', 36, 40).clear();
+    g.fillStyle(0x788c7b).fillRect(2, 7, 86, 12).fillRect(2, 24, 86, 8);
+    g.fillStyle(0x51665d).fillRect(12, 32, 7, 12).fillRect(70, 32, 7, 12);
+    g.generateTexture('bench', 90, 44).clear();
+    g.lineStyle(4, 0x51665d).lineBetween(10, 44, 59, 44).lineBetween(53, 44, 53, 9).lineBetween(43, 9, 62, 9);
+    g.fillStyle(0x40584c).fillCircle(12, 50, 6).fillCircle(58, 50, 6);
+    g.fillStyle(0x977d99).fillRoundedRect(28, 15, 16, 22, 3);
+    g.fillStyle(0xe9cfae).fillCircle(36, 8, 7);
+    g.generateTexture('scooter', 68, 56).clear();
+    for (const x of [10, 32, 54]) {
+      g.fillStyle(0x91a1a0).fillEllipse(x, 21, 18, 16).fillCircle(x + 5, 12, 6);
+      g.fillStyle(0x40584c).fillCircle(x + 7, 11, 1);
+      g.lineStyle(2, 0x51665d).lineBetween(x - 3, 27, x - 3, 32);
+    }
+    g.generateTexture('pigeons', 68, 34);
     g.destroy();
   }
 }
