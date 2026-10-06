@@ -32,8 +32,7 @@ class PlayScene extends Phaser.Scene {
   private lastGround = -Infinity;
   private bufferedJump = -Infinity;
   private hitUntil = 0;
-  private knockbackUntil = 0;
-  private idleSince = 0;
+  private exhaustedUntil = 0;
   private finished = false;
   private wasPortrait = false;
   constructor() { super('play'); }
@@ -43,8 +42,7 @@ class PlayScene extends Phaser.Scene {
     this.exhausted = false;
     this.checkpoint = 100;
     this.lastGround = this.bufferedJump = -Infinity;
-    this.hitUntil = this.knockbackUntil = 0;
-    this.idleSince = this.time.now;
+    this.hitUntil = this.exhaustedUntil = 0;
     this.finished = this.wasPortrait = false;
     this.grannies = [];
     ending.hidden = true;
@@ -63,8 +61,9 @@ class PlayScene extends Phaser.Scene {
       scenery.fillRoundedRect(x + 320, 350, 95, 90, 8);
     }
     const ground = this.physics.add.staticGroup();
-    const slab = (x: number, y: number, width: number, height: number) => {
-      ground.add(this.add.rectangle(x + width / 2, y + height / 2, width, height, 0x788c7b));
+    const obstacles = this.physics.add.staticGroup();
+    const slab = (x: number, y: number, width: number, height: number, group = ground) => {
+      group.add(this.add.rectangle(x + width / 2, y + height / 2, width, height, 0x788c7b));
       this.add.rectangle(x + width / 2, y + 4, width, 8, 0x96aa8c);
     };
     let start = 0;
@@ -74,14 +73,25 @@ class PlayScene extends Phaser.Scene {
       this.sign(gap.start - 130, 'Прыгни →');
     }
     slab(start, s.floorY, s.levelWidth - start, 180);
-    s.obstacles.forEach((x, i) => slab(x, s.floorY - (i % 3 === 0 ? 48 : 34), 42, i % 3 === 0 ? 48 : 34));
+    s.obstacles.forEach((x, i) => slab(x, s.floorY - (i % 3 === 0 ? 48 : 34), 42, i % 3 === 0 ? 48 : 34, obstacles));
     this.sign(170, 'Котик ждёт →');
-    this.sign(6100, 'Можно выдохнуть');
+    this.sign(6100, 'Тап — прыжок');
     this.sign(13100, 'Ещё немного →');
     this.tanya = this.physics.add.sprite(100, s.floorY - 25, 'tanya');
     this.tanya.setSize(26, 48).setOffset(7, 4).setMaxVelocity(500, 700);
     this.physics.add.collider(this.tanya, ground);
-    this.keys = this.input.keyboard!.addKeys('A,D,LEFT,RIGHT,SPACE,UP') as typeof this.keys;
+    // Платформы поддерживают сверху; удар сбоку не блокирует auto-run.
+    this.physics.add.collider(this.tanya, obstacles, undefined, (_player, block) => {
+      const body = this.tanya.body as Phaser.Physics.Arcade.Body;
+      const obstacle = (block as Phaser.GameObjects.Rectangle).body as Phaser.Physics.Arcade.StaticBody;
+      return body.velocity.y >= 0 && body.bottom <= obstacle.top + 12;
+    });
+    this.physics.add.overlap(this.tanya, obstacles, (_player, block) => {
+      const body = this.tanya.body as Phaser.Physics.Arcade.Body;
+      const obstacle = (block as Phaser.GameObjects.Rectangle).body as Phaser.Physics.Arcade.StaticBody;
+      if (body.bottom > obstacle.top + 12) this.hit(s.obstacleDamage);
+    });
+    this.keys = this.input.keyboard!.addKeys('SPACE,UP') as typeof this.keys;
     this.input.keyboard!.on('keydown', hideHint);
     this.events.once('shutdown', () => this.input.keyboard!.off('keydown', hideHint));
     const bottles = this.physics.add.staticGroup();
@@ -102,7 +112,7 @@ class PlayScene extends Phaser.Scene {
       const sprite = this.physics.add.sprite(range.left, s.floorY - 27, 'granny');
       sprite.setSize(48, 44).setOffset(10, 12).setVelocityX(s.grannySpeed);
       this.physics.add.collider(sprite, ground);
-      this.physics.add.overlap(this.tanya, sprite, () => this.hit(sprite));
+      this.physics.add.overlap(this.tanya, sprite, () => this.hit(s.grannyDamage));
       this.grannies.push({ sprite, ...range });
     }
     const catX = s.levelWidth - 150;
@@ -131,27 +141,17 @@ class PlayScene extends Phaser.Scene {
     const body = this.tanya.body as Phaser.Physics.Arcade.Body;
     const grounded = body.blocked.down || body.touching.down;
     if (grounded) this.lastGround = now;
-    const keyboardAxis = Number(this.keys.D.isDown || this.keys.RIGHT.isDown) - Number(this.keys.A.isDown || this.keys.LEFT.isDown);
-    const axis = keyboardAxis || controls.axis;
     // Прочитать все запросы, чтобы JustDown не оставался от предыдущего кадра.
     const space = Phaser.Input.Keyboard.JustDown(this.keys.SPACE);
     const up = Phaser.Input.Keyboard.JustDown(this.keys.UP);
     const touch = controls.consumeJump();
     if (space || up || touch) this.bufferedJump = now;
-    if (now >= this.knockbackUntil) {
-      this.tanya.setVelocityX(axis * (this.exhausted ? s.tiredSpeed : s.speed));
-      if (axis) this.tanya.setFlipX(axis < 0);
-    }
-    if (now - this.bufferedJump <= s.jumpBufferMs && now - this.lastGround <= s.coyoteMs && !this.exhausted && this.energy > 0 && now >= this.knockbackUntil) {
+    if (this.exhausted && now >= this.exhaustedUntil) this.changeEnergy(s.recoveryEnergy);
+    this.tanya.setVelocityX(this.exhausted ? s.tiredSpeed : s.speed).setFlipX(false);
+    if (now - this.bufferedJump <= s.jumpBufferMs && now - this.lastGround <= s.coyoteMs) {
       this.tanya.setVelocityY(-s.jumpVelocity);
       this.bufferedJump = this.lastGround = -Infinity;
-      this.changeEnergy(-s.jumpEnergy);
-      this.idleSince = now;
     }
-    if (Math.abs(body.velocity.x) > 2 || !grounded) {
-      if (Math.abs(body.velocity.x) > 2) this.changeEnergy(-s.walkEnergyPerSecond * dt);
-      this.idleSince = now;
-    } else if (now - this.idleSince > s.restDelayMs) this.changeEnergy(s.restEnergyPerSecond * dt);
     this.tanya.setAlpha(now < this.hitUntil ? (Math.floor(now / 100) % 2 ? .45 : 1) : 1);
     for (const granny of this.grannies) {
       if (granny.sprite.x >= granny.right) granny.sprite.setVelocityX(-s.grannySpeed).setFlipX(true);
@@ -174,24 +174,22 @@ class PlayScene extends Phaser.Scene {
     this.energy = Phaser.Math.Clamp(this.energy + amount, 0, 100);
     if (this.energy === 0 && !this.exhausted) {
       this.exhausted = true;
-      message('Таня устала. Остановись и отдохни', 3500);
+      this.exhaustedUntil = this.time.now + s.exhaustedDurationMs;
+      message('Таня устала — скоро восстановится', 2500);
     }
-    if (this.exhausted && this.energy >= 12) {
+    if (this.exhausted && this.energy > 0) {
       this.exhausted = false;
-      message('Можно идти и прыгать!', 1400);
+      message('Снова бежим быстро!', 1400);
     }
   }
-  private hit(granny: Phaser.Physics.Arcade.Sprite) {
+  private hit(damage: number) {
     if (this.finished || this.time.now < this.hitUntil) return;
     this.hitUntil = this.time.now + s.hitCooldownMs;
-    this.knockbackUntil = this.time.now + 300;
-    this.tanya.setVelocity(this.tanya.x < granny.x ? -s.knockbackSpeed : s.knockbackSpeed, -150);
-    this.changeEnergy(-s.grannyDamage);
-    if (!this.exhausted) message(`Ой! −${s.grannyDamage} энергии`, 1000);
+    this.changeEnergy(-damage);
+    if (!this.exhausted) message(`Ой! −${damage} энергии`, 1000);
   }
   private respawn() {
     this.tanya.setPosition(this.checkpoint, s.floorY - 26).setVelocity(0, 0);
-    this.knockbackUntil = 0;
     this.hitUntil = this.time.now + 800;
     this.lastGround = this.bufferedJump = -Infinity;
     controls.reset();
