@@ -15,9 +15,25 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Verify GitHub Pages is enabled
+        uses: actions/configure-pages@v5
+        with:
+          enablement: false
+      - name: Verify Pages uses GitHub Actions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          source_type="$(gh api "repos/${GITHUB_REPOSITORY}/pages" --jq '.build_type')"
+          if [ "$source_type" != "workflow" ]; then
+            echo "::error::Pages must use GitHub Actions. Open Settings > Pages > Build and deployment > Source and select GitHub Actions."
+            exit 1
+          fi
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
