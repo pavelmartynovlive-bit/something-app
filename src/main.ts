@@ -1,0 +1,280 @@
+import Phaser from 'phaser';
+import { settings as s } from './settings';
+import { TouchControls } from './controls';
+import './style.css';
+import './pwa';
+
+const element = <T extends HTMLElement>(id: string) => document.querySelector<T>(id)!;
+const hudValue = element('#energy-value');
+const hudFill = element('#energy-fill');
+const energyTrack = element('.energy-track');
+const hint = element('#hint');
+const toast = element('#toast');
+const ending = element('#ending');
+const installDialog = element<HTMLDialogElement>('#install-dialog');
+let toastTimer: ReturnType<typeof setTimeout>;
+let controls: TouchControls;
+const hideHint = () => { hint.hidden = true; };
+function message(text: string, duration = 1800) {
+  clearTimeout(toastTimer);
+  toast.textContent = text;
+  toast.classList.add('visible');
+  toastTimer = setTimeout(() => toast.classList.remove('visible'), duration);
+}
+
+class PlayScene extends Phaser.Scene {
+  private tanya!: Phaser.Physics.Arcade.Sprite;
+  private keys!: Record<string, Phaser.Input.Keyboard.Key>;
+  private grannies: { sprite: Phaser.Physics.Arcade.Sprite; left: number; right: number }[] = [];
+  private energy = 100;
+  private exhausted = false;
+  private checkpoint = 100;
+  private lastGround = -Infinity;
+  private bufferedJump = -Infinity;
+  private hitUntil = 0;
+  private knockbackUntil = 0;
+  private idleSince = 0;
+  private finished = false;
+  private wasPortrait = false;
+  constructor() { super('play'); }
+
+  create() {
+    this.energy = 100;
+    this.exhausted = false;
+    this.checkpoint = 100;
+    this.lastGround = this.bufferedJump = -Infinity;
+    this.hitUntil = this.knockbackUntil = 0;
+    this.idleSince = this.time.now;
+    this.finished = this.wasPortrait = false;
+    this.grannies = [];
+    ending.hidden = true;
+    toast.classList.remove('visible');
+    clearTimeout(toastTimer);
+    controls?.reset();
+    this.makeTextures();
+    this.cameras.main.setBackgroundColor('#c7dfcf');
+    this.resize();
+    this.scale.on('resize', this.resize, this);
+    this.events.once('shutdown', () => this.scale.off('resize', this.resize, this));
+    const scenery = this.add.graphics();
+    scenery.fillStyle(0xb6cfbe);
+    for (let x = 0; x < s.levelWidth; x += 500) {
+      scenery.fillRoundedRect(x + 140, 305, 140, 135, 10);
+      scenery.fillRoundedRect(x + 320, 350, 95, 90, 8);
+    }
+    const ground = this.physics.add.staticGroup();
+    const slab = (x: number, y: number, width: number, height: number) => {
+      ground.add(this.add.rectangle(x + width / 2, y + height / 2, width, height, 0x788c7b));
+      this.add.rectangle(x + width / 2, y + 4, width, 8, 0x96aa8c);
+    };
+    let start = 0;
+    for (const gap of s.gaps) {
+      slab(start, s.floorY, gap.start - start, 180);
+      start = gap.start + gap.width;
+      this.sign(gap.start - 130, 'Прыгни →');
+    }
+    slab(start, s.floorY, s.levelWidth - start, 180);
+    s.obstacles.forEach((x, i) => slab(x, s.floorY - (i % 3 === 0 ? 48 : 34), 42, i % 3 === 0 ? 48 : 34));
+    this.sign(170, 'Котик ждёт →');
+    this.sign(6100, 'Можно выдохнуть');
+    this.sign(13100, 'Ещё немного →');
+    this.tanya = this.physics.add.sprite(100, s.floorY - 25, 'tanya');
+    this.tanya.setSize(26, 48).setOffset(7, 4).setMaxVelocity(500, 700);
+    this.physics.add.collider(this.tanya, ground);
+    this.keys = this.input.keyboard!.addKeys('A,D,LEFT,RIGHT,SPACE,UP') as typeof this.keys;
+    this.input.keyboard!.on('keydown', hideHint);
+    this.events.once('shutdown', () => this.input.keyboard!.off('keydown', hideHint));
+    const bottles = this.physics.add.staticGroup();
+    s.bottles.forEach(x => {
+      const bottle = bottles.create(x, s.floorY - 26, 'lipton') as Phaser.Physics.Arcade.Sprite;
+      bottle.setSize(42, 52);
+    });
+    this.physics.add.overlap(this.tanya, bottles, (_player, item) => {
+      if (this.finished) return;
+      const bottle = item as Phaser.Physics.Arcade.Sprite;
+      const label = this.add.text(bottle.x, bottle.y - 25, `+${s.liptonEnergy}`, { fontSize: '22px', color: '#326544', fontStyle: 'bold' }).setOrigin(.5);
+      bottle.destroy();
+      this.changeEnergy(s.liptonEnergy);
+      this.tweens.add({ targets: label, y: label.y - 45, alpha: 0, duration: 850, onComplete: () => label.destroy() });
+      message(`Lipton! +${s.liptonEnergy} энергии`, 1200);
+    });
+    for (const range of s.grannies) {
+      const sprite = this.physics.add.sprite(range.left, s.floorY - 27, 'granny');
+      sprite.setSize(48, 44).setOffset(10, 12).setVelocityX(s.grannySpeed);
+      this.physics.add.collider(sprite, ground);
+      this.physics.add.overlap(this.tanya, sprite, () => this.hit(sprite));
+      this.grannies.push({ sprite, ...range });
+    }
+    const catX = s.levelWidth - 150;
+    this.add.image(catX, s.floorY - 22, 'cat');
+    this.add.text(catX, s.floorY - 75, 'Мяу…', { fontSize: '22px', color: '#29483e' }).setOrigin(.5);
+    this.sign(catX - 260, 'Покорми котика');
+    if (!controls) controls = new TouchControls(this.game.canvas, hideHint);
+    this.updateHud();
+  }
+
+  update(_time: number, delta: number) {
+    const now = this.time.now;
+    const portrait = window.matchMedia('(pointer: coarse)').matches && window.innerHeight > window.innerWidth;
+    if (portrait || document.hidden || installDialog.open) {
+      this.physics.pause();
+      controls.reset();
+      this.wasPortrait = true;
+      return;
+    }
+    if (this.wasPortrait && !this.finished) {
+      this.physics.resume();
+      this.wasPortrait = false;
+    }
+    if (this.finished) return;
+    const dt = Math.min(delta, 50) / 1000;
+    const body = this.tanya.body as Phaser.Physics.Arcade.Body;
+    const grounded = body.blocked.down || body.touching.down;
+    if (grounded) this.lastGround = now;
+    const keyboardAxis = Number(this.keys.D.isDown || this.keys.RIGHT.isDown) - Number(this.keys.A.isDown || this.keys.LEFT.isDown);
+    const axis = keyboardAxis || controls.axis;
+    // Прочитать все запросы, чтобы JustDown не оставался от предыдущего кадра.
+    const space = Phaser.Input.Keyboard.JustDown(this.keys.SPACE);
+    const up = Phaser.Input.Keyboard.JustDown(this.keys.UP);
+    const touch = controls.consumeJump();
+    if (space || up || touch) this.bufferedJump = now;
+    if (now >= this.knockbackUntil) {
+      this.tanya.setVelocityX(axis * (this.exhausted ? s.tiredSpeed : s.speed));
+      if (axis) this.tanya.setFlipX(axis < 0);
+    }
+    if (now - this.bufferedJump <= s.jumpBufferMs && now - this.lastGround <= s.coyoteMs && !this.exhausted && this.energy > 0 && now >= this.knockbackUntil) {
+      this.tanya.setVelocityY(-s.jumpVelocity);
+      this.bufferedJump = this.lastGround = -Infinity;
+      this.changeEnergy(-s.jumpEnergy);
+      this.idleSince = now;
+    }
+    if (Math.abs(body.velocity.x) > 2 || !grounded) {
+      if (Math.abs(body.velocity.x) > 2) this.changeEnergy(-s.walkEnergyPerSecond * dt);
+      this.idleSince = now;
+    } else if (now - this.idleSince > s.restDelayMs) this.changeEnergy(s.restEnergyPerSecond * dt);
+    this.tanya.setAlpha(now < this.hitUntil ? (Math.floor(now / 100) % 2 ? .45 : 1) : 1);
+    for (const granny of this.grannies) {
+      if (granny.sprite.x >= granny.right) granny.sprite.setVelocityX(-s.grannySpeed).setFlipX(true);
+      if (granny.sprite.x <= granny.left) granny.sprite.setVelocityX(s.grannySpeed).setFlipX(false);
+    }
+    if (grounded && Math.abs(body.bottom - s.floorY) < 3) {
+      for (const cp of s.checkpoints) if (this.tanya.x >= cp) this.checkpoint = Math.max(this.checkpoint, cp);
+    }
+    if (this.tanya.y > 620) this.respawn();
+    if (this.tanya.x < 16) this.tanya.x = 16;
+    const camera = this.cameras.main;
+    const viewWidth = camera.width / camera.zoom;
+    const target = Phaser.Math.Clamp(this.tanya.x - viewWidth * .35, 0, Math.max(0, s.levelWidth - viewWidth));
+    camera.scrollX = Phaser.Math.Linear(camera.scrollX, target, 1 - Math.exp(-dt * 5));
+    element('#distance').textContent = `${Math.min(100, Math.round(this.tanya.x / (s.levelWidth - 150) * 100))}% пути`;
+    this.updateHud();
+    if (Math.abs(this.tanya.x - (s.levelWidth - 150)) < 80 && grounded) this.feedCat();
+  }
+  private changeEnergy(amount: number) {
+    this.energy = Phaser.Math.Clamp(this.energy + amount, 0, 100);
+    if (this.energy === 0 && !this.exhausted) {
+      this.exhausted = true;
+      message('Таня устала. Остановись и отдохни', 3500);
+    }
+    if (this.exhausted && this.energy >= 12) {
+      this.exhausted = false;
+      message('Можно идти и прыгать!', 1400);
+    }
+  }
+  private hit(granny: Phaser.Physics.Arcade.Sprite) {
+    if (this.finished || this.time.now < this.hitUntil) return;
+    this.hitUntil = this.time.now + s.hitCooldownMs;
+    this.knockbackUntil = this.time.now + 300;
+    this.tanya.setVelocity(this.tanya.x < granny.x ? -s.knockbackSpeed : s.knockbackSpeed, -150);
+    this.changeEnergy(-s.grannyDamage);
+    if (!this.exhausted) message(`Ой! −${s.grannyDamage} энергии`, 1000);
+  }
+  private respawn() {
+    this.tanya.setPosition(this.checkpoint, s.floorY - 26).setVelocity(0, 0);
+    this.knockbackUntil = 0;
+    this.hitUntil = this.time.now + 800;
+    this.lastGround = this.bufferedJump = -Infinity;
+    controls.reset();
+    message('Вернулись на безопасное место', 1500);
+    this.cameras.main.scrollX = Math.max(0, this.checkpoint - this.cameras.main.width / this.cameras.main.zoom * .35);
+  }
+  private feedCat() {
+    this.finished = true;
+    this.tanya.setVelocity(0, 0).setAlpha(1).setFlipX(false);
+    controls.reset();
+    this.physics.pause();
+    this.add.rectangle(s.levelWidth - 195, s.floorY - 7, 22, 10, 0xe5b83d);
+    message('Таня покормила котика', 1800);
+    this.time.delayedCall(1600, () => { ending.hidden = false; });
+  }
+  private updateHud() {
+    hudValue.textContent = `${Math.ceil(this.energy)}`;
+    hudFill.style.width = `${this.energy}%`;
+    hudFill.style.background = this.exhausted ? '#bd745b' : '#568968';
+    energyTrack.setAttribute('aria-valuenow', `${Math.ceil(this.energy)}`);
+  }
+  private resize() {
+    this.cameras.main.setOrigin(0, 0);
+    this.cameras.main.setZoom(this.scale.height / 540);
+    this.cameras.main.scrollY = 0;
+    controls?.reset();
+  }
+  private sign(x: number, text: string) {
+    this.add.rectangle(x, s.floorY - 30, 4, 60, 0x788c7b);
+    this.add.text(x, s.floorY - 70, text, { fontSize: '17px', color: '#3c594b', backgroundColor: '#eef3df', padding: { x: 10, y: 7 } }).setOrigin(.5);
+  }
+  private makeTextures() {
+    if (this.textures.exists('tanya')) return;
+    const g = this.add.graphics();
+    g.fillStyle(0x446b55).fillRoundedRect(8, 21, 24, 25, 5);
+    g.fillStyle(0xf0d2ac).fillCircle(20, 13, 10);
+    g.fillStyle(0x705745).fillRect(10, 3, 20, 6);
+    g.fillStyle(0x29483e).fillRect(9, 44, 8, 10).fillRect(23, 44, 8, 10).fillCircle(25, 13, 2);
+    g.generateTexture('tanya', 40, 56).clear();
+    g.fillStyle(0x977d99).fillRoundedRect(5, 20, 25, 29, 6);
+    g.fillStyle(0xe9cfae).fillCircle(17, 13, 10);
+    g.fillStyle(0xf5f0e5).fillRect(6, 3, 23, 8);
+    g.fillStyle(0x91a1a0).fillRoundedRect(34, 28, 30, 20, 3);
+    g.lineStyle(3, 0x51665d).lineBetween(28, 23, 38, 33);
+    g.fillStyle(0x40584c).fillCircle(39, 52, 4).fillCircle(59, 52, 4);
+    g.generateTexture('granny', 68, 58).clear();
+    g.fillStyle(0xe8b93b).fillRoundedRect(2, 8, 38, 42, 5);
+    g.fillStyle(0x698849).fillRect(14, 0, 14, 10);
+    g.fillStyle(0xfff1b5).fillRect(4, 22, 34, 15);
+    g.generateTexture('bottle-base', 42, 52).clear();
+    const bottle = this.textures.createCanvas('lipton', 42, 52)!;
+    const ctx = bottle.getContext();
+    ctx.drawImage(this.textures.get('bottle-base').getSourceImage() as HTMLCanvasElement, 0, 0);
+    ctx.fillStyle = '#645024'; ctx.font = 'bold 9px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('LIPTON', 21, 33);
+    bottle.refresh();
+    g.fillStyle(0xd29a59).fillRoundedRect(9, 20, 32, 24, 8).fillCircle(27, 16, 14);
+    g.fillTriangle(14, 9, 15, 0, 24, 9).fillTriangle(29, 9, 40, 0, 40, 14);
+    g.lineStyle(6, 0xd29a59).lineBetween(10, 34, 2, 20);
+    g.fillStyle(0x4b483a).fillCircle(23, 15, 2).fillCircle(33, 15, 2);
+    g.generateTexture('cat', 48, 46);
+    g.destroy();
+  }
+}
+
+export const game = new Phaser.Game({
+  type: Phaser.AUTO,
+  parent: 'game',
+  backgroundColor: '#c7dfcf',
+  scale: { mode: Phaser.Scale.RESIZE, width: '100%', height: '100%' },
+  physics: { default: 'arcade', arcade: { gravity: { x: 0, y: s.gravity }, debug: false } },
+  input: { activePointers: 3, keyboard: true },
+  scene: PlayScene,
+  render: { antialias: true },
+});
+// dvh меняется и при скрытии панели браузера. Наблюдаем контейнер, а не
+// только window.resize: это также устраняет задержку размера при повороте.
+new ResizeObserver(() => {
+  if (!game.isBooted) return;
+  game.scale.getParentBounds();
+  game.scale.refresh();
+}).observe(element('#game'));
+setTimeout(hideHint, 2800);
+element<HTMLButtonElement>('#replay').addEventListener('click', () => {
+  controls.reset();
+  game.scene.start('play');
+});

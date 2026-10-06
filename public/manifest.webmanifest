@@ -1,0 +1,17 @@
+{
+  "id": "./",
+  "name": "Таня и голодный кот",
+  "short_name": "Таня и кот",
+  "description": "Перепрыгни препятствия, собери Lipton и покорми котика.",
+  "lang": "ru",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#c7dfcf",
+  "theme_color": "#c7dfcf",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
