@@ -83,8 +83,9 @@ class PlayScene extends Phaser.Scene {
     slab(start, s.floorY, s.levelWidth - start, 180);
     s.obstacles.forEach((x, i) => slab(x, s.floorY - (i % 3 === 0 ? 48 : 34), 42, i % 3 === 0 ? 48 : 34, obstacles));
     this.sign(170, 'Котик ждёт →');
-    this.sign(4100, 'Прыжками — наверх ↑');
-    this.sign(5900, 'Нижний путь →');
+    this.sign(1510, 'Прыжками — наверх ↑');
+    this.sign(3710, 'Ещё один верхний путь ↑');
+    this.sign(2350, 'Лавочка снизу →');
     for (const platform of s.routePlatforms) {
       slab(platform.x, platform.y, platform.width, 18, upperRoute);
       const body = (upperRoute.getChildren().at(-1) as Phaser.GameObjects.Rectangle).body as Phaser.Physics.Arcade.StaticBody;
@@ -92,7 +93,7 @@ class PlayScene extends Phaser.Scene {
       body.checkCollision.left = body.checkCollision.right = body.checkCollision.down = false;
       if (platform.label) this.add.text(platform.x + 22, platform.y - 28, platform.label, { fontSize: '15px', color: '#3c594b' });
     }
-    this.sign(13100, 'Ещё немного →');
+    this.sign(6000, 'Ещё немного →');
     this.tanya = this.physics.add.sprite(100, s.floorY - 25, 'tanya');
     this.tanya.setSize(26, 48).setOffset(7, 4).setMaxVelocity(500, 700);
     this.physics.add.collider(this.tanya, ground);
@@ -238,7 +239,7 @@ class PlayScene extends Phaser.Scene {
   private feedCat() {
     const success = this.foodCount >= s.requiredFood;
     element('#end-title').textContent = success ? 'Котик спасён ❤️' : 'Нужно ещё немного корма';
-    element('#end-description').textContent = success ? 'Таня дошла. Котик поел. Всё получилось.' : `Собрано ${this.foodCount}/5. Котику нужно минимум ${s.requiredFood} пакетика — попробуй ещё раз.`;
+    element('#end-description').textContent = success ? 'Таня дошла. Котик поел. Всё получилось.' : `Собрано ${this.foodCount}/${s.food.length}. Котику нужно минимум ${s.requiredFood} пакетика — попробуй ещё раз.`;
     this.finished = true;
     this.tanya.setVelocity(0, 0).setAlpha(1).setFlipX(false);
     controls.reset();
@@ -248,7 +249,7 @@ class PlayScene extends Phaser.Scene {
     this.time.delayedCall(1600, () => { ending.hidden = false; });
   }
   private updateHud() {
-    element('#food-count').textContent = `Корм ${this.foodCount}/5`;
+    element('#food-count').textContent = `Корм ${this.foodCount}/${s.food.length}`;
     hudValue.textContent = `${Math.ceil(this.energy)}`;
     hudFill.style.width = `${this.energy}%`;
     hudFill.style.background = this.exhausted ? '#bd745b' : '#568968';
