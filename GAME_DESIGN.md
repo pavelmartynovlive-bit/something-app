@@ -1029,6 +1029,17 @@ If more vertical control is explored later, the preferred candidate is:
 This is only a future candidate.
 It is NOT approved for the current level-design iteration and must not be implemented unless explicitly requested.
 
+### 20.1 Variable jump height / double-tap status
+
+Do not copy a press-and-hold jump-height mechanic.
+
+If more vertical control is explored later, the preferred candidate is:
+- first tap = normal jump;
+- second tap during the early part of the jump = additional upward boost.
+
+This is only a future candidate.
+It is NOT approved for the current level-design iteration and must not be implemented unless explicitly requested.
+
 ---
 
 ## 21. Level-design workflow
