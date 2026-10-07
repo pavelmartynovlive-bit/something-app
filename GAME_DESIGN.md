@@ -20,7 +20,11 @@ Project-specific interpretation:
 - the player should understand what the game is asking before they commit;
 - optional challenge should add depth without blocking progress;
 - collectibles must communicate movement, not merely fill space;
-- level geometry must be authored intentionally, not generated as repeated platform templates.
+- level geometry must be authored intentionally, not generated as repeated platform templates;
+- the main game is ground-first: the ground route is the gameplay spine, not merely the fallback beneath platforms;
+- upper geometry is usually a short gameplay accent or bonus detour, not a parallel highway;
+- terrain shape, hazards and collectible trajectories should create rhythm together;
+- visual/platform variety is not enough: the player's action grammar must also change.
 
 ---
 
@@ -317,7 +321,18 @@ Prefer small, readable patterns such as:
 - a staircase upward;
 - a short line leading to Lipton;
 - a reward burst after a challenge;
-- a richer cluster on an optional upper path.
+- a richer cluster on an optional upper path;
+- a descending arc that communicates a safe return to ground;
+- two visibly different trajectories when the player is making a real route choice.
+
+Treat food placement as movement notation.
+
+A good food pattern should help the player understand:
+- when to jump;
+- roughly how high the intended arc should be;
+- where a safe landing is;
+- whether a short bonus route is worth taking;
+- when the route returns to ground.
 
 A typical cluster may contain around 3–6 food items.
 
@@ -446,6 +461,51 @@ Examples:
 
 The player should feel a meaningful change in gameplay roughly every 10–15 seconds.
 
+### 9.3 Ground-first level grammar
+
+The ground route is the default gameplay spine.
+
+Most moment-to-moment play should happen through combinations of:
+- changing ground height;
+- short gaps or interruptions;
+- hazards;
+- collectible trajectories;
+- short optional upper detours;
+- recovery decisions.
+
+Do not build large parts of the level as:
+ground below + long safe platform highway above.
+
+A typical useful phrase is closer to:
+
+ground → hazard → short upper bonus → return to ground → terrain change → moving hazard → collectible arc
+
+than:
+
+platform → platform → platform → descend → repeat.
+
+Upper geometry should normally last only long enough to create one compact challenge or reward beat before reconnecting with the main flow.
+
+### 9.4 Terrain creates rhythm
+
+Do not rely on floating platforms as the main source of level variation.
+
+Use the playable ground itself to change movement:
+- small rises and drops;
+- short ledges;
+- shallow stepped height changes;
+- short gaps when fail-forward behavior remains appropriate;
+- local high/low terrain;
+- brief slopes or ramps if supported cleanly by the movement system.
+
+Terrain variation should change the timing or anticipation of the next action.
+
+Avoid long flat streets unless the flatness has a deliberate purpose such as:
+- reading an approaching scooter;
+- a recovery beat;
+- a clear final approach;
+- a setup for a new mechanic.
+
 ---
 
 ## 10. Four-step development of an idea
@@ -526,7 +586,9 @@ Two sections may use the same object but should not ask the player to perform th
 Avoid:
 - platform → food → pigeons → Lipton repeated many times;
 - repeated canopy shapes with only object positions changed;
-- identical food arcs repeated section after section.
+- identical food arcs repeated section after section;
+- box → box → climb → climb → descend → descend as a recurring phrase;
+- repeated long upper routes that bypass most hazards.
 
 Reusable code primitives are good.
 Repeated level compositions are not.
@@ -617,8 +679,25 @@ Usually:
 Usually:
 - harder;
 - more food;
-- Lipton or another bonus;
-- requires better timing.
+- may contain Lipton or another bonus when the added reward is justified;
+- requires better timing;
+- is short and local rather than a long parallel highway;
+- reconnects with the main ground flow quickly.
+
+A route must never be simultaneously:
+- safer;
+- easier;
+- and more rewarding
+
+than the alternative.
+
+Upper routes should not remove most of the game's hazards for long stretches.
+If the upper route gives stronger rewards, it should carry its own challenge through existing mechanics, for example:
+- tighter jump timing;
+- shorter landing windows;
+- pigeons or another existing hazard on the upper surface;
+- a gap or drop;
+- risk of falling safely back to the lower route and losing the optional reward.
 
 Route choices must be visible before the commitment point.
 
@@ -869,17 +948,18 @@ Use:
 Goal:
 - make energy affect a decision rather than merely the HUD.
 
-### Section 6 — Vertical route
+### Section 6 — Short vertical accent
 Dominant idea:
-- climb / descend.
+- one compact change of height inside a ground-first level.
 
 Use:
-- short platform chain;
+- a short platform or terrain sequence;
 - collectible path as guidance;
-- safe fall to lower route.
+- one meaningful upper challenge or reward;
+- safe return to the ground route.
 
 Goal:
-- change the level silhouette and movement pattern.
+- change the level silhouette and movement pattern without creating a long parallel upper highway.
 
 ### Section 7 — Combined challenge
 Dominant idea:
@@ -938,6 +1018,17 @@ Do not add:
 
 unless explicitly requested.
 
+### 20.1 Variable jump height / double-tap status
+
+Do not copy Super Mario Run's press-and-hold jump-height mechanic.
+
+If more vertical control is explored later, the preferred candidate is:
+- first tap = normal jump;
+- second tap during the early part of the jump = additional upward boost.
+
+This is only a future candidate.
+It is NOT approved for the current level-design iteration and must not be implemented unless explicitly requested.
+
 ---
 
 ## 21. Level-design workflow
@@ -977,11 +1068,15 @@ Check:
 1. Is there a clear 6–8 section structure?
 2. Does each section have a different dominant idea or spatial pattern?
 3. Is the main route readable?
-4. Are optional routes visible before commitment?
-5. Are food trails trustworthy?
-6. Is recovery placed intentionally?
-7. Are there long autopilot stretches?
-8. Are any sections mechanically redundant?
+4. Is the level ground-first rather than built around repeated upper highways?
+5. Are optional upper routes short, purposeful and risky enough to justify their reward?
+6. Are optional routes visible before commitment?
+7. Are food trails trustworthy and do they describe movement rather than fill space?
+8. Is recovery placed intentionally?
+9. Are there long autopilot stretches?
+10. Are any sections mechanically redundant?
+11. Does the player's action grammar change, not just the object skin?
+12. Does each long flat stretch have a deliberate reason to exist?
 
 Only then modify the level.
 
@@ -1076,7 +1171,10 @@ After level changes, verify:
 
 ### Variety
 - the level is not the same platform / food / hazard pattern repeated with different spacing;
-- each section has its own dominant idea and silhouette.
+- each section has its own dominant idea and silhouette;
+- the ground profile changes meaningfully across the level;
+- upper routes are short accents rather than repeated parallel highways;
+- neighboring sections do not ask for the same finger rhythm with different objects.
 
 ### Scope
 - normal run remains approximately 60–90 seconds;
