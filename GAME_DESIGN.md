@@ -480,3 +480,95 @@ After implementation:
 5. verify the player rarely remains inactive for more than 2–3 seconds.
 
 This document is the source of truth for gameplay and level-design decisions unless the user explicitly overrides it.
+
+---
+
+## Level sections and mechanic rotation
+
+Do not build the level as one continuous sequence of similar platforms.
+
+Divide each level into 6–8 clearly differentiated gameplay sections.
+
+Each section must have:
+- one dominant gameplay idea;
+- a distinct rhythm;
+- a beginning and an end;
+- at least one memorable interaction.
+
+Example section types:
+- basic jump timing;
+- pigeons;
+- upper/lower route choice;
+- scooters;
+- fatigue/recovery decision;
+- vertical climb;
+- combined challenge;
+- final approach.
+
+Do not repeat the same section type back-to-back.
+
+A mechanic may return later only if:
+- combined with another mechanic;
+- used at a different height;
+- used under different energy pressure;
+- or presented with a new route choice.
+
+The player should feel a meaningful change in gameplay every 10–15 seconds.
+
+## Collectible density
+
+Cat food has two roles:
+1. gameplay reward and navigation;
+2. helping the level feel visually active and populated.
+
+Do not reduce collectible density so aggressively that large parts of the level feel visually empty.
+
+Prefer medium-density, intentional clusters rather than either extreme:
+- not one collectible every few seconds;
+- not continuous collectible spam across the whole level.
+
+A typical cluster may contain around 3–6 food items.
+
+Use several clusters throughout a section when appropriate, but give each cluster a clear spatial pattern or gameplay purpose.
+
+Each collectible cluster should help with one or more of the following:
+- show a jump arc;
+- visually connect two platforms;
+- guide the player upward or downward;
+- reward an upper route;
+- reward a difficult sequence;
+- draw attention toward Lipton or a recovery opportunity;
+- encourage a specific movement pattern;
+- make an otherwise sparse gameplay section feel visually alive.
+
+Food can also be used for rhythm:
+- a short line before a jump;
+- an arc during a jump;
+- a landing cluster;
+- a vertical staircase of collectibles;
+- a small reward burst after a challenge.
+
+Avoid:
+- very long uninterrupted rows on flat safe ground;
+- random isolated food with no relation to movement;
+- filling every empty space with collectibles;
+- sections where there is neither meaningful gameplay nor enough visual activity.
+
+Do not rely on food alone to solve visual emptiness.
+
+Visual density should also come from environment and level composition:
+- street props;
+- plants;
+- lamps;
+- signs;
+- benches;
+- fences;
+- buildings;
+- background details;
+- structural supports.
+
+The screen should feel populated even when the player is between collectible clusters.
+
+The goal is:
+meaningful collectible density + visually rich environment,
+not collectible spam.
