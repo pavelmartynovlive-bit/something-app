@@ -1,3 +1,5 @@
+Before making gameplay or level-design changes, read GAME_DESIGN.md.
+
 # Таня и голодный кот
 
 Одна мобильная сцена auto-runner на Phaser 3 + TypeScript + Vite, без backend, внешнего арта и сохранений. Таня бежит сама; игрок управляет только прыжками. Прохождение — примерно 45–50 секунд, события идут каждые 2–4 секунды на обычной скорости.
