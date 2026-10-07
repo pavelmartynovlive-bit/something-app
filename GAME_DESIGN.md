@@ -183,6 +183,29 @@ If practical, keep a debug visualization or documented values for:
 - horizontal reach;
 - tired-state reach.
 
+### 4.3 Metrics are outcomes, not arbitrary standards
+
+Do not invent spatial constants just because they look systematic.
+
+Do not introduce a fixed tile size, camera percentage, or other numeric "standard" unless it follows from the current game's actual movement, screen size, and playtest results.
+
+Useful metrics should be derived from the current build, for example:
+- Tanya's measured jump height;
+- normal-speed horizontal jump reach;
+- tired-state jump reach;
+- minimum comfortable landing width;
+- minimum pass-under clearance;
+- approximate player reaction time at the current run speed;
+- visible distance required to read a hazard before commitment.
+
+When a metric changes because movement speed, jump physics, viewport size, or fatigue behavior changes, re-measure it.
+
+Prefer:
+measured gameplay outcome → geometry rule
+
+over:
+arbitrary grid rule → forced geometry.
+
 ---
 
 ## 5. Energy system
@@ -546,6 +569,35 @@ When reviewing a build, identify:
 
 Do not solve boredom only by increasing run speed or adding more objects.
 
+### 12.2 Clean-run flow test
+
+A skilled or clean run should feel like a continuous choreography rather than a sequence of forced stops.
+
+If the player chooses not to use an optional bench, the main route should generally support forward flow:
+- jumps connect naturally;
+- landing positions prepare the next action;
+- hazard timing does not require unexplained waiting;
+- collectible arcs reinforce the intended rhythm;
+- route transitions do not create awkward dead time.
+
+This does NOT mean the game must never slow down.
+
+Intentional pauses are allowed when they serve:
+- recovery;
+- anticipation;
+- a route reveal;
+- a comedic beat;
+- the final approach.
+
+During playtesting, perform at least one clean-run flow test:
+- avoid unnecessary collisions;
+- skip optional bench stops where possible;
+- follow the intended main route;
+- note every place where the player must stop, wait, or break rhythm because of geometry or timing.
+
+Any forced rhythm break should have a clear design reason.
+If it does not, redesign that section.
+
 ---
 
 ## 13. Route choices and optional challenge
@@ -620,6 +672,24 @@ Major overhead platforms should visually read as something supported:
 - structural legs.
 
 Gameplay readability is more important than architectural realism, but geometry should feel intentional rather than generated.
+
+### 14.4 Visual-collision contract
+
+What the player sees and what the physics engine collides with should agree.
+
+For gameplay-critical surfaces:
+- the visible platform edge should closely match the actual collision edge;
+- the visible top surface should match the real landing surface;
+- openings that look passable should actually be passable;
+- hazards should not damage the player outside their visually communicated dangerous area;
+- decorative objects should not unexpectedly block movement;
+- invisible collision should be avoided unless it solves a specific accessibility or edge-case problem.
+
+Do not compensate for confusing collision by making the invisible hitbox dramatically larger or smaller than the art.
+
+If forgiving collision is needed, keep the difference subtle and biased in the player's favor.
+
+When replacing placeholder art later, re-check collision alignment instead of assuming the old graybox hitboxes still fit.
 
 ---
 
@@ -995,7 +1065,14 @@ After level changes, verify:
 - no accidental long autopilot stretches;
 - no identical section type repeated back-to-back;
 - meaningful gameplay changes occur across the level;
-- calm beats are deliberate and short.
+- calm beats are deliberate and short;
+- a clean run does not contain unexplained forced stops or waits that break flow.
+
+### Visual-collision consistency
+- visible platform edges align with collision edges;
+- visible openings match actual passable openings;
+- decorative objects do not unexpectedly block the player;
+- hazard visuals match their damaging collision areas.
 
 ### Variety
 - the level is not the same platform / food / hazard pattern repeated with different spacing;
