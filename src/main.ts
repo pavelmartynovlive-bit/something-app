@@ -83,17 +83,15 @@ class PlayScene extends Phaser.Scene {
     slab(start, s.floorY, s.levelWidth - start, 180);
     s.obstacles.forEach((x, i) => slab(x, s.floorY - (i % 3 === 0 ? 48 : 34), 42, i % 3 === 0 ? 48 : 34, obstacles));
     this.sign(170, 'Котик ждёт →');
-    this.sign(1510, 'Прыжками — наверх ↑');
-    this.sign(3710, 'Ещё один верхний путь ↑');
-    this.sign(2350, 'Лавочка снизу →');
+    for (const sign of s.signs) this.sign(sign.x, sign.text);
     for (const platform of s.routePlatforms) {
-      slab(platform.x, platform.y, platform.width, 18, upperRoute);
+      slab(platform.x, platform.y, platform.width, s.platformThickness, upperRoute);
       const body = (upperRoute.getChildren().at(-1) as Phaser.GameObjects.Rectangle).body as Phaser.Physics.Arcade.StaticBody;
       // Односторонняя опора: края и низ никогда не блокируют автобег.
       body.checkCollision.left = body.checkCollision.right = body.checkCollision.down = false;
       if (platform.label) this.add.text(platform.x + 22, platform.y - 28, platform.label, { fontSize: '15px', color: '#3c594b' });
     }
-    this.sign(6000, 'Ещё немного →');
+    this.sign(s.levelWidth - 600, 'Ещё немного →');
     this.tanya = this.physics.add.sprite(100, s.floorY - 25, 'tanya');
     this.tanya.setSize(26, 48).setOffset(7, 4).setMaxVelocity(500, 700);
     this.physics.add.collider(this.tanya, ground);
@@ -204,7 +202,7 @@ class PlayScene extends Phaser.Scene {
     const target = Phaser.Math.Clamp(this.tanya.x - viewWidth * .35, 0, Math.max(0, s.levelWidth - viewWidth));
     camera.scrollX = Phaser.Math.Linear(camera.scrollX, target, 1 - Math.exp(-dt * 5));
     // Небольшое вертикальное смещение сохраняет нижнюю страховочную дорожку в кадре.
-    const targetY = Phaser.Math.Clamp((this.tanya.y - (s.floorY - 24)) * .28, -90, 0);
+    const targetY = Phaser.Math.Clamp((this.tanya.y - (s.floorY - 24)) * .22, -40, 0);
     camera.scrollY = Phaser.Math.Linear(camera.scrollY, targetY, 1 - Math.exp(-dt * 2.8));
     element('#distance').textContent = `${Math.min(100, Math.round(this.tanya.x / (s.levelWidth - 150) * 100))}% пути`;
     this.updateHud();
@@ -328,8 +326,8 @@ class PlayScene extends Phaser.Scene {
   }
   private resize() {
     this.cameras.main.setOrigin(0, 0);
-    this.cameras.main.setZoom(this.scale.height / 540);
-    this.cameras.main.scrollY = Phaser.Math.Clamp(this.cameras.main.scrollY, -90, 0);
+    this.cameras.main.setZoom(this.scale.height / s.viewHeight);
+    this.cameras.main.scrollY = Phaser.Math.Clamp(this.cameras.main.scrollY, -40, 0);
     controls?.reset();
   }
   private sign(x: number, text: string) {
