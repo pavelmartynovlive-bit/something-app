@@ -1,5 +1,29 @@
 # Game Design — Tanya Cat Runner
 
+> This document is the source of truth for gameplay and level-design decisions.
+> Before changing gameplay, level geometry, pacing, collectibles, hazards, or camera behavior, read this document first.
+> Do not override these rules unless the user explicitly asks for a change.
+
+## 0. Design principles and references
+
+Primary references:
+- Super Mario Run / 2D Mario — clear forward direction, readable main route, collectibles as guidance, optional challenge layered over an accessible path.
+- Super Mario 3D Land / 3D World — introduce an idea, develop it, twist it, then pay it off.
+- Rayman Jungle Run / Fiesta Run — short auto-run stages, one-touch control, strong rhythm, route variation through jump timing.
+- Celeste — implicit teaching, strong mechanical identity per area, deliberate difficulty and fast iteration.
+- N++ — player choice inside linear levels, compact challenges, large variation from a small mechanic set.
+
+Project-specific interpretation:
+- short and replayable is better than long and repetitive;
+- one-touch simplicity must be compensated by strong level composition;
+- the level should evolve every few seconds without becoming constant noise;
+- the player should understand what the game is asking before they commit;
+- optional challenge should add depth without blocking progress;
+- collectibles must communicate movement, not merely fill space;
+- level geometry must be authored intentionally, not generated as repeated platform templates.
+
+---
+
 ## 1. Game concept
 
 A short mobile 2D auto-runner / platformer about Tanya helping cats.
@@ -14,35 +38,99 @@ The tone should be:
 The game should feel light and funny rather than punishing.
 
 The current version is a gameplay prototype.
-Visual polish is secondary to movement, rhythm and level design.
+Movement, rhythm, readability and level design are more important than visual polish.
 
 ---
 
-## 2. Core gameplay loop
+## 2. Player promise and design pillars
 
-The character automatically runs to the right.
+### 2.1 One-touch readability
+
+The player should quickly understand:
+- Tanya runs automatically;
+- tapping means jump;
+- food is desirable;
+- Lipton restores energy;
+- benches restore energy more slowly;
+- hazards should be avoided;
+- the cat is the destination.
+
+Do not require instructions for ordinary moment-to-moment play if the level itself can teach the behavior.
+
+### 2.2 Rhythmic variation
+
+The game must not feel like one platform pattern repeated across the whole level.
+
+The player should regularly feel:
+- a new spatial shape;
+- a new timing pattern;
+- a new route decision;
+- a change in energy pressure;
+- a short recovery;
+- a combination of previously learned ideas.
+
+### 2.3 Fatigue pressure, not health management
+
+Energy represents tiredness and creates gentle pressure.
+
+It should change decisions and pace, but it should not turn the game into a conventional health-point system.
+
+### 2.4 Fail forward
+
+Most mistakes should cost:
+- energy;
+- collectibles;
+- an optional upper route;
+- time;
+
+rather than immediately ending the run.
+
+### 2.5 Personal absurdity
+
+The game should eventually feel like Tanya's world rather than a generic platformer.
+
+Gameplay can exaggerate ordinary street-life objects into memorable obstacles:
+- scooters;
+- pigeons;
+- grannies with trolleys;
+- benches;
+- Lipton;
+- cat food.
+
+Do not add new mechanics solely for variety without explicit approval.
+
+---
+
+## 3. Core gameplay loop
+
+Tanya automatically runs to the right.
 
 The player mainly controls jumping.
 
 The player must:
-
-1. read upcoming obstacles;
-2. jump at the right moment;
+1. read upcoming geometry and hazards;
+2. choose the right moment to jump;
 3. collect cat food;
-4. manage Tanya's energy;
-5. decide whether to take harder routes for better rewards;
-6. use rest zones or Lipton when energy is low;
+4. decide whether to take optional harder routes;
+5. manage Tanya's energy;
+6. choose when recovery is worth the time or route cost;
 7. reach the cat with enough food.
 
 Core loop:
 
-run → read obstacle → jump → collect / avoid → manage energy → continue
+run → read → choose → jump / avoid / collect → manage energy → recover or continue → repeat
 
-The player should rarely spend more than 2–3 seconds without making a meaningful decision or action.
+The player should rarely remain on pure autopilot for more than about 3 seconds unless the pause is deliberate:
+- a recovery beat;
+- a reveal;
+- a safe landing after a difficult sequence;
+- the final approach.
+
+High gameplay density does NOT mean an obstacle every second.
 
 ---
 
-## 3. Mobile controls
+## 4. Mobile controls and movement
 
 Primary target: mobile browser / PWA.
 
@@ -53,30 +141,47 @@ Controls:
 Desktop fallback:
 - Space / Arrow Up = jump.
 
-Controls must be extremely simple.
-
 Do not add manual left/right movement unless explicitly requested later.
 
----
-
-## 4. Tanya movement
+### 4.1 Movement feel
 
 Movement should feel:
 - responsive;
 - forgiving;
+- predictable;
 - slightly arcade-like;
-- easy to understand immediately.
+- immediately understandable.
 
 Use:
 - coyote time;
 - jump buffer;
 - forgiving collision shapes;
-- wide landing surfaces;
+- generous landing surfaces on the main route;
 - predictable jump arcs.
 
-Do not design hardcore precision platforming.
+Do not design hardcore precision platforming for the required route.
 
-The player should usually understand why they failed.
+### 4.2 Jump metrics: measure, do not guess
+
+Level geometry must be built from the actual movement model.
+
+Before authoring or re-authoring major platform sequences:
+- measure the current maximum jump height;
+- measure horizontal jump reach at normal run speed;
+- measure reach at tired / reduced speed;
+- know the minimum comfortable landing width.
+
+Required jumps must have clear safety margin inside Tanya's measured jump envelope.
+
+Optional challenge jumps may approach the edge of the jump envelope, but must remain physically possible and readable.
+
+Do not tune geometry by visual guess alone.
+
+If practical, keep a debug visualization or documented values for:
+- jump apex;
+- jump duration;
+- horizontal reach;
+- tired-state reach.
 
 ---
 
@@ -98,27 +203,41 @@ At zero energy Tanya does not die.
 Instead:
 - running speed is reduced;
 - jumping may become weaker;
-- animations / feedback should communicate tiredness;
+- feedback should communicate tiredness;
 - the player can recover.
 
 There must never be a soft-lock at zero energy.
+
+### 5.1 Energy design goal
+
+Energy should create a small number of meaningful recovery decisions during a run.
+
+Avoid both extremes:
+- energy is irrelevant because recovery is everywhere;
+- energy dominates every few seconds and feels like constant maintenance.
+
+A clean run should still make the player notice energy, but should not require obsessive meter watching.
 
 ---
 
 ## 6. Energy recovery
 
-### Lipton
+### 6.1 Lipton
 
-Lipton is an instant energy recovery collectible.
+Lipton is instant energy recovery.
 
 Purpose:
 - quick recovery;
-- reward for risky routes;
-- emergency recovery during a run.
+- reward for a harder route;
+- emergency recovery during a run;
+- a reason to choose a particular trajectory.
 
 Lipton should usually not require stopping.
 
-### Bench
+Lipton placement should be intentional.
+Do not place it at arbitrary regular intervals.
+
+### 6.2 Bench
 
 A bench is a rest zone.
 
@@ -127,80 +246,127 @@ When Tanya uses it:
 - energy restores;
 - she then continues running automatically.
 
-A bench creates a small strategic choice:
+A bench creates a decision:
 
 continue immediately  
 or  
 spend time restoring energy.
 
-Benches should not appear too frequently.
+Benches work best:
+- after a demanding sequence;
+- before a demanding sequence;
+- on a safer lower route;
+- at a natural visual pause.
 
-They work best:
-- after a difficult sequence;
-- before a difficult sequence;
-- on an easier lower route.
+Do not place benches so frequently that recovery becomes automatic.
 
 ---
 
 ## 7. Cat food collectibles
 
-Cat food is the main level collectible.
+Cat food is the main collectible.
 
-Example:
-- 5 bags exist in a level;
-- at least 3 are required to feed the final cat.
+It has three roles:
+1. reward;
+2. navigation / movement guidance;
+3. visual rhythm.
 
 Cat food must not be placed randomly.
 
-Use it to:
-- guide jump trajectories;
-- reward exploration;
-- signal upper routes;
-- teach the player;
-- reward difficult sequences.
+### 7.1 Collectible trust
 
-Good examples:
-- food arranged in an arc over a jump;
-- food placed on an upper platform;
-- food after a difficult obstacle;
-- food used to visually guide the player upward.
+If food visually suggests a trajectory, that trajectory must be:
+- safe enough to trust;
+- physically reachable;
+- consistent with what the player has already learned.
 
-Avoid placing collectibles on long empty flat sections with no decision involved.
+Never use a food trail to lure the player into an unfair collision, blind fall, impossible jump, or unavoidable punishment.
+
+The player should learn:
+"If the food shows a route, I can trust that route."
+
+### 7.2 Collectible patterns
+
+Prefer small, readable patterns such as:
+- a short line before a jump;
+- an arc through the air;
+- a landing cluster;
+- a staircase upward;
+- a short line leading to Lipton;
+- a reward burst after a challenge;
+- a richer cluster on an optional upper path.
+
+A typical cluster may contain around 3–6 food items.
+
+Use multiple clusters where appropriate, but each cluster should have a movement or reward purpose.
+
+Avoid:
+- long uninterrupted rows on flat safe ground;
+- random isolated food;
+- filling every empty space with food;
+- identical clusters repeated section after section.
+
+### 7.3 Collectible density
+
+Do not reduce food density so aggressively that the game looks visually dead.
+
+But do not use food as the main solution to empty level composition.
+
+Visual density should also come from:
+- buildings;
+- plants;
+- lamps;
+- signs;
+- fences;
+- street props;
+- structural supports;
+- background details.
+
+The goal is:
+
+meaningful collectible density + visually active environment
+
+not:
+
+collectible spam.
 
 ---
 
 ## 8. Obstacles
 
-### Granny with trolley
+### 8.1 Granny with trolley
 
-Slow moving obstacle.
+Slow moving hazard.
 
 Purpose:
 - basic timing;
-- introductory moving hazard.
+- introductory moving obstacle;
+- readable anticipation.
 
 The player should clearly see her movement pattern.
 
-### Scooter
+### 8.2 Scooter
 
-Fast moving obstacle.
+Faster timing hazard.
 
 Purpose:
 - stronger timing challenge;
-- surprise without unfairness.
+- change of rhythm;
+- pressure after the player has learned basic jumping.
 
 The scooter must be visible early enough to react.
 
-Never spawn it in a way that makes collision unavoidable.
+Do not spawn it from a blind position or directly after a landing with no reaction time.
 
-### Pigeons
+### 8.3 Pigeons
 
 Pigeons sit on the ground and fly up when Tanya approaches.
 
 Purpose:
 - visual movement;
 - rhythm variation;
-- light hazard.
+- light hazard;
+- comic texture.
 
 Collision may:
 - reduce energy slightly;
@@ -211,239 +377,472 @@ Pigeons should feel funny rather than deadly.
 
 ---
 
-## 9. Level rhythm
+## 9. Level architecture
 
-Avoid long empty stretches.
+### 9.1 Prototype duration
 
-A meaningful event should generally occur every 1–2 seconds.
+For the current prototype, target approximately 60–90 seconds for a normal active run.
 
-Meaningful events include:
-- jump;
-- obstacle;
-- collectible;
-- vertical change;
-- route choice;
-- rest opportunity;
-- moving hazard;
-- reward;
-- short environmental interaction.
+Do not make the level longer merely to create a feeling of scale.
 
-Use rhythm like:
+If the level needs more than about 90 seconds, it should justify the extra time with a genuinely new section idea rather than more copies of existing patterns.
 
-setup → action → reward → short breathing room → next action
+Prefer:
 
-After a difficult sequence, a 2–3 second calm section is acceptable.
+short + dense + replayable
 
-Do not make every second equally intense.
+over:
 
----
+long + varied-looking + repetitive.
 
-## 10. Level structure
+### 9.2 Section-based construction
 
-The level must not be a flat horizontal corridor.
+Do not build the level as one continuous sequence of similar platforms.
 
-Use:
-- height changes;
-- stairs of platforms;
-- upper and lower routes;
-- drops;
-- short platform sequences;
-- wide safe areas;
-- risk/reward routes.
+Divide the level into approximately 6–8 clearly differentiated gameplay sections.
 
-Good pattern:
+Each section should usually last about 8–15 seconds.
 
-ground → low obstacle → jump → food arc → pigeons → platform steps upward → reward → drop → scooter → rest zone
-
-The world should feel like a route, not a treadmill.
-
----
-
-## 11. Verticality
-
-Use vertical gameplay regularly.
+Each section must have:
+- one dominant gameplay idea;
+- a distinct spatial silhouette;
+- a distinct rhythm;
+- a readable beginning;
+- a readable end;
+- at least one memorable interaction.
 
 Examples:
-- boxes;
-- benches;
-- awnings;
-- low roofs;
-- steps;
-- raised platforms;
-- small ledges.
+- basic jump timing;
+- pigeons;
+- upper/lower route choice;
+- scooters;
+- fatigue/recovery decision;
+- vertical climb;
+- combined challenge;
+- final approach.
 
-Upper routes should usually:
-- require slightly better timing;
-- contain more rewards.
-
-Lower routes should usually:
-- be safer;
-- contain fewer rewards.
-
-If the player fails to reach an upper route, they should normally fall safely onto the lower route and continue.
-
-Do not punish a missed optional jump with restart unless explicitly intended.
+The player should feel a meaningful change in gameplay roughly every 10–15 seconds.
 
 ---
 
-## 12. Route choices
+## 10. Four-step development of an idea
 
-Include occasional route choices.
+For important recurring level ideas, use a four-step progression inspired by Nintendo's level-design approach:
 
-Typical structure:
+1. Introduce
+2. Develop
+3. Twist
+4. Payoff
+
+### 10.1 Introduce
+
+Show the idea in a safe, obvious context.
+
+Examples:
+- first pigeons on flat ground;
+- first upper platform with a clear food arc;
+- first scooter with generous reaction time.
+
+### 10.2 Develop
+
+Ask the player to use the same idea in a slightly harder or more interesting context.
+
+Examples:
+- pigeons after a small jump;
+- two-step upper route;
+- scooter after a simple landing.
+
+### 10.3 Twist
+
+Change one important condition.
+
+Examples:
+- pigeons appear on the safer lower route while the upper route avoids them;
+- Lipton is on the risky route;
+- the scooter appears while energy is already low;
+- a familiar jump now leads downward rather than upward.
+
+### 10.4 Payoff
+
+Use the learned idea in a satisfying final combination.
+
+Examples:
+- upper route + food arc + scooter timing;
+- fatigue decision followed by a short combined challenge.
+
+Do not force every tiny object into a rigid four-step pattern.
+Use this structure for the level's important ideas and recurring mechanic families.
+
+---
+
+## 11. Mechanic rotation and repetition control
+
+A mechanic may return later only if at least one context changes:
+- height;
+- route;
+- timing;
+- energy pressure;
+- reward;
+- combination with another mechanic;
+- spatial layout.
+
+Do not repeat the same challenge grammar back-to-back.
+
+Challenge grammar examples:
+- jump over;
+- jump up;
+- drop down;
+- choose upper/lower;
+- time around a moving hazard;
+- collect along a trajectory;
+- decide whether to recover;
+- combine two learned mechanics.
+
+Two sections may use the same object but should not ask the player to perform the same action in the same spatial pattern.
+
+Avoid:
+- platform → food → pigeons → Lipton repeated many times;
+- repeated canopy shapes with only object positions changed;
+- identical food arcs repeated section after section.
+
+Reusable code primitives are good.
+Repeated level compositions are not.
+
+---
+
+## 12. Rhythm and pacing
+
+Do not interpret "dense" as "constant intensity."
+
+Use waves.
+
+Typical local rhythm:
+
+setup → action → reward → brief recovery → next action
+
+A stronger sequence can be:
+
+easy → easy → challenge → reward → breathing space → twist
+
+Breathing room should usually be around 1–3 seconds and should feel intentional.
+
+A calm beat may contain:
+- visual scenery;
+- a safe collectible cluster;
+- a bench;
+- a reveal of the next route;
+- a landing after a difficult sequence.
+
+A calm beat should not become a long empty corridor.
+
+### 12.1 Pacing audit
+
+When reviewing a build, identify:
+- where the player is on autopilot;
+- where the player receives too many demands at once;
+- where two adjacent sections feel identical;
+- where a recovery beat is missing;
+- where a recovery beat is too long.
+
+Do not solve boredom only by increasing run speed or adding more objects.
+
+---
+
+## 13. Route choices and optional challenge
+
+The main route should be accessible and readable.
+
+Optional routes create mastery and replay value.
 
 ### Lower route
+Usually:
 - safer;
 - easier;
-- fewer collectibles;
+- fewer rewards;
 - may include a bench.
 
 ### Upper route
+Usually:
 - harder;
 - more food;
-- Lipton or bonus reward;
-- requires several jumps.
+- Lipton or another bonus;
+- requires better timing.
 
-Choices must be readable before the player commits.
+Route choices must be visible before the commitment point.
 
----
+The player should not discover an upper route only after passing the jump required to enter it.
 
-## 13. Difficulty curve
+If the player misses an optional upper route, they should normally:
+- fall safely to the lower route;
+- lose only the optional reward;
+- continue the run.
 
-Do not keep difficulty flat.
-
-Suggested structure:
-
-1. safe introduction;
-2. one simple obstacle;
-3. collectible used as jump guidance;
-4. second obstacle type;
-5. short vertical section;
-6. first route choice;
-7. brief rest;
-8. combination of existing mechanics;
-9. final challenge;
-10. cat.
-
-Introduce mechanics one at a time.
-
-Do not introduce multiple unfamiliar mechanics simultaneously.
+Do not turn optional challenge into mandatory frustration.
 
 ---
 
-## 14. Fairness
+## 14. Geometry and collision readability
 
-The player must have enough time to understand and react.
+Every piece of gameplay geometry must visually communicate how it behaves.
 
-Rules:
-- upcoming hazards should usually be visible in advance;
-- required jumps must be physically possible;
-- obstacles should not spawn directly after blind landings;
-- never require knowledge the player could not reasonably have;
-- avoid unavoidable collisions.
+### 14.1 No ambiguous geometry
 
-The camera should support anticipation.
+If the player can run beneath a platform:
+- provide obvious vertical clearance;
+- keep lower-route obstacles jumpable;
+- make the passage visually read as valid.
+
+If the lower route is blocked:
+- make the blockage obvious;
+- do not create a fake-looking passage.
+
+Never place a box or hazard under a low ceiling if the resulting jump is unclear or physically awkward.
+
+### 14.2 Avoid giant slabs
+
+Do not use very long uninterrupted upper platforms unless they serve a deliberate gameplay purpose.
+
+Prefer:
+- short canopies;
+- awnings;
+- supported walkways;
+- broken platform chains;
+- stepped upper paths.
+
+Upper geometry should feel like a sequence of actions, not a ceiling.
+
+### 14.3 Structural readability
+
+Major overhead platforms should visually read as something supported:
+- posts;
+- walls;
+- braces;
+- structural legs.
+
+Gameplay readability is more important than architectural realism, but geometry should feel intentional rather than generated.
 
 ---
 
-## 15. Camera
+## 15. Camera, anticipation and signposting
 
 Do not center Tanya exactly in the middle of the screen.
 
-Leave more visible space in front of her.
+Leave more visible space ahead of her than behind her.
 
-The player should be able to see upcoming hazards.
+The player should usually be able to see the next required action before they must commit.
 
 Camera behavior:
 - smooth horizontal tracking;
 - limited vertical tracking;
-- no aggressive bouncing during jumps;
-- show upper routes early enough to understand them.
+- no aggressive vertical bouncing on every jump;
+- show upper-route entrances early;
+- keep likely landing areas visible;
+- avoid blind hazards immediately outside the camera.
+
+Use signposting through:
+- collectible arcs;
+- platform silhouettes;
+- route height;
+- hazard motion;
+- environmental framing.
+
+Text signs should not be required for ordinary route understanding.
 
 ---
 
 ## 16. Mobile readability
 
-Important objects must be readable instantly on a phone.
+Important gameplay elements must be readable instantly on a phone.
 
 Avoid:
 - tiny collectibles;
-- thin platforms;
-- visually ambiguous hazards;
-- excessive UI;
-- cluttered backgrounds.
+- very thin platforms;
+- tiny hazards;
+- low-contrast interactive objects;
+- cluttered backgrounds;
+- excessive HUD.
 
-Gameplay objects must clearly separate from decorative background elements.
+Gameplay objects must visually separate from decorative background elements.
 
----
+The player should be able to distinguish:
+- collision surfaces;
+- hazards;
+- collectibles;
+- recovery objects;
 
-## 17. Level density
-
-Prefer a short dense level over a long empty one.
-
-If the player runs for several seconds without:
-- jumping;
-- choosing;
-- collecting;
-- avoiding;
-- resting;
-
-the section should probably be redesigned.
-
-Do not fix boring sections only by increasing run speed.
-
-Improve the sequence of decisions instead.
+without pausing to inspect the scene.
 
 ---
 
-## 18. Meaningful actions
+## 17. Difficulty curve
 
-Before adding any object, ask:
+Do not keep difficulty flat.
 
-"What does the player do or decide because this exists?"
+Do not simply make each section harder than the previous one either.
 
-An object should normally:
-- test timing;
-- guide movement;
-- offer a choice;
-- reward risk;
-- provide recovery;
-- create breathing room;
-- prepare the next challenge.
+Use difficulty waves.
 
-If it does none of these, it is probably decoration rather than gameplay.
+Suggested arc:
+1. safe introduction;
+2. simple execution;
+3. first variation;
+4. route choice;
+5. short recovery;
+6. stronger timing challenge;
+7. twist / combination;
+8. final approach and cat.
 
-Decoration is allowed, but it should not replace actual level design.
+Introduce unfamiliar mechanics safely before combining them.
+
+Do not introduce multiple unfamiliar mechanics at the same time.
+
+The required route should be completable by a relatively inexperienced player.
+
+Mastery should mainly be expressed through:
+- collecting more food;
+- taking upper routes;
+- reaching recovery rewards efficiently;
+- cleaner timing;
+- replaying for a better run.
 
 ---
 
-## 19. Prototype scope
+## 18. Visual density vs gameplay density
+
+Gameplay density and visual density are different.
+
+A screen may be visually rich while gameplay remains simple.
+
+Use decoration to avoid dead-looking scenes:
+- trees;
+- windows;
+- signs;
+- fences;
+- parked objects;
+- planters;
+- street lamps;
+- background buildings.
+
+But decoration must not look like collision geometry unless it actually has collision.
+
+Do not add gameplay objects merely to fill visual space.
+
+Do not add collectibles merely because the background feels empty.
+
+If a section feels empty, first ask:
+
+Is the problem:
+- no decision?
+- no visual composition?
+- no upcoming goal?
+- no variation in silhouette?
+- no reward?
+
+Fix the actual problem.
+
+---
+
+## 19. Example section map for the current prototype
+
+This is an example structure, not a rigid script.
+
+### Section 1 — Learn the rhythm
+Dominant idea:
+- basic jump timing.
+
+Use:
+- simple ground obstacle;
+- food arc that teaches jump trajectory.
+
+Goal:
+- establish trust and control.
+
+### Section 2 — Pigeon rhythm
+Dominant idea:
+- light hazard timing.
+
+Use:
+- pigeons in increasingly interesting positions;
+- avoid repeating the exact same ground pattern.
+
+Goal:
+- introduce moving visual pressure.
+
+### Section 3 — First route choice
+Dominant idea:
+- upper vs lower.
+
+Upper:
+- more food.
+
+Lower:
+- safer path and/or bench.
+
+Goal:
+- teach risk/reward.
+
+### Section 4 — Scooter timing
+Dominant idea:
+- faster moving hazard.
+
+Goal:
+- change timing rhythm.
+
+### Section 5 — Fatigue decision
+Dominant idea:
+- recovery choice.
+
+Use:
+- low-energy pressure;
+- Lipton and/or bench with different costs.
+
+Goal:
+- make energy affect a decision rather than merely the HUD.
+
+### Section 6 — Vertical route
+Dominant idea:
+- climb / descend.
+
+Use:
+- short platform chain;
+- collectible path as guidance;
+- safe fall to lower route.
+
+Goal:
+- change the level silhouette and movement pattern.
+
+### Section 7 — Combined challenge
+Dominant idea:
+- combine two already learned mechanics.
+
+Possible combination:
+- route choice + scooter;
+- pigeons + vertical path;
+- fatigue + optional Lipton reward.
+
+Goal:
+- payoff without introducing anything new.
+
+### Section 8 — Final approach
+Dominant idea:
+- release tension and reach the cat.
+
+Goal:
+- short satisfying ending;
+- no unnecessary final repetition.
+
+---
+
+## 20. Prototype scope
 
 Current target:
 - one short level;
-- roughly 90–120 seconds;
+- approximately 60–90 seconds on a normal run;
 - one final cat;
 - simple mobile controls;
 - placeholder visuals.
 
-Do not add:
-- complex story systems;
-- dialogue trees;
-- inventory;
-- progression systems;
-- multiple worlds;
-- backend;
-- account system;
-- advanced visual polish;
-
-unless explicitly requested.
-
----
-
-## 20. Current gameplay objects
-
 Current approved mechanics:
-
 - auto-run;
 - jump;
 - energy;
@@ -456,119 +855,225 @@ Current approved mechanics:
 - upper / lower routes;
 - final cat.
 
-Do not introduce new gameplay mechanics without explicit approval.
+Do not add:
+- complex story systems;
+- dialogue trees;
+- inventory;
+- progression systems;
+- multiple worlds;
+- backend;
+- account system;
+- advanced visual polish;
+- new gameplay mechanics;
+
+unless explicitly requested.
 
 ---
 
-## 21. Working process
+## 21. Level-design workflow
 
-Before modifying level design:
+Do not immediately modify geometry when asked to "improve the level."
+
+First produce a section map.
+
+For each proposed section, define:
+- section name;
+- approximate duration;
+- dominant idea;
+- what the player sees;
+- what the player must decide;
+- what the player does;
+- reward / consequence;
+- collectible pattern;
+- recovery opportunity;
+- how this section differs from the previous one.
+
+Then inspect the whole level for repetition before implementing.
+
+### 21.1 Authoring rule
+
+The level may use reusable helper functions and primitives.
+
+However:
+- do not auto-generate the level from one repeated template;
+- do not create dozens of platforms just because the helper makes that easy;
+- do not treat platform count as a quality metric.
+
+A short authored sequence is preferable to a large procedurally repeated one.
+
+### 21.2 Before implementation
+
+Check:
+1. Is there a clear 6–8 section structure?
+2. Does each section have a different dominant idea or spatial pattern?
+3. Is the main route readable?
+4. Are optional routes visible before commitment?
+5. Are food trails trustworthy?
+6. Is recovery placed intentionally?
+7. Are there long autopilot stretches?
+8. Are any sections mechanically redundant?
+
+Only then modify the level.
+
+---
+
+## 22. Playtest protocol
+
+The next useful iteration should come from playtesting, not platform counting.
+
+Run at least three kinds of test:
+
+### 22.1 Normal run
+Play naturally.
+
+Observe:
+- where attention drops;
+- where the level feels good;
+- where the next action is unclear;
+- where the player feels rushed or bored.
+
+### 22.2 Collector run
+Try to collect as much food as practical.
+
+Observe:
+- whether collectible paths are readable;
+- whether optional routes feel worth the effort;
+- whether food changes movement decisions;
+- whether food becomes visual noise.
+
+### 22.3 Failure / fatigue run
+Intentionally:
+- miss upper routes;
+- hit hazards;
+- reach zero energy;
+- skip recovery when possible.
+
+Observe:
+- whether the game remains completable;
+- whether failures are understandable;
+- whether fatigue changes play without creating a soft-lock;
+- whether missed optional jumps fail forward.
+
+### 22.4 Playtest notes
+
+Record feedback by section, not by individual platform.
+
+Useful notes:
+- "Section 3 feels identical to section 2."
+- "Section 5 has no meaningful decision."
+- "Upper route in section 6 is not visible early enough."
+- "The player is on autopilot for 5 seconds after the scooter."
+
+Avoid notes like:
+- "move platform 20px right"
+
+until the structural issue is understood.
+
+---
+
+## 23. Acceptance checks
+
+After level changes, verify:
+
+### Completion
+- normal route is completable;
+- zero-energy route cannot soft-lock;
+- optional-route misses safely return to progress.
+
+### Jump validity
+- every required jump is inside the measured jump envelope;
+- tired-state mandatory jumps remain possible;
+- landing zones are visible and fair.
+
+### Readability
+- no blind mandatory hazards;
+- no ambiguous pass-under geometry;
+- no collectible trail points toward an unsafe or impossible route;
+- interactive objects are visually distinct from decoration.
+
+### Pacing
+- no accidental long autopilot stretches;
+- no identical section type repeated back-to-back;
+- meaningful gameplay changes occur across the level;
+- calm beats are deliberate and short.
+
+### Variety
+- the level is not the same platform / food / hazard pattern repeated with different spacing;
+- each section has its own dominant idea and silhouette.
+
+### Scope
+- normal run remains approximately 60–90 seconds;
+- no new mechanics were added without approval.
+
+---
+
+## 24. Quality metrics
+
+Do not report quality primarily using:
+- total platform count;
+- total object count;
+- total collectible count.
+
+More useful metrics:
+- normal completion time;
+- time to first boredom / attention drop in playtest;
+- longest unintended autopilot stretch;
+- number of clearly distinct sections;
+- number of repeated challenge grammars;
+- percentage of optional-route failures that safely fail forward;
+- whether every required jump was validated against current movement metrics;
+- whether the player understands the next required action before commitment.
+
+---
+
+## 25. Reference material
+
+These references inform the principles above. They are not rules to copy literally.
+
+- Koichi Hayashida on Super Mario 3D Land's four-step idea development:
+  https://www.gamedeveloper.com/design/the-structure-of-fun-learning-from-i-super-mario-3d-land-i-s-director
+
+- Nintendo / Iwata Asks — Super Mario 3D Land: clear course guidance and optional Star Medals:
+  https://iwataasks.nintendo.com/interviews/3ds/super-mario-3d-land/0/1/
+
+- Nintendo / Iwata Asks — New Super Mario Bros. Wii: coins used to safely guide player movement and preserve player trust:
+  https://iwataasks.nintendo.com/interviews/wii/nsmb/1/5/
+
+- Nintendo / Ask the Developer — Super Mario Bros. Wonder: lessons from Super Mario Run about accessibility and helping more players continue:
+  https://www.nintendo.com/us/whatsnew/ask-the-developer-vol-11-super-mario-bros-wonder-part-3/
+
+- GDC Vault — Math for Game Programmers: Building A Better Jump:
+  https://www.gdcvault.com/play/1023148/Math-for-Game-Programmers-Building
+
+- GDC Vault — Level Design Workshop: Designing Celeste:
+  https://www.gdcvault.com/play/1024307/Level-Design-Workshop-Designing-Celeste
+
+- GDC Vault — Empowering the Player: Level Design in N++:
+  https://www.gdcvault.com/play/1023282/Empowering-the-Player-Level-Design
+
+- Rayman Jungle Run interview: one-touch control, short levels and rhythm:
+  https://www.pocketgamer.com/rayman-jungle-run/hands-on-with-rayman-jungle-run-on-ios-and-android/
+
+---
+
+## 26. Final working rule
+
+Before changing level design:
 
 1. read this document;
 2. inspect the current implementation;
-3. identify violations of these rules;
-4. describe the proposed level structure;
-5. explain what the player does in each section;
-6. only then modify the level.
+3. produce or update the section map;
+4. identify repetition, pacing and readability problems;
+5. explain the proposed change at section level;
+6. only then modify geometry.
 
 After implementation:
 
-1. verify the full level is completable;
-2. verify all required jumps are reachable;
-3. verify optional upper routes fail safely;
-4. verify zero energy cannot soft-lock the player;
-5. verify the player rarely remains inactive for more than 2–3 seconds.
+1. validate jump reach;
+2. validate main-route completion;
+3. validate fail-forward behavior;
+4. run the three playtest modes;
+5. report findings by section;
+6. do not claim success merely because the level contains many platforms or objects.
 
-This document is the source of truth for gameplay and level-design decisions unless the user explicitly overrides it.
-
----
-
-## Level sections and mechanic rotation
-
-Do not build the level as one continuous sequence of similar platforms.
-
-Divide each level into 6–8 clearly differentiated gameplay sections.
-
-Each section must have:
-- one dominant gameplay idea;
-- a distinct rhythm;
-- a beginning and an end;
-- at least one memorable interaction.
-
-Example section types:
-- basic jump timing;
-- pigeons;
-- upper/lower route choice;
-- scooters;
-- fatigue/recovery decision;
-- vertical climb;
-- combined challenge;
-- final approach.
-
-Do not repeat the same section type back-to-back.
-
-A mechanic may return later only if:
-- combined with another mechanic;
-- used at a different height;
-- used under different energy pressure;
-- or presented with a new route choice.
-
-The player should feel a meaningful change in gameplay every 10–15 seconds.
-
-## Collectible density
-
-Cat food has two roles:
-1. gameplay reward and navigation;
-2. helping the level feel visually active and populated.
-
-Do not reduce collectible density so aggressively that large parts of the level feel visually empty.
-
-Prefer medium-density, intentional clusters rather than either extreme:
-- not one collectible every few seconds;
-- not continuous collectible spam across the whole level.
-
-A typical cluster may contain around 3–6 food items.
-
-Use several clusters throughout a section when appropriate, but give each cluster a clear spatial pattern or gameplay purpose.
-
-Each collectible cluster should help with one or more of the following:
-- show a jump arc;
-- visually connect two platforms;
-- guide the player upward or downward;
-- reward an upper route;
-- reward a difficult sequence;
-- draw attention toward Lipton or a recovery opportunity;
-- encourage a specific movement pattern;
-- make an otherwise sparse gameplay section feel visually alive.
-
-Food can also be used for rhythm:
-- a short line before a jump;
-- an arc during a jump;
-- a landing cluster;
-- a vertical staircase of collectibles;
-- a small reward burst after a challenge.
-
-Avoid:
-- very long uninterrupted rows on flat safe ground;
-- random isolated food with no relation to movement;
-- filling every empty space with collectibles;
-- sections where there is neither meaningful gameplay nor enough visual activity.
-
-Do not rely on food alone to solve visual emptiness.
-
-Visual density should also come from environment and level composition:
-- street props;
-- plants;
-- lamps;
-- signs;
-- benches;
-- fences;
-- buildings;
-- background details;
-- structural supports.
-
-The screen should feel populated even when the player is between collectible clusters.
-
-The goal is:
-meaningful collectible density + visually rich environment,
-not collectible spam.
+This document remains the source of truth unless the user explicitly overrides it.
