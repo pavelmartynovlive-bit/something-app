@@ -61,7 +61,7 @@ class PlayScene extends Phaser.Scene {
     this.resize();
     this.scale.on('resize', this.resize, this);
     this.events.once('shutdown', () => this.scale.off('resize', this.resize, this));
-    const scenery = this.add.graphics();
+    const scenery = this.add.graphics().setDepth(-2);
     scenery.fillStyle(0xb6cfbe);
     for (let x = 0; x < s.levelWidth; x += 500) {
       scenery.fillRoundedRect(x + 140, 305, 140, 135, 10);
@@ -84,7 +84,17 @@ class PlayScene extends Phaser.Scene {
     s.obstacles.forEach((x, i) => slab(x, s.floorY - (i % 3 === 0 ? 48 : 34), 42, i % 3 === 0 ? 48 : 34, obstacles));
     this.sign(170, 'Котик ждёт →');
     for (const sign of s.signs) this.sign(sign.x, sign.text);
+    // Опоры находятся за игровой дорожкой: они поддерживают навес визуально,
+    // но не являются препятствиями в проходе перед ними.
+    const supports = this.add.graphics().setDepth(-1);
     for (const platform of s.routePlatforms) {
+      const underside = platform.y + s.platformThickness;
+      supports.fillStyle(0x9bb3a3);
+      supports.lineStyle(3, 0x9bb3a3);
+      for (const postX of [platform.x + 16, platform.x + platform.width - 23]) {
+        supports.fillRect(postX, underside, 7, s.floorY - underside);
+        supports.lineBetween(postX + 3, underside + 25, postX + 24, underside);
+      }
       slab(platform.x, platform.y, platform.width, s.platformThickness, upperRoute);
       const body = (upperRoute.getChildren().at(-1) as Phaser.GameObjects.Rectangle).body as Phaser.Physics.Arcade.StaticBody;
       // Односторонняя опора: края и низ никогда не блокируют автобег.

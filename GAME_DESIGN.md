@@ -421,7 +421,7 @@ Decoration is allowed, but it should not replace actual level design.
 
 Current target:
 - one short level;
-- roughly 3–5 minutes;
+- roughly 90–120 seconds;
 - one final cat;
 - simple mobile controls;
 - placeholder visuals.

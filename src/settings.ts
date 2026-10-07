@@ -1,15 +1,13 @@
 // Все числа прототипа — здесь. Координаты уровня заданы в игровых пикселях.
 type Platform = { x: number; y: number; width: number; label: string };
 type Point = { x: number; y: number };
-type RouteKind = 'stairs' | 'low' | 'rolling' | 'split';
+type RouteKind = 'canopy' | 'broken' | 'steps';
 
-// Десять авторских последовательностей, без случайной генерации.
-// Каждый квартал ~18с: прыжки → выбор высоты → спуск → самокат → передышка.
+// Пять коротких разделов вместо десяти повторяющихся кварталов.
 const sectionWidth = 6000;
 const sections: [RouteKind, RouteKind][] = [
-  ['stairs', 'low'], ['low', 'rolling'], ['rolling', 'split'],
-  ['split', 'stairs'], ['low', 'split'], ['rolling', 'low'],
-  ['stairs', 'rolling'], ['split', 'low'], ['rolling', 'split'], ['split', 'rolling'],
+  ['canopy', 'steps'], ['broken', 'canopy'], ['steps', 'broken'],
+  ['broken', 'steps'], ['steps', 'canopy'],
 ];
 const layout = {
   obstacles: [] as number[], routePlatforms: [] as Platform[],
@@ -19,41 +17,38 @@ const layout = {
   checkpoints: [100], signs: [] as { x: number; text: string }[],
 };
 function addRoute(start: number, kind: RouteKind) {
-  // Первые два шага знакомят с подъёмом. Затем разные длины и перепады.
+  // Все навесы проходимы снизу: минимум 76px до земли при росте 56px.
+  // Под высокой серединой помещается полный прыжок, без пересечения крыши.
   const shapes: Record<RouteKind, [number, number, number][]> = {
-    stairs: [[0,380,260],[300,320,260],[600,260,360],[1020,300,240],[1320,370,260]],
-    low: [[0,380,300],[340,320,420],[820,320,360],[1240,380,340]],
-    rolling: [[0,380,260],[300,320,260],[600,350,260],[900,290,260],[1200,350,380]],
-    split: [[0,380,260],[300,320,300],[660,260,280],[1000,320,240],[1300,380,280]],
+    canopy: [[0,340,220],[280,284,220],[560,228,220],[840,284,220],[1120,340,220]],
+    broken: [[0,340,200],[270,284,220],[560,228,200],[830,284,220],[1120,340,220]],
+    steps: [[0,340,240],[300,284,200],[560,228,240],[860,284,200],[1120,340,240]],
   };
   const platforms = shapes[kind].map(([x,y,width],i) => ({
     x:start+x,y,width,label:i===0?'Наверх ↑':i===2?'Корм →':i===3?'Спуск →':'',
   }));
   layout.routePlatforms.push(...platforms);
-  // Цепочка у подъёма и на наградной площадке, а не случайные предметы.
   const reward=platforms[2];
-  layout.food.push({x:platforms[1].x+140,y:platforms[1].y-40},
-    {x:reward.x+100,y:reward.y-55},{x:reward.x+230,y:reward.y-40});
-  layout.bottles.push({x:reward.x+reward.width-35,y:reward.y-26});
-  layout.signs.push({x:start-90,text:'Корм наверху / проще снизу'});
+  layout.food.push({x:platforms[1].x+100,y:platforms[1].y-40},
+    {x:reward.x+65,y:reward.y-55},{x:reward.x+155,y:reward.y-40});
+  layout.bottles.push({x:reward.x+reward.width-30,y:reward.y-26});
+  layout.signs.push({x:start-90,text:'Снизу проход / корм наверху'});
 }
 sections.forEach(([first,second],index) => {
   const base=index*sectionWidth;
-  // Вступление обучает одиночным прыжкам, далее опасности комбинируются.
-  const obstacles=index===0?[500,1250,1950,2850,3550,5100,5700]
-    :index%2===0?[500,1250,1950,2800,3550,4050,5100,5700]
-    :[500,1250,1800,2850,3550,4100,5050,5700];
-  layout.obstacles.push(...obstacles.map(x=>base+x));
-  layout.pigeons.push(...(index===0?[950,2150,3050,4450]:[950,2200,3050,4500]).map(x=>base+x));
-  layout.food.push({x:base+560,y:340},{x:base+5760,y:340});
+  // Ящики только на открытой земле: ни одного под крышей или у её края.
+  layout.obstacles.push(...[500,1250,3420,5700].map(x=>base+x));
+  layout.pigeons.push(base+950,base+(index%2===0?4460:2260));
+  layout.food.push(...[560,2260,3250,4460,5450,5760].map(x=>({x:base+x,y:340})));
   addRoute(base+1600,first);addRoute(base+3800,second);
-  // Нижний маршрут обеспечивает восстановление даже при нулевой энергии.
   layout.bottles.push({x:base+1450,y:414});
-  const benchX=base+(index%2===0?2450:4750);
+  // Лавочка и стая расположены под разными высокими навесами.
+  const benchX=base+(index%2===0?2260:4460);
   layout.benches.push(benchX);
   layout.signs.push({x:benchX-120,text:'Можно отдохнуть →'});
-  if(index>0)layout.grannies.push({left:base+2600,right:base+2720});
-  // Запуск за 650px; встреча после спуска, с видимым временем на реакцию.
+  // Бабка встречается до выбора маршрута, а не в низком проходе.
+  if(index>0)layout.grannies.push({left:base+1000,right:base+1120});
+  // Встреча с самокатом ~3353/5553: уже после свободного приземления.
   layout.scooters.push(base+3750,base+5950);
   layout.checkpoints.push(base+1500,base+3200,base+5400);
 });
@@ -61,7 +56,7 @@ sections.forEach(([first,second],index) => {
 export const settings = {
   speed: 330,
   tiredSpeed: 130,
-  jumpVelocity: 520,
+  jumpVelocity: 560,
   gravity: 1400,
   liptonEnergy: 22,
   obstacleDamage: 15,
@@ -85,7 +80,7 @@ export const settings = {
   levelWidth: sectionWidth * sections.length,
   floorY: 440,
   viewHeight: 490,
-  platformThickness: 28,
+  platformThickness: 24,
   // Сплошная нижняя страховочная дорожка на всём протяжении забега.
   gaps: [] as { start: number; width: number }[],
   ...layout,
