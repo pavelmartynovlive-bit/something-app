@@ -1,87 +1,52 @@
-// Все числа прототипа — здесь. Координаты уровня заданы в игровых пикселях.
+// Individually authored ground-first phrases. Food trajectories follow validated geometry.
+import { groundSpans, groundYAt, interruptions } from './terrain';
+import { food } from './food-layout';
 type Platform = { x: number; y: number; width: number; label: string };
 type Point = { x: number; y: number };
-type RouteKind = 'canopy' | 'broken' | 'steps';
-
-// Пять коротких разделов вместо десяти повторяющихся кварталов.
-const sectionWidth = 6000;
-const sections: [RouteKind, RouteKind][] = [
-  ['canopy', 'steps'], ['broken', 'canopy'], ['steps', 'broken'],
-  ['broken', 'steps'], ['steps', 'canopy'],
+type Box = { x: number; width: number; height: number };
+export const levelSections = [
+  { name: 'Земля готовит посадку', start: 100, end: 3400, idea: 'Подъём → посадка → сброс → короткий разрыв' },
+  { name: 'Спуск меняет момент', start: 3400, end: 6700, idea: 'Сброс → отложенный прыжок над птицами → уступ' },
+  { name: 'Пересечь и выбрать', start: 6700, end: 10330, idea: 'Разрыв → бабушка → короткий рискованный навес' },
+  { name: 'Посадка меняет встречу', start: 10330, end: 13630, idea: 'Подъём → прочитать самокат → выбрать спуск' },
+  { name: 'Продолжить или восстановиться', start: 13630, end: 16600, idea: 'Lipton на прыжке или лавочка в углублении' },
+  { name: 'Городской перепад', start: 16600, end: 19980, idea: 'Земля → терраса → высокая земля → один спуск' },
+  { name: 'Вернуться, выбрать, покормить', start: 19980, end: 23860, idea: 'Самокат → короткий бонус → разрыв → кот' },
 ];
-const layout = {
-  obstacles: [] as number[], routePlatforms: [] as Platform[],
-  bottles: [] as Point[], food: [] as Point[], scooters: [] as number[],
-  pigeons: [] as number[], benches: [] as number[],
-  grannies: [] as { left: number; right: number }[],
-  checkpoints: [100], signs: [] as { x: number; text: string }[],
-};
-function addRoute(start: number, kind: RouteKind) {
-  // Все навесы проходимы снизу: минимум 76px до земли при росте 56px.
-  // Под высокой серединой помещается полный прыжок, без пересечения крыши.
-  const shapes: Record<RouteKind, [number, number, number][]> = {
-    canopy: [[0,340,220],[280,284,220],[560,228,220],[840,284,220],[1120,340,220]],
-    broken: [[0,340,200],[270,284,220],[560,228,200],[830,284,220],[1120,340,220]],
-    steps: [[0,340,240],[300,284,200],[560,228,240],[860,284,200],[1120,340,240]],
-  };
-  const platforms = shapes[kind].map(([x,y,width],i) => ({
-    x:start+x,y,width,label:i===0?'Наверх ↑':i===2?'Корм →':i===3?'Спуск →':'',
-  }));
-  layout.routePlatforms.push(...platforms);
-  const reward=platforms[2];
-  layout.food.push({x:platforms[1].x+100,y:platforms[1].y-40},
-    {x:reward.x+65,y:reward.y-55},{x:reward.x+155,y:reward.y-40});
-  layout.bottles.push({x:reward.x+reward.width-30,y:reward.y-26});
-  layout.signs.push({x:start-90,text:'Снизу проход / корм наверху'});
-}
-sections.forEach(([first,second],index) => {
-  const base=index*sectionWidth;
-  // Ящики только на открытой земле: ни одного под крышей или у её края.
-  layout.obstacles.push(...[500,1250,3420,5700].map(x=>base+x));
-  layout.pigeons.push(base+950,base+(index%2===0?4460:2260));
-  layout.food.push(...[560,2260,3250,4460,5450,5760].map(x=>({x:base+x,y:340})));
-  addRoute(base+1600,first);addRoute(base+3800,second);
-  layout.bottles.push({x:base+1450,y:414});
-  // Лавочка и стая расположены под разными высокими навесами.
-  const benchX=base+(index%2===0?2260:4460);
-  layout.benches.push(benchX);
-  layout.signs.push({x:benchX-120,text:'Можно отдохнуть →'});
-  // Бабка встречается до выбора маршрута, а не в низком проходе.
-  if(index>0)layout.grannies.push({left:base+1000,right:base+1120});
-  // Встреча с самокатом ~3353/5553: уже после свободного приземления.
-  layout.scooters.push(base+3750,base+5950);
-  layout.checkpoints.push(base+1500,base+3200,base+5400);
-});
-
+// Audit annotations describe intended inputs/visible choices; never drive the game.
+export const rewardJumps = [2850, 6040, 8890, 12580, 13100, 16020, 20950, 22260];
+export const routeChoices = [
+  { x: 7930, entrance: 8150, end: 8670 },
+  { x: 21360, entrance: 21580, end: 21920 },
+];
+export const rhythmDecisions = [
+  { x: 1270, kind: 'walk-off-or-jump' }, { x: 3660, kind: 'read-drop-and-birds' },
+  { x: 9200, kind: 'safe-descent' }, { x: 13900, kind: 'Lipton-or-bench' },
+  { x: 16600, targetX: 17300, kind: 'read-solid-terraces' }, { x: 18820, kind: 'read-ground-landing' }, { x: 19000, targetX: 20330, kind: 'read-approaching-scooter' },
+];
 export const settings = {
-  speed: 330,
-  tiredSpeed: 130,
-  jumpVelocity: 560,
-  gravity: 1400,
-  liptonEnergy: 22,
-  obstacleDamage: 15,
-  grannyDamage: 15,
-  grannySpeed: 24,
-  hitCooldownMs: 1400,
-  energyDrainPerSecond: 3.5,
-  tiredJumpVelocity: 440,
-  scooterSpeed: 210,
-  scooterDamage: 12,
-  scooterSlowMs: 650,
-  scooterSlowSpeed: 100,
-  pigeonDamage: 6,
-  pigeonTriggerDistance: 150,
-  benchDurationMs: 2500,
-  benchEnergyPerSecond: 22,
-  benchEnergyThreshold: 65,
-  requiredFood: 3,
-  coyoteMs: 130,
-  jumpBufferMs: 150,
-  levelWidth: sectionWidth * sections.length,
-  floorY: 440,
-  viewHeight: 490,
-  platformThickness: 24,
-  // Сплошная нижняя страховочная дорожка на всём протяжении забега.
-  gaps: [] as { start: number; width: number }[],
-  ...layout,
+  speed: 330, tiredSpeed: 190, jumpVelocity: 560, gravity: 1400, tiredJumpVelocity: 500,
+  liptonEnergy: 22, energyDrainPerSecond: 2,
+  obstacleDamage: 15, grannyDamage: 15, grannySpeed: 12, hitCooldownMs: 1400,
+  scooterSpeed: 210, scooterDamage: 12, scooterSlowMs: 650, scooterSlowSpeed: 100,
+  pigeonDamage: 6, pigeonTriggerDistance: 210,
+  benchDurationMs: 2500, benchEnergyPerSecond: 22, benchEnergyThreshold: 65,
+  requiredFood: 128, bonusFood: 170, // measured budgets: ground 153, one detour 165, both 174
+  coyoteMs: 130, jumpBufferMs: 150,
+  levelWidth: 24010, floorY: 440, viewHeight: 490, platformThickness: 12,
+  groundSpans, interruptions,
+  obstacles: [] as Box[],
+  routePlatforms: [
+    { x: 8150, y: 360, width: 520, label: 'Корм ↑ / птицы!' },
+    { x: 21580, y: 360, width: 340, label: 'Прыжок с края ↑' },
+  ] as Platform[],
+  bottles: [{ x: 7570, y: 325 }, { x: 14420, y: 354 }, { x: 21100, y: 330 }] as Point[],
+  food,
+  scooters: [11970, 20330],
+  pigeons: [{ x: 4230, y: 460 }, { x: 5350, y: 420 }, { x: 8460, y: 360 }, { x: 18440, y: 360 }],
+  benches: [14480],
+  grannies: [{ left: 7540, right: 7580 }],
+  checkpoints: levelSections.map(section => section.start),
+  signs: levelSections.map(section => ({ x: section.start + 160, text: section.name })),
 };
+export { groundYAt };

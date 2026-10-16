@@ -36,3 +36,6 @@ button:focus-visible { outline: 3px solid #e5b83d; outline-offset: 4px; }
 @media (max-height: 400px) { .energy-card { padding: 8px 12px; } .end-card { padding: 16px 28px; } }
 
 @media (max-width: 850px) { .hud-right { gap: 5px; } .goal { font-size: 12px; padding: 9px; } .energy-card { width: 150px; } #install { padding: 9px; } }
+
+.food-panel { display: grid; gap: 2px; }
+#food-needed { font-size: 11px; font-weight: 400; }

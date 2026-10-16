@@ -370,6 +370,17 @@ collectible spam.
 
 ---
 
+### 7.4 Approved food model: resource thresholds (Model B)
+
+Food is a count toward feeding the final cat, not a promise of collecting every object.
+Show `Корм: X` and `Котику нужно: Y`. Do not show X / total when alternative routes contain mutually exclusive food.
+
+Below the minimum: explain the shortfall and offer replay. At the minimum: the cat is fed. At the bonus threshold: a visibly better / funnier feeding result, using the existing final cat rather than a new progression system.
+
+Thresholds are balancing outcomes. Recalculate coherent main/lower and collector budgets after layout changes. The lower/main route needs reasonable margin, the minimum should remain relevant into the later level, and the bonus must be reachable in one collector run but require better routing/execution. Neither the world object count nor the bonus threshold is a claimed 100% maximum.
+
+---
+
 ## 8. Obstacles
 
 ### 8.1 Granny with trolley

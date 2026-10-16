@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
-import { settings as s } from './settings';
+import { settings as s, levelSections, groundYAt } from './settings';
+import { touchesDanger } from './hazard-shapes';
 import { TouchControls } from './controls';
 import './style.css';
 import './pwa';
@@ -33,10 +34,11 @@ class PlayScene extends Phaser.Scene {
   private bufferedJump = -Infinity;
   private hitUntil = 0;
   private slowUntil = 0;
+  private airborneSpeed = s.speed;
   private restRemaining = 0;
   private foodCount = 0;
   private scooters: { sprite: Phaser.Physics.Arcade.Sprite; spawnX: number; launched: boolean }[] = [];
-  private pigeons: { sprite: Phaser.Physics.Arcade.Sprite; flying: boolean; dangerRemaining: number }[] = [];
+  private pigeons: { sprite: Phaser.Physics.Arcade.Sprite; flying: boolean; lowFlightRemaining: number; perchY: number }[] = [];
   private finished = false;
   private wasPortrait = false;
   constructor() { super('play'); }
@@ -47,6 +49,7 @@ class PlayScene extends Phaser.Scene {
     this.checkpoint = 100;
     this.lastGround = this.bufferedJump = -Infinity;
     this.hitUntil = this.slowUntil = 0;
+    this.airborneSpeed = s.speed;
     this.restRemaining = this.foodCount = 0;
     this.scooters = [];
     this.pigeons = [];
@@ -57,15 +60,24 @@ class PlayScene extends Phaser.Scene {
     clearTimeout(toastTimer);
     controls?.reset();
     this.makeTextures();
-    this.cameras.main.setBackgroundColor('#c7dfcf');
+    this.cameras.main.setBackgroundColor('#c7dfcf').setScroll(0, 0);
     this.resize();
     this.scale.on('resize', this.resize, this);
     this.events.once('shutdown', () => this.scale.off('resize', this.resize, this));
     const scenery = this.add.graphics().setDepth(-2);
-    scenery.fillStyle(0xb6cfbe);
-    for (let x = 0; x < s.levelWidth; x += 500) {
-      scenery.fillRoundedRect(x + 140, 305, 140, 135, 10);
-      scenery.fillRoundedRect(x + 320, 350, 95, 90, 8);
+    for (const [i, section] of levelSections.entries()) {
+      for (let x = section.start; x < section.end; x += 430) {
+        scenery.fillStyle(0xb6cfbe);
+        scenery.fillRoundedRect(x + 140, 280 - (i % 3) * 25, 140, 160 + (i % 3) * 25, 10);
+        scenery.fillRoundedRect(x + 310, 350, 95, 90, 8);
+        scenery.fillStyle(0xc7dfcf);
+        scenery.fillRect(x + 162, 315, 22, 28);
+        scenery.fillRect(x + 214, 315, 22, 28);
+        scenery.lineStyle(3, 0xa1bdab);
+        scenery.lineBetween(x + 75, 340, x + 75, 440);
+        scenery.fillStyle(0xa1bdab).fillCircle(x + 75, 339, 12);
+        scenery.fillStyle(0xaac6ad).fillEllipse(x + 30, 430, 38, 22);
+      }
     }
     const ground = this.physics.add.staticGroup();
     const obstacles = this.physics.add.staticGroup();
@@ -74,15 +86,19 @@ class PlayScene extends Phaser.Scene {
       group.add(this.add.rectangle(x + width / 2, y + height / 2, width, height, 0x788c7b));
       this.add.rectangle(x + width / 2, y + 4, width, 8, 0x96aa8c);
     };
-    let start = 0;
-    for (const gap of s.gaps) {
-      slab(start, s.floorY, gap.start - start, 180);
-      start = gap.start + gap.width;
-      this.sign(gap.start - 130, 'Прыгни →');
+    for (const span of s.groundSpans) {
+      // Filled to one foundation: the terraces have no playable underside.
+      slab(span.start, span.y, span.end - span.start, 660 - span.y);
     }
-    slab(start, s.floorY, s.levelWidth - start, 180);
-    s.obstacles.forEach((x, i) => slab(x, s.floorY - (i % 3 === 0 ? 48 : 34), 42, i % 3 === 0 ? 48 : 34, obstacles));
-    this.sign(170, 'Котик ждёт →');
+    for (const box of s.obstacles) {
+      const y = groundYAt(box.x) - box.height;
+      const crate = this.add.rectangle(box.x + box.width / 2, y + box.height / 2, box.width, box.height, 0xb99c70);
+      obstacles.add(crate);
+      const detail = this.add.graphics();
+      detail.lineStyle(2, 0x705745);
+      detail.strokeRect(box.x + 1, y + 1, box.width - 2, box.height - 2);
+      detail.lineBetween(box.x + 3, y + 3, box.x + box.width - 3, groundYAt(box.x) - 3);
+    }
     for (const sign of s.signs) this.sign(sign.x, sign.text);
     // Опоры находятся за игровой дорожкой: они поддерживают навес визуально,
     // но не являются препятствиями в проходе перед ними.
@@ -92,10 +108,17 @@ class PlayScene extends Phaser.Scene {
       supports.fillStyle(0x9bb3a3);
       supports.lineStyle(3, 0x9bb3a3);
       for (const postX of [platform.x + 16, platform.x + platform.width - 23]) {
-        supports.fillRect(postX, underside, 7, s.floorY - underside);
+        supports.fillRect(postX, underside, 7, groundYAt(postX) - underside);
         supports.lineBetween(postX + 3, underside + 25, postX + 24, underside);
       }
-      slab(platform.x, platform.y, platform.width, s.platformThickness, upperRoute);
+      // A light, open awning with a strong top edge communicates a one-way surface.
+      const awning = this.add.rectangle(platform.x + platform.width / 2, platform.y + s.platformThickness / 2,
+        platform.width, s.platformThickness, 0x788c7b, .55);
+      upperRoute.add(awning);
+      this.add.rectangle(platform.x + platform.width / 2, platform.y + 2, platform.width, 4, 0x568968);
+      for (let x = platform.x + 36; x < platform.x + platform.width; x += 70) {
+        this.add.text(x, platform.y + 12, '↑', { fontSize: '12px', color: '#568968' });
+      }
       const body = (upperRoute.getChildren().at(-1) as Phaser.GameObjects.Rectangle).body as Phaser.Physics.Arcade.StaticBody;
       // Односторонняя опора: края и низ никогда не блокируют автобег.
       body.checkCollision.left = body.checkCollision.right = body.checkCollision.down = false;
@@ -103,23 +126,18 @@ class PlayScene extends Phaser.Scene {
     }
     this.sign(s.levelWidth - 600, 'Ещё немного →');
     this.tanya = this.physics.add.sprite(100, s.floorY - 25, 'tanya');
-    this.tanya.setSize(26, 48).setOffset(7, 4).setMaxVelocity(500, 700);
+    this.tanya.setSize(24, 50).setOffset(8, 4).setMaxVelocity(500, 700);
     this.physics.add.collider(this.tanya, ground);
     this.physics.add.collider(this.tanya, upperRoute, undefined, (_player, block) => {
       const body = this.tanya.body as Phaser.Physics.Arcade.Body;
       const platform = (block as Phaser.GameObjects.Rectangle).body as Phaser.Physics.Arcade.StaticBody;
       return body.velocity.y >= 0 && body.prev.y + body.height <= platform.top + 4;
     });
-    // Платформы поддерживают сверху; удар сбоку не блокирует auto-run.
-    this.physics.add.collider(this.tanya, obstacles, undefined, (_player, block) => {
+    // Crates are genuinely solid. A missed jump contacts the visible face;
+    // a jump from that face remains possible even at zero energy.
+    this.physics.add.collider(this.tanya, obstacles, () => {
       const body = this.tanya.body as Phaser.Physics.Arcade.Body;
-      const obstacle = (block as Phaser.GameObjects.Rectangle).body as Phaser.Physics.Arcade.StaticBody;
-      return body.velocity.y >= 0 && body.bottom <= obstacle.top + 12;
-    });
-    this.physics.add.overlap(this.tanya, obstacles, (_player, block) => {
-      const body = this.tanya.body as Phaser.Physics.Arcade.Body;
-      const obstacle = (block as Phaser.GameObjects.Rectangle).body as Phaser.Physics.Arcade.StaticBody;
-      if (body.bottom > obstacle.top + 12) this.hit(s.obstacleDamage);
+      if (body.blocked.right) this.hit(s.obstacleDamage);
     });
     this.keys = this.input.keyboard!.addKeys('SPACE,UP') as typeof this.keys;
     this.input.keyboard!.on('keydown', hideHint);
@@ -139,18 +157,18 @@ class PlayScene extends Phaser.Scene {
       message(`Lipton! +${s.liptonEnergy} энергии`, 1200);
     });
     for (const range of s.grannies) {
-      const sprite = this.physics.add.sprite(range.left, s.floorY - 27, 'granny');
+      const sprite = this.physics.add.sprite(range.left, groundYAt(range.left) - 27, 'granny');
       sprite.setSize(48, 44).setOffset(10, 12).setVelocityX(s.grannySpeed);
       this.physics.add.collider(sprite, ground);
-      this.physics.add.overlap(this.tanya, sprite, () => this.hit(s.grannyDamage));
       this.grannies.push({ sprite, ...range });
     }
-    this.createNewObjects();
+    this.createNewObjects(ground);
     const catX = s.levelWidth - 150;
     this.add.image(catX, s.floorY - 22, 'cat');
     this.add.text(catX, s.floorY - 75, 'Мяу…', { fontSize: '22px', color: '#29483e' }).setOrigin(.5);
     this.sign(catX - 260, 'Покорми котика');
     if (!controls) controls = new TouchControls(this.game.canvas, hideHint);
+    element('#food-goal').textContent = `Котику нужно: ${s.requiredFood}. ${s.bonusFood}+ — кошачий пир!`;
     this.updateHud();
   }
 
@@ -170,7 +188,10 @@ class PlayScene extends Phaser.Scene {
     if (this.finished) return;
     const dt = Math.min(delta, 50) / 1000;
     const body = this.tanya.body as Phaser.Physics.Arcade.Body;
-    const grounded = body.blocked.down || body.touching.down;
+    // Only solid surfaces establish grounding; collectible/rest overlaps
+    // may set touching.down while Tanya is still airborne.
+    const grounded = body.blocked.down;
+    const jumpVelocity = this.exhausted ? s.tiredJumpVelocity : s.jumpVelocity;
     if (grounded) this.lastGround = now;
     // Прочитать все запросы, чтобы JustDown не оставался от предыдущего кадра.
     const space = Phaser.Input.Keyboard.JustDown(this.keys.SPACE);
@@ -185,24 +206,29 @@ class PlayScene extends Phaser.Scene {
       if (this.restRemaining === 0) {
         this.tanya.setTexture('tanya');
         body.allowGravity = true;
-        this.tanya.setPosition(this.tanya.x, s.floorY - 25);
+        body.reset(this.tanya.x, groundYAt(this.tanya.x) - 26);
         message('Отдохнули — побежали!', 1200);
       }
     } else {
+      if (grounded) this.airborneSpeed = this.exhausted ? s.tiredSpeed : s.speed;
       this.changeEnergy(-s.energyDrainPerSecond * dt);
-      this.tanya.setVelocityX(now < this.slowUntil ? s.scooterSlowSpeed : this.exhausted ? s.tiredSpeed : s.speed).setFlipX(false);
+      // Fatigue/recovery changes the next grounded stride, not a jump that was
+      // already committed. This keeps food-guided arcs predictable at energy 0.
+      this.tanya.setVelocityX(now < this.slowUntil ? s.scooterSlowSpeed : this.airborneSpeed).setFlipX(false);
     }
     if (this.restRemaining === 0 && now - this.bufferedJump <= s.jumpBufferMs && now - this.lastGround <= s.coyoteMs) {
-      this.tanya.setVelocityY(-(this.exhausted ? s.tiredJumpVelocity : s.jumpVelocity));
+      this.tanya.setVelocityY(-jumpVelocity);
       this.bufferedJump = this.lastGround = -Infinity;
     }
     this.tanya.setAlpha(now < this.hitUntil ? (Math.floor(now / 100) % 2 ? .45 : 1) : 1);
+    // Keep the trolley silhouette stable when the patrol reverses: flipping
+    // it would instantly move the head hitbox across a jump already in progress.
     for (const granny of this.grannies) {
-      if (granny.sprite.x >= granny.right) granny.sprite.setVelocityX(-s.grannySpeed).setFlipX(true);
-      if (granny.sprite.x <= granny.left) granny.sprite.setVelocityX(s.grannySpeed).setFlipX(false);
+      if (granny.sprite.x >= granny.right) granny.sprite.setVelocityX(-s.grannySpeed);
+      if (granny.sprite.x <= granny.left) granny.sprite.setVelocityX(s.grannySpeed);
     }
     this.updateNewObjects(dt);
-    if (grounded && Math.abs(body.bottom - s.floorY) < 3) {
+    if (grounded && Math.abs(body.bottom - groundYAt(this.tanya.x)) < 3) {
       for (const cp of s.checkpoints) if (this.tanya.x >= cp) this.checkpoint = Math.max(this.checkpoint, cp);
     }
     if (this.tanya.y > 620) this.respawn();
@@ -237,7 +263,7 @@ class PlayScene extends Phaser.Scene {
     return true;
   }
   private respawn() {
-    this.tanya.setPosition(this.checkpoint, s.floorY - 26).setVelocity(0, 0);
+    this.tanya.setPosition(this.checkpoint, groundYAt(this.checkpoint) - 26).setVelocity(0, 0);
     this.hitUntil = this.time.now + 800;
     this.lastGround = this.bufferedJump = -Infinity;
     controls.reset();
@@ -246,24 +272,33 @@ class PlayScene extends Phaser.Scene {
   }
   private feedCat() {
     const success = this.foodCount >= s.requiredFood;
-    element('#end-title').textContent = success ? 'Котик спасён ❤️' : 'Нужно ещё немного корма';
-    element('#end-description').textContent = success ? 'Таня дошла. Котик поел. Всё получилось.' : `Собрано ${this.foodCount}/${s.food.length}. Котику нужно минимум ${s.requiredFood} пакетика — попробуй ещё раз.`;
+    const feast = this.foodCount >= s.bonusFood;
+    element('#end-title').textContent = feast ? 'Кошачий пир! 🐈🎉' : success ? 'Котик накормлен ❤️' : 'Котику не хватило корма';
+    element('#end-description').textContent = feast
+      ? `Корм: ${this.foodCount}. Котик поел и заказал добавку. Таня открыла кошачий ресторан!`
+      : success ? `Корм: ${this.foodCount}. Котик сыт. Таня справилась! Для кошачьего пира нужно ${s.bonusFood} пакетиков.`
+      : `Корм: ${this.foodCount}. Котику нужно: ${s.requiredFood}. Не хватило ${s.requiredFood - this.foodCount} пакетиков. Попробуй ещё раз и следуй за кормом.`;
+    element('.cat-icon').textContent = feast ? '🐈🍽️🎉' : success ? '🐈❤️' : '🐈';
     this.finished = true;
     this.tanya.setVelocity(0, 0).setAlpha(1).setFlipX(false);
     controls.reset();
     this.physics.pause();
-    if (success) this.add.rectangle(s.levelWidth - 195, s.floorY - 7, 22, 10, 0xe5b83d);
-    message(success ? 'Таня покормила котика' : 'Нужно ещё немного корма', 1800);
+    if (success) {
+      this.add.rectangle(s.levelWidth - 195, s.floorY - 7, feast ? 48 : 22, 10, 0xe5b83d);
+      if (feast) this.add.text(s.levelWidth - 170, s.floorY - 110, 'Мур! А добавка будет?', { fontSize: '22px', color: '#29483e' }).setOrigin(.5);
+    }
+    message(feast ? 'Кошачий пир! Кот требует звезду Мишлен.' : success ? 'Таня покормила котика' : 'Нужно ещё немного корма', 1800);
     this.time.delayedCall(1600, () => { ending.hidden = false; });
   }
   private updateHud() {
-    element('#food-count').textContent = `Корм ${this.foodCount}/${s.food.length}`;
+    element('#food-count').textContent = `Корм: ${this.foodCount}`;
+    element('#food-needed').textContent = `Котику нужно: ${s.requiredFood}`;
     hudValue.textContent = `${Math.ceil(this.energy)}`;
     hudFill.style.width = `${this.energy}%`;
     hudFill.style.background = this.exhausted ? '#bd745b' : '#568968';
     energyTrack.setAttribute('aria-valuenow', `${Math.ceil(this.energy)}`);
   }
-  private createNewObjects() {
+  private createNewObjects(ground: Phaser.Physics.Arcade.StaticGroup) {
     const food = this.physics.add.staticGroup();
     for (const point of s.food) food.create(point.x, point.y, 'food');
     this.physics.add.overlap(this.tanya, food, (_player, item) => {
@@ -276,34 +311,31 @@ class PlayScene extends Phaser.Scene {
       this.updateHud();
     });
     for (const x of s.scooters) {
-      const sprite = this.physics.add.sprite(x, s.floorY - 28, 'scooter').setImmovable(true);
-      (sprite.body as Phaser.Physics.Arcade.Body).allowGravity = false;
+      const sprite = this.physics.add.sprite(x, groundYAt(x) - 28, 'scooter');
+      this.physics.add.collider(sprite, ground);
       this.scooters.push({ sprite, spawnX: x, launched: false });
-      this.physics.add.overlap(this.tanya, sprite, () => {
-        if (this.hit(s.scooterDamage)) {
-          this.slowUntil = this.time.now + s.scooterSlowMs;
-          this.cameras.main.shake(90, .002);
-        }
-      });
     }
-    for (const x of s.pigeons) {
-      const sprite = this.physics.add.sprite(x, s.floorY - 16, 'pigeons');
+    for (const point of s.pigeons) {
+      const sprite = this.physics.add.sprite(point.x, point.y - 16, 'pigeons');
       (sprite.body as Phaser.Physics.Arcade.Body).allowGravity = false;
-      const flock = { sprite, flying: false, dangerRemaining: 0 };
+      const flock = { sprite, flying: false, lowFlightRemaining: 0, perchY: point.y };
       this.pigeons.push(flock);
-      this.physics.add.overlap(this.tanya, sprite, () => {
-        if ((!flock.flying || flock.dangerRemaining > 0) && this.hit(s.pigeonDamage)) this.cameras.main.shake(160, .004);
-      });
     }
     const benches = this.physics.add.staticGroup();
-    for (const x of s.benches) benches.create(x, s.floorY - 22, 'bench');
+    for (const x of s.benches) {
+      const bench = benches.create(x, groundYAt(x) - 22, 'bench') as Phaser.Physics.Arcade.Sprite;
+      // Rest is activated by the visibly marked seat, not the whole 90px prop.
+      bench.setSize(24, 32).setOffset(33, 12);
+      this.add.rectangle(x, groundYAt(x) - 24, 24, 5, 0xe5b83d);
+    }
     this.physics.add.overlap(this.tanya, benches, (_player, item) => {
       const bench = item as Phaser.Physics.Arcade.Sprite;
       const body = this.tanya.body as Phaser.Physics.Arcade.Body;
-      if (this.finished || this.restRemaining > 0 || bench.getData('used') || this.energy >= s.benchEnergyThreshold || !(body.blocked.down || body.touching.down)) return;
+      if (this.finished || this.restRemaining > 0 || bench.getData('used') || this.energy >= s.benchEnergyThreshold || body.velocity.y < 0 || !(body.blocked.down && Math.abs(body.bottom - groundYAt(this.tanya.x)) < 3)) return;
       bench.setData('used', true);
       this.restRemaining = s.benchDurationMs;
-      this.tanya.setPosition(bench.x, s.floorY - 25).setVelocity(0, 0).setTexture('tanya-sitting');
+      body.reset(bench.x, groundYAt(bench.x) - 26);
+      this.tanya.setVelocity(0, 0).setTexture('tanya-sitting');
       body.allowGravity = false;
       controls.reset();
       message('Отдыхаем на лавочке', s.benchDurationMs);
@@ -318,19 +350,34 @@ class PlayScene extends Phaser.Scene {
       if (scooter.sprite.x < 0) scooter.sprite.setVelocityX(0).setVisible(false);
     }
     for (const flock of this.pigeons) {
-      if (!flock.flying && Math.abs(flock.sprite.x - this.tanya.x) < s.pigeonTriggerDistance) {
+      if (!flock.flying && Math.abs(this.tanya.body!.bottom - flock.perchY) < 60 && Math.abs(flock.sprite.x - this.tanya.x) < s.pigeonTriggerDistance) {
         flock.flying = true;
-        flock.dangerRemaining = .45;
+        flock.lowFlightRemaining = .45;
         // Сначала вспархивают низко: без прыжка можно задеть стаю.
-        flock.sprite.setVelocity(35, -35);
-        this.tweens.add({ targets: flock.sprite, angle: 12, yoyo: true, repeat: 2, duration: 70 });
+        flock.sprite.setVelocity(-60, -45);
       }
       if (flock.flying) {
-        flock.dangerRemaining = Math.max(0, flock.dangerRemaining - dt);
-        if (flock.dangerRemaining === 0) {
-          (flock.sprite.body as Phaser.Physics.Arcade.Body).checkCollision.none = true;
-          flock.sprite.setVelocity(65, -260);
+        flock.lowFlightRemaining = Math.max(0, flock.lowFlightRemaining - dt);
+        if (flock.lowFlightRemaining === 0) {
+          flock.sprite.setVelocity(-90, -260);
         }
+      }
+    }
+    const player = this.tanya.body as Phaser.Physics.Arcade.Body;
+    for (const granny of this.grannies) {
+      if (touchesDanger(player, granny.sprite, 'granny')) this.hit(s.grannyDamage);
+    }
+    for (const scooter of this.scooters) {
+      if (touchesDanger(player, scooter.sprite, 'scooter') && this.hit(s.scooterDamage)) {
+        this.slowUntil = this.time.now + s.scooterSlowMs;
+        this.cameras.main.shake(90, .002);
+      }
+    }
+    for (const flock of this.pigeons) {
+      // Visible birds remain dangerous while flying. No invisible rectangular
+      // flock and no timer that silently turns still-visible birds harmless.
+      if (touchesDanger(player, flock.sprite, 'pigeons') && this.hit(s.pigeonDamage)) {
+        this.cameras.main.shake(160, .004);
       }
     }
   }
@@ -341,8 +388,8 @@ class PlayScene extends Phaser.Scene {
     controls?.reset();
   }
   private sign(x: number, text: string) {
-    this.add.rectangle(x, s.floorY - 30, 4, 60, 0x788c7b);
-    this.add.text(x, s.floorY - 70, text, { fontSize: '17px', color: '#3c594b', backgroundColor: '#eef3df', padding: { x: 10, y: 7 } }).setOrigin(.5);
+    this.add.rectangle(x, groundYAt(x) - 30, 4, 60, 0x788c7b);
+    this.add.text(x, groundYAt(x) - 70, text, { fontSize: '17px', color: '#3c594b', backgroundColor: '#eef3df', padding: { x: 10, y: 7 } }).setOrigin(.5);
   }
   private makeTextures() {
     if (this.textures.exists('tanya')) return;
