@@ -21,7 +21,8 @@
       "right": 2207.3846153846152,
       "top": 0,
       "bottom": 735.7948717948718,
-      "alpha": 1
+      "alpha": 1,
+      "visible": true
     },
     {
       "key": "winter:atmosphere",
@@ -40,7 +41,8 @@
       "right": 755.6,
       "top": 58.86358974358975,
       "bottom": 310.73025641025646,
-      "alpha": 0.6
+      "alpha": 0.6,
+      "visible": true
     },
     {
       "key": "winter:far-city",
@@ -59,7 +61,8 @@
       "right": 1275.1,
       "top": 119.8727948717949,
       "bottom": 574.6584615384616,
-      "alpha": 1
+      "alpha": 1,
+      "visible": true
     },
     {
       "key": "winter:mid-city",
@@ -78,7 +81,8 @@
       "right": 2002.4,
       "top": -63.37641025641028,
       "bottom": 604.0902564102564,
-      "alpha": 1
+      "alpha": 1,
+      "visible": true
     }
   ],
   "devices": [
@@ -298,5 +302,112 @@
       "sha256": "565026ced79aea1fbe0fed5c13872843b69743c1137e00a70345ee831ea52a07",
       "bytes": 1281320
     }
-  ]
+  ],
+  "midCityVisibility": {
+    "progressBasis": "clamped camera travel / total camera travel",
+    "fullyVisible": [
+      [
+        0,
+        0.1
+      ],
+      [
+        0.9,
+        1
+      ]
+    ],
+    "smoothTransitions": [
+      [
+        0.1,
+        0.18
+      ],
+      [
+        0.82,
+        0.9
+      ]
+    ],
+    "hidden": [
+      0.18,
+      0.82
+    ],
+    "samples": [
+      {
+        "fraction": 0,
+        "alpha": 1,
+        "visible": true
+      },
+      {
+        "fraction": 0.1,
+        "alpha": 1,
+        "visible": true
+      },
+      {
+        "fraction": 0.12,
+        "alpha": 0.8437500000000001,
+        "visible": true
+      },
+      {
+        "fraction": 0.14,
+        "alpha": 0.4999999999999999,
+        "visible": true
+      },
+      {
+        "fraction": 0.16,
+        "alpha": 0.15625,
+        "visible": true
+      },
+      {
+        "fraction": 0.18,
+        "alpha": 0,
+        "visible": false
+      },
+      {
+        "fraction": 0.25,
+        "alpha": 0,
+        "visible": false
+      },
+      {
+        "fraction": 0.5,
+        "alpha": 0,
+        "visible": false
+      },
+      {
+        "fraction": 0.75,
+        "alpha": 0,
+        "visible": false
+      },
+      {
+        "fraction": 0.82,
+        "alpha": 0,
+        "visible": false
+      },
+      {
+        "fraction": 0.84,
+        "alpha": 0.15625000000000122,
+        "visible": true
+      },
+      {
+        "fraction": 0.86,
+        "alpha": 0.4999999999999999,
+        "visible": true
+      },
+      {
+        "fraction": 0.88,
+        "alpha": 0.8437500000000018,
+        "visible": true
+      },
+      {
+        "fraction": 0.9,
+        "alpha": 1,
+        "visible": true
+      },
+      {
+        "fraction": 1,
+        "alpha": 1,
+        "visible": true
+      }
+    ],
+    "resizeStatesTested": 7,
+    "replayBackgroundCount": 4
+  },
+  "gameplayComparisonNote": "Full-run results below were measured during initial background integration. This follow-up changes only background render visibility; gameplay sources and asset pixels are unchanged. Full gameplay simulations were not repeated."
 }

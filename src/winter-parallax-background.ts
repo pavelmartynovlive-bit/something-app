@@ -20,13 +20,28 @@ export class WinterParallaxBackground {
 
   private readonly layers: { spec: typeof winterLayers[number]; image: Phaser.GameObjects.Image }[];
 
-  constructor(scene: Phaser.Scene, private readonly worldWidth: number) {
+  constructor(private readonly scene: Phaser.Scene, private readonly worldWidth: number) {
     this.layers = winterLayers.map((spec, index) => ({
       spec,
       image: scene.add.image(0, 0, `winter:${spec.name}`)
         .setOrigin(0, 0).setDepth(-100 + index)
         .setScrollFactor(spec.factor, 0).setAlpha(spec.alpha),
     }));
+    // Read the final camera position before drawing, including paused/resized views.
+    scene.events.on(Phaser.Scenes.Events.PRE_RENDER, this.updateVisibility, this);
+  }
+
+  private updateVisibility() {
+    const camera = this.scene.cameras.main;
+    const travel = Math.max(0, this.worldWidth - camera.width / camera.zoom);
+    const progress = travel > 0 ? Phaser.Math.Clamp(camera.scrollX / travel, 0, 1) : 0;
+    // Solid courtyards at the two ends; a short soft transition into open sky.
+    const edgeDistance = Math.min(progress, 1 - progress);
+    const fade = Phaser.Math.Clamp((edgeDistance - .10) / .08, 0, 1);
+    const opacity = 1 - fade * fade * (3 - 2 * fade);
+    for (const { spec, image } of this.layers) {
+      if (spec.name === 'mid-city') image.setAlpha(opacity).setVisible(opacity > 0);
+    }
   }
 
   resize(camera: Phaser.Cameras.Scene2D.Camera, groundScreenY: number) {
@@ -48,9 +63,11 @@ export class WinterParallaxBackground {
       if (spec.placement === 'mid') y = groundScreenY + height * .12 - image.displayHeight;
       image.setPosition(0, y);
     }
+    this.updateVisibility();
   }
 
   destroy() {
+    this.scene.events.off(Phaser.Scenes.Events.PRE_RENDER, this.updateVisibility, this);
     for (const { image } of this.layers) image.destroy();
   }
 }

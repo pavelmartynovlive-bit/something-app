@@ -16,9 +16,10 @@ try {
    const original={x:s.tanya.x,y:s.tanya.y,width:s.tanya.body.width,height:s.tanya.body.height,gravity:s.physics.world.gravity.y};
    const images=s.children.list.filter(o=>o.texture?.key.startsWith('winter:'));
    const poses=[];
-   for(const fraction of [0,.1,.25,.5,.75,.9,1]){
+   for(const fraction of [0,.1,.12,.14,.16,.18,.25,.5,.75,.82,.84,.86,.88,.9,1]){
     c.scrollX=T*fraction;
-    poses.push({fraction,layers:images.map(o=>({key:o.texture.key,type:o.type,depth:o.depth,body:!!o.body,width:o.displayWidth,height:o.displayHeight,scaleX:o.scaleX,scaleY:o.scaleY,sourceWidth:o.frame.realWidth,sourceHeight:o.frame.realHeight,factorX:o.scrollFactorX,factorY:o.scrollFactorY,left:o.x-c.scrollX*o.scrollFactorX,right:o.x+o.displayWidth-c.scrollX*o.scrollFactorX,top:o.y,bottom:o.y+o.displayHeight,alpha:o.alpha}))});
+    s.events.emit('prerender',game.renderer);
+    poses.push({fraction,layers:images.map(o=>({key:o.texture.key,type:o.type,depth:o.depth,body:!!o.body,width:o.displayWidth,height:o.displayHeight,scaleX:o.scaleX,scaleY:o.scaleY,sourceWidth:o.frame.realWidth,sourceHeight:o.frame.realHeight,factorX:o.scrollFactorX,factorY:o.scrollFactorY,left:o.x-c.scrollX*o.scrollFactorX,right:o.x+o.displayWidth-c.scrollX*o.scrollFactorX,top:o.y,bottom:o.y+o.displayHeight,alpha:o.alpha,visible:o.visible}))});
    }
    const y=images.map(o=>o.y);c.scrollY+=40;
    const verticalStable=images.every((o,i)=>o.y-c.scrollY*o.scrollFactorY===y[i]);c.scrollY-=40;
@@ -29,7 +30,15 @@ try {
   assert.deepEqual(result.original,result.after);assert.equal(result.verticalStable,true);
   for(const pose of result.poses){assert.equal(pose.layers.length,4);assert.equal(new Set(pose.layers.map(l=>l.factorX)).size,4);for(const l of pose.layers){assert.equal(l.type,'Image');assert.equal(l.body,false);assert.equal(l.factorY,0);assert.equal(l.scaleX,l.scaleY);assert.ok(l.depth<result.gameplayMinDepth);assert.ok(l.left<=1e-6&&l.right>=result.viewport.width-1e-6,'horizontal coverage '+l.key);}
    assert.deepEqual(pose.layers.map(l=>l.key),['winter:sky','winter:atmosphere','winter:far-city','winter:mid-city']);
+   const mid=pose.layers[3];
+   if(pose.fraction<=.1||pose.fraction>=.9){assert.equal(mid.alpha,1);assert.equal(mid.visible,true)}
+   else if(pose.fraction>=.18&&pose.fraction<=.82){assert.ok(mid.alpha<1e-9);assert.equal(mid.visible,false)}
+   else {assert.ok(mid.alpha>0&&mid.alpha<1,'partial fade only in transitions');assert.equal(mid.visible,true)}
+   assert.deepEqual(pose.layers.slice(0,3).map(l=>[l.alpha,l.visible]),[[1,true],[.6,true],[1,true]]);
    const sky=pose.layers[0];assert.ok(sky.top<=0&&sky.bottom>=result.viewport.height-1e-6,'opaque sky fills viewport');}
+  const alphas=result.poses.map(p=>p.layers[3].alpha);
+  for(let i=1;i<=7;i++)assert.ok(alphas[i]<=alphas[i-1],'smooth fade out');
+  for(let i=8;i<alphas.length;i++)assert.ok(alphas[i]>=alphas[i-1],'smooth fade in');
   samples.push(result);
  }
  assert.deepEqual(samples[0].poses,samples.at(-1).poses,'same composition after rotate/return');
@@ -40,5 +49,5 @@ try {
   await page.evaluate(fraction=>{const s=game.scene.getScene('play'),c=s.cameras.main;c.scrollX=(cfg.levelWidth-c.width/c.zoom)*fraction;c.scrollY=s.framing.baseY;game.renderer.preRender();game.scene.render(game.renderer);game.renderer.postRender()},fraction);
   await page.screenshot({path:`/tmp/winter-background-${Math.round(fraction*100)}.png`});
  }
- assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);writeFileSync('/tmp/winter-background-check.json',JSON.stringify({samples,errors,failed,replay},null,2));console.log('PASS: four non-physics Images, full horizontal/sky coverage 0–100%, no wrapping, separate factors, fixed vertical parallax, proportional scale, seven resize states and replay');
+ assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);writeFileSync('/tmp/winter-background-check.json',JSON.stringify({samples,errors,failed,replay},null,2));console.log('PASS: four non-physics Images, full horizontal/sky coverage 0–100%, no wrapping, separate factors, fixed vertical parallax, proportional scale, seven resize states, replay, middle scenery hidden centrally and smoothly restored at ends');
 }finally{await browser.close()}

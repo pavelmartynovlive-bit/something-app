@@ -115,3 +115,28 @@ prop layer remains. Sky, atmosphere, far city and middle courtyard stay; gamepla
 objects, terrain, physics, energy and all remaining scroll factors are untouched.
 Middle scenery keeps its corrected full layer opacity. Tests pass for four layers,
 all progress/resize cases, replay and production build. Preview updated.
+
+
+## Middle courtyard only at the ends
+
+Following phone feedback, the mid-city panorama is now fully opaque during the
+first / last 10% of camera travel. Smoothstep fades it out over 10–18%, hides it
+completely over 18–82%, and brings it back over 82–90%. The central 64% shows only
+sky, atmosphere and distant city behind gameplay. Transitions briefly blend the
+middle layer; the start and end retain full opacity rather than permanent ghost
+architecture. The near-decor layer remains absent.
+
+Visibility is calculated before each Phaser render from the existing camera
+scroll and world width; it also refreshes on resize. It does not change camera
+tracking, gameplay, asset pixels, layer scale, depth or scroll factors. The class
+removes its render listener on destruction, including replay. No scene gameplay
+code changed in this follow-up.
+
+The background check now samples 15 progress positions on seven resize states,
+checks full / partial / hidden visibility and monotonic fades, validates unchanged
+other-layer opacity, coverage, body dimensions and replay. Production build and
+presentation checks pass. Prior complete gameplay-run measurements above are
+retained as historical integration evidence, not claimed as rerun here.
+
+Changed in this follow-up: background module, existing background check, this
+report, validation JSON and rendered preview.
