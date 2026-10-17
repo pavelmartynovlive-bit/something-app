@@ -2,15 +2,15 @@
 // Every group is authored; there is no reusable arc/section generator.
 type Point = {x:number;y:number};
 export const foodClusters: {purpose:string;points:Point[]}[] = [
- {purpose:'1: normal gap arc',points:[{x:380,y:365},{x:416,y:318},{x:452,y:306},{x:488,y:318},{x:524,y:365}]},
+ {purpose:'1: normal gap arc',points:[{x:375,y:390},{x:456,y:318},{x:492,y:306},{x:528,y:318},{x:564,y:365}]},
  {purpose:'1: landing cue rises over the granny before the second ascent',points:[{x:660,y:370},{x:710,y:320},{x:770,y:360}]},
  {purpose:'1→2: second ascent points toward the tall ledge',points:[{x:940,y:340},{x:970,y:310},{x:1000,y:310},{x:1040,y:340}]},
  {purpose:'2: near-vertical boost notation',points:[{x:1320,y:340},{x:1380,y:270},{x:1420,y:220},{x:1460,y:185},{x:1500,y:175},{x:1580,y:205},{x:1640,y:254}]},
  {purpose:'3: downhill diagonal stops before the delayed bird jump',points:[{x:1830,y:155},{x:2020,y:298},{x:2100,y:328},{x:2180,y:357},{x:2260,y:387}]},
  {purpose:'3: reward after delayed bird jump, into next ascent',points:[{x:2550,y:315},{x:2580,y:335},{x:2610,y:370},{x:2640,y:407}]},
- {purpose:'4: first low landing, not three identical arcs',points:[{x:2790,y:355},{x:2830,y:310},{x:2870,y:300},{x:2920,y:339}]},
- {purpose:'4: zig-zag toward narrow second surface',points:[{x:2990,y:285},{x:3040,y:232},{x:3080,y:238},{x:3120,y:270}]},
- {purpose:'4: lower continuation through the third surface',points:[{x:3170,y:220},{x:3220,y:197},{x:3270,y:240},{x:3330,y:330}]},
+ {purpose:'4: first low landing, not three identical arcs',points:[{x:2790,y:205},{x:2830,y:185},{x:2870,y:205},{x:2920,y:286}]},
+ {purpose:'4: zig-zag toward narrow second surface',points:[{x:2990,y:245},{x:3040,y:200},{x:3080,y:210},{x:3120,y:230}]},
+ {purpose:'4: final ascending surface, then return toward ground',points:[{x:3170,y:190},{x:3220,y:145},{x:3270,y:152},{x:3330,y:179}]},
  {purpose:'4: optional boost reward above the third surface',points:[{x:3280,y:105},{x:3310,y:95},{x:3340,y:95},{x:3370,y:105},{x:3400,y:120}]},
  {purpose:'4 lower: safe ramp remains a viable route',points:[{x:2940,y:395},{x:2980,y:394},{x:3020,y:393}]},
  {purpose:'4→5: return downhill directly into long-gap takeoff',points:[{x:3630,y:320},{x:3700,y:285},{x:3770,y:335},{x:4000,y:383}]},

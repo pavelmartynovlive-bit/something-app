@@ -1453,3 +1453,42 @@ Food requirement80 /bonus103 remain justified by new actual route budgets98 /103
 Stable portrait scale, existing jump/boost envelopes, coyote and buffer unchanged.
 See current LEVEL_AUDIT.md and overview for measured local map / caveats. Do not
 claim automated visible-cue metrics are manual phone playtesting. Stop after tests.
+
+## 30. Approved phone spacing and stronger zero-energy fatigue
+
+Latest phone request supersedes §29's platform coordinates, short-gap widths and
+tired run speed. Keep the same ten-phrase V3 macro and overall10730px length.
+
+Character artwork is56px tall (body50px). Every floating island must leave at
+least1.15×56=64.4px between its FULL visible stone underside and the highest
+underlying ground across its width. Current minimum is65px. Platform art depth
+is shared through platform-art.ts, never guessed from the12px one-way proxy.
+
+Three ascending top surfaces: x2860,y317,w120; x3040,y261,w80;
+x3190,y205,w100. Each next top is56px higher. The third island moves40px left
+for reachable timing; missed jumps still land on the continuous ramp. Standalone
+islands at1050,y315,w110 and8130,y348,w100 now also have65px clear underneath.
+Floating stone art stays thick and unsupported; no lamps or world billboards.
+
+Short pits retain starts420/6040/9600 and double from70/60/40 to140/120/80px.
+Their far edges move to560/6160/9680, taking width from the following surface;
+level length, pit depths,270px long pit and recovery anchors stay unchanged.
+Rubbish stays inside the resized pits. Food count and80/103 thresholds stay;
+only local jump/landing cues move with changed geometry. Collector budget105,
+normal upper run102, platform fallback89; zero-start89.
+
+At zero energy, ground speed is85px/s, half the former170. Normal240px/s,
+vertical impulses, gravity, boost window, coyote/buffer and energy/recovery values
+are unchanged. Standard tired flight inherits85px/s (measured59.5px reach,
+85.2px height); tired boost retains330px/s after activation (measured330.7–345.3px
+reach,194.2–195.2px height depending on early tap timing). All three widened short
+pits therefore use the existing early second tap when tired. This is not a new
+jump mechanic. A scooter slowdown may never raise85px/s to its former100px/s
+slowdown cap: clamp it to the current committed movement speed.
+
+Seven full policies complete; clean/collector/zero-start have no collisions or
+falls. Four deliberately missed pits still give four automatic returns, food and
+energy preserved. Zero-start run62.58s; normal41.72s, collector41.37s. The slower
+fatigue run is intentional; do not stretch or redesign the normal route to hit
+an arbitrary target. See docs/winter-environment/clearance-and-fatigue.md for
+measured clearances and validation. Stop for manual phone playtesting.

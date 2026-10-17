@@ -243,7 +243,7 @@ class PlayScene extends Phaser.Scene {
       this.changeEnergy(-s.energyDrainPerSecond * dt);
       // Fatigue/recovery changes the next grounded stride, not a jump that was
       // already committed. This keeps food-guided arcs predictable at energy 0.
-      this.tanya.setVelocityX(now < this.slowUntil ? s.scooterSlowSpeed : this.airborneSpeed).setFlipX(false);
+      this.tanya.setVelocityX(now < this.slowUntil ? Math.min(s.scooterSlowSpeed, this.airborneSpeed) : this.airborneSpeed).setFlipX(false);
     }
     if (this.restRemaining === 0 && now - this.bufferedJump <= s.jumpBufferMs && now - this.lastGround <= s.coyoteMs) {
       this.tanya.setVelocityY(-jumpVelocity);

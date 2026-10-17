@@ -179,3 +179,12 @@ anchors and food. It is a development artifact, not new player UI.
 Raw traces: `/tmp/tanya-v3-*`; committed JSON contains the compact results.
 
 **Stop for manual phone playtesting; no further autonomous V3 redesign.**
+
+
+## Latest phone spacing / fatigue update
+
+Approved short pits140/120/80; floating underside clearance≥64.4 (actual≥65),
+ascending tops317/261/205, tired speed85. See
+[measured report](docs/winter-environment/clearance-and-fatigue.md) and
+[current run results](docs/winter-environment/gameplay-validation.json).
+Older exact platform/gap/tired-speed numbers above are historical.

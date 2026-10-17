@@ -9,7 +9,7 @@ try{
  const result=await page.evaluate(()=>{
   const transitions=[];
   for(const tr of terrain.terrainTransitions.filter(t=>t.rise>0&&!cfg.interruptions.some(g=>g.start+g.width===t.x)))for(const tired of [false,true])for(const offset of [-10,0,10]){
-   const boosted=tr.rise>100;const lead=(boosted?(tired?110:130):(tired?(tr.rise>45?65:45):80))+offset;
+   const boosted=tr.rise>100;const lead=(boosted?(tired?110:130):(tired?(tr.rise>45?42:35):80))+offset*(tired&&!boosted?.5:1);
    const s=restart();place(s,tr.x-lead-(tired?6:8),tr.fromY);if(tired)s.changeEnergy(-100);tick(2);
    const launch=s.tanya.x,start=s.time.now;key(true);tick();key(false);let sent=false,landing=null,blocked=0;
    for(let i=0;i<100;i++){
@@ -19,10 +19,11 @@ try{
    transitions.push({x:tr.x,rise:tr.rise,tired,offset,lead:tr.x-launch,boosted,landing,blocked,footMargin:landing===null?null:landing-tr.x-12});
   }
   const shortGaps=[];
-  for(const gap of cfg.interruptions.filter(g=>g.width<100))for(const tired of [false,true])for(const offset of [-10,0,10]){
-   const lead=(tired?(gap.width>=60?15:25):60)+(tired?offset/2:offset),from=terrain.groundYAt(gap.start-1),target=terrain.groundYAt(gap.start+gap.width+1);
-   const s=restart();place(s,gap.start-lead-(tired?6:8),from);if(tired)s.changeEnergy(-100);tick(2);key(true);tick();key(false);let land=null,blocked=0,deepest=from;
-   for(let i=0;i<75;i++){tick();blocked+=Number(s.tanya.body.blocked.right);deepest=Math.max(deepest,s.tanya.body.bottom);if(s.tanya.body.blocked.down&&s.tanya.x>gap.start+gap.width+12&&Math.abs(s.tanya.body.bottom-target)<2){land=s.tanya.x;break}}
+  for(const gap of cfg.interruptions.filter(g=>g.width<200))for(const tired of [false,true])for(const offset of [-10,0,10]){
+   const leads=tired?{420:90,6040:160,9600:150}:{420:25,6040:35,9600:70};
+   const lead=leads[gap.start]+offset,from=terrain.groundYAt(gap.start-1),target=terrain.groundYAt(gap.start+gap.width+1);
+   const s=restart();place(s,gap.start-lead-(tired?6:8),from);if(tired)s.changeEnergy(-100);tick(2);const takeoff=s.time.now;key(true);tick();key(false);let sent=false,land=null,blocked=0,deepest=from;
+   for(let i=0;i<100;i++){if(tired&&!sent&&s.time.now-takeoff>=150){key(true);sent=true;}tick();key(false);blocked+=Number(s.tanya.body.blocked.right);deepest=Math.max(deepest,s.tanya.body.bottom);if(s.tanya.body.blocked.down&&s.tanya.x>gap.start+gap.width+12&&Math.abs(s.tanya.body.bottom-target)<2){land=s.tanya.x;break}}
    shortGaps.push({start:gap.start,tired,offset,land,blocked,deepest,footMargin:land===null?null:land-gap.start-gap.width-12});
   }
   const longGap=[];
@@ -52,7 +53,7 @@ try{
   const ramps=[];
   for(const ramp of cfg.groundSpans.filter(g=>g.endY!==undefined))for(const tired of [false,true]){
    const s=restart();place(s,ramp.start+20,terrain.groundYAt(ramp.start+20));if(tired)s.changeEnergy(-100);tick(2);let error=0,air=0,blocked=0;
-   for(let i=0;i<600&&s.tanya.x<ramp.end-20;i++){tick();const b=s.tanya.body;error=Math.max(error,Math.abs(b.bottom-terrain.groundYAt(b.center.x)));air+=Number(!b.blocked.down);blocked+=Number(b.blocked.right)}
+   for(let i=0;i<Math.ceil((ramp.end-ramp.start)/cfg.tiredSpeed*60)+10&&s.tanya.x<ramp.end-20;i++){tick();const b=s.tanya.body;error=Math.max(error,Math.abs(b.bottom-terrain.groundYAt(b.center.x)));air+=Number(!b.blocked.down);blocked+=Number(b.blocked.right)}
    ramps.push({start:ramp.start,tired,error,air,blocked});
   }
   const escapes=[];
@@ -65,7 +66,7 @@ try{
     delay:(s.time.now-start)/1000,x:s.tanya.x,anchor:s.checkpoint,foot:s.tanya.body.bottom,ground:terrain.groundYAt(s.checkpoint),vy:s.tanya.body.velocity.y});
   }
   const oneWay=[];
-  for(const p of cfg.routePlatforms){const s=restart();place(s,p.x+p.width/2,terrain.groundYAt(p.x+p.width/2));const update=s.update;s.sys.sceneUpdate=function(t,d){update.call(this,t,d);this.tanya.setVelocityX(0)};s.tanya.setVelocityX(0);key(true);tick();key(false);let hitHead=false,landed=false;for(let i=0;i<65;i++){tick();hitHead||=s.tanya.body.blocked.up;landed||=s.tanya.body.blocked.down&&Math.abs(s.tanya.body.bottom-p.y)<1}oneWay.push({x:p.x,hitHead,landed})}
+  for(const p of cfg.routePlatforms){const s=restart();place(s,p.x+p.width/2,terrain.groundYAt(p.x+p.width/2));const update=s.update;s.sys.sceneUpdate=function(t,d){update.call(this,t,d);this.tanya.setVelocityX(0)};s.tanya.setVelocityX(0);key(true);tick();key(false);let hitHead=false,landed=false;for(let i=0;i<100;i++){if(i===9)key(true);tick();key(false);hitHead||=s.tanya.body.blocked.up;landed||=s.tanya.body.blocked.down&&Math.abs(s.tanya.body.bottom-p.y)<1}oneWay.push({x:p.x,hitHead,landed})}
   const coyote=[];for(const frames of [4,12]){const s=restart(),p=cfg.routePlatforms[0];place(s,p.x+p.width-20,p.y);let i=0;while(s.tanya.body.blocked.down&&i++<30)tick();tick(frames-1);key(true);tick();key(false);coyote.push({frames,vy:s.tanya.body.velocity.y})}
   const buffer=(()=>{const s=restart();place(s,100,330);while(s.tanya.body.bottom<410)tick();key(true);tick();key(false);let fired=false;for(let i=0;i<12;i++){tick();fired||=s.tanya.body.velocity.y<0}return fired})();
   const scooters=[];
@@ -78,14 +79,14 @@ try{
    }
    scooters.push({tired,avoid,hits,reaction:tap===null?null:(tap-visible)/1000});
   }
-  const benches=[];for(const jump of [false,true]){const s=restart();place(s,6800,545);s.changeEnergy(-100);tick(2);let once=false,rest=false;for(let i=0;i<330;i++){if(jump&&!once&&s.tanya.x>=7100){key(true);once=true}tick();key(false);rest||=s.restRemaining>0}benches.push({jump,rest,energy:s.energy})}
+  const benches=[];for(const jump of [false,true]){const s=restart();place(s,6800,545);s.changeEnergy(-100);tick(2);let once=false,rest=false;for(let i=0;i<330;i++){if(jump&&!once&&s.tanya.x>=7170){key(true);once=true}tick();key(false);rest||=s.restRemaining>0}benches.push({jump,rest,energy:s.energy})}
   const masks=[];const s=restart();for(const kind of ['scooter','pigeons','granny']){const source=s.textures.get(kind).getSourceImage(),c=document.createElement('canvas');c.width=source.width;c.height=source.height;const ctx=c.getContext('2d');ctx.drawImage(source,0,0);const pixels=ctx.getImageData(0,0,c.width,c.height).data;let outside=0;for(const r of haz.hazardShapes[kind])for(let y=r.y;y<r.y+r.height;y++)for(let x=r.x;x<r.x+r.width;x++)if(!pixels[(y*c.width+x)*4+3])outside++;masks.push({kind,outside})}
   const endings=[];for(const food of [cfg.requiredFood-1,cfg.requiredFood,cfg.bonusFood]){const s=restart();s.foodCount=food;s.feedCat();tick(100);endings.push({food,title:document.querySelector('#end-title').textContent,description:document.querySelector('#end-description').textContent,visible:!document.querySelector('#ending').hidden})}
   return {boostControls,transitions,shortGaps,longGap,ramps,escapes,oneWay,coyote,buffer,scooters,benches,masks,endings};
  });
  writeFileSync('/tmp/tanya-v3-collisions.json',JSON.stringify(result,null,2));
  assert.deepEqual(errors,[]);assert.ok(result.boostControls.every(r=>r.boosts===(r.mode==='third-tap'?1:0)&&r.initialVy<0),'hold/repeat/third/late/ArrowUp');assert.ok(result.transitions.every(t=>t.landing!==null&&t.blocked===0),'mandatory terrain transitions');
- assert.ok(result.shortGaps.every(g=>g.land!==null&&g.blocked===0&&g.footMargin>10),'short gaps at both energies');
+ assert.ok(result.shortGaps.every(g=>g.land!==null&&g.blocked===0&&g.footMargin>10),'widened short gaps: standard normal / boosted tired');
  assert.ok(result.longGap.filter(g=>g.delay!==null).every(g=>g.land!==null&&g.deepest<426&&g.footMargin>20),'boosted long gap');assert.ok(result.longGap.filter(g=>g.delay===null).every(g=>g.falls>0),'standard jump cannot clear the long gap');
  assert.ok(result.ramps.every(r=>r.error<1&&r.air===0&&r.blocked===0),'analytic ramp contacts');assert.ok(result.escapes.every(e=>e.recovered&&e.falls===1&&e.food===17&&e.energyPreserved&&Math.abs(e.foot-e.ground)<.01&&e.vy===0&&e.delay>=.57&&e.delay<=.65),'automatic pit recovery');
  assert.ok(result.oneWay.every(p=>!p.hitHead&&p.landed),'readable one-way platforms');assert.ok(result.coyote[0].vy<0&&result.coyote[1].vy>=0);assert.ok(result.buffer);

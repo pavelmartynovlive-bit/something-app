@@ -1,6 +1,7 @@
 # Winter environment integration — 2026-10-17
 
-> Latest phone-feedback changes: [floating islands, pit rubbish, no lamps or billboards](phone-feedback.md).
+> Current spacing and fatigue: [clearances / wider pits / zero-energy85px/s](clearance-and-fatigue.md).
+> Earlier phone-feedback changes: [floating islands, pit rubbish, no lamps or billboards](phone-feedback.md).
 > Presentation numbers below describe the original integration; use the linked update for the current state.
 
 Base: `28b0ab1`. Read current GAME_DESIGN.md in full, LEVEL_REFERENCES.md, the

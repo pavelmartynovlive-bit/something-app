@@ -27,9 +27,9 @@ try {
    }
    topSamples.push({start:span.start,samples:src.width,holes,overhang,maxError});
   }
-  const platforms=cfg.routePlatforms.map(p=>{const image=visuals.find(o=>o.texture.key==='winter-art:platform:'+p.x);return {x:image.x,y:image.y,width:image.displayWidth,height:image.displayHeight,body:!!image.body}});
+  const platforms=cfg.routePlatforms.map(p=>{const image=visuals.find(o=>o.texture.key==='winter-art:platform:'+p.x);return {x:image.x,y:image.y,width:image.displayWidth,height:image.displayHeight,body:!!image.body,clearance:Math.min(terrain.groundYAt(p.x),terrain.groundYAt(p.x+p.width-1e-6))-p.y-image.displayHeight}});
   const bench=s.benchSprites[0],b=bench.body;
-  return {visualCount:visuals.length,visualsWithBodies:visuals.filter(o=>!!o.body).length,rects,expected,topSamples,platforms,
+  return {playerHeight:s.tanya.height,minimumClearance:s.tanya.height*1.15,tiredSpeed:cfg.tiredSpeed,pitWidths:cfg.interruptions.map(p=>p.width),visualCount:visuals.length,visualsWithBodies:visuals.filter(o=>!!o.body).length,rects,expected,topSamples,platforms,
    scenery: {lamps:visuals.filter(o=>o.texture?.key==='environment:streetlamp_winter.png').length,garages:visuals.filter(o=>o.texture?.key==='environment:garage_winter.png').map(o=>o.x),supports:s.children.list.filter(o=>o.type==='Graphics'&&o.depth===-1).length},
    billboards:s.children.list.filter(o=>o.type==='Text'&&[...cfg.signs.map(sign=>sign.text),'Бонус ↑','Ещё немного →','Покорми котика'].includes(o.text)).map(o=>o.text),
    rubbish:visuals.filter(o=>o.texture?.key.startsWith('winter-art:slush:')).map(o=>({x:o.x,y:o.y,width:o.displayWidth,height:o.displayHeight})),
@@ -39,6 +39,8 @@ try {
    generated:s.textures.getTextureKeys().filter(k=>k.startsWith('winter-art:')).length,
    textures:s.textures.getTextureKeys().filter(k=>k.startsWith('environment:'))};
  });
+ assert.equal(contract.tiredSpeed,85);assert.deepEqual(contract.pitWidths,[140,270,120,80]);assert.ok(contract.platforms.every(p=>p.clearance>=contract.minimumClearance),'character plus 15% below full stone silhouette');
+ assert.equal(contract.platforms[0].y-contract.platforms[1].y,contract.playerHeight);assert.equal(contract.platforms[1].y-contract.platforms[2].y,contract.playerHeight);
  assert.equal(contract.visualsWithBodies,0);assert.deepEqual(contract.rects,contract.expected);
  assert.ok(contract.topSamples.every(t=>t.holes===0&&t.overhang===0&&t.maxError<=.51),'snow matches analytic ground to half a world pixel');
  assert.deepEqual(contract.bench,{x:7200,y:523,texture:'bench',textureWidth:90,textureHeight:44,width:24,height:32,offset:[33,12],enable:true,visible:false});
@@ -46,6 +48,15 @@ try {
  for(const [i,p] of contract.platforms.entries()){const raw=contract.expected.at(-contract.platforms.length+i);assert.deepEqual([p.x,p.y,p.width],raw.slice(0,3));assert.ok(p.height>=30&&p.height>raw[3],'thick one-way stone art')}
  assert.deepEqual(contract.scenery,{lamps:0,garages:[160,10510],supports:0});assert.deepEqual(contract.billboards,[]);
  assert.equal(contract.rubbish.length,4);for(const pit of contract.rubbish){assert.equal(pit.height,30);assert.ok(contract.expected.some(r=>r[0]===pit.x&&r[2]===pit.width),'rubbish stays inside original pit');}
+ const speedProbe=await page.evaluate(()=>{
+  const s=game.scene.getScene('play'),saved={energy:s.energy,exhausted:s.exhausted,slow:s.slowUntil};
+  s.energy=0;s.exhausted=true;s.slowUntil=0;s.tanya.body.blocked.down=true;
+  Object.getPrototypeOf(s).update.call(s,s.time.now,0);const tired=s.tanya.body.velocity.x;
+  s.slowUntil=s.time.now+1000;Object.getPrototypeOf(s).update.call(s,s.time.now,0);const afterScooter=s.tanya.body.velocity.x;
+  s.energy=saved.energy;s.exhausted=saved.exhausted;s.slowUntil=saved.slow;s.updateHud();
+  return {tired,afterScooter};
+ });
+ assert.deepEqual(speedProbe,{tired:85,afterScooter:85},'fatigue is 50% slower and scooter cannot accelerate it');
  const resize=[];
  for(const [width,height] of [[375,667],[390,844],[430,932],[844,390],[390,844]]){
   await page.setViewportSize({width,height});await page.waitForTimeout(70);
@@ -76,6 +87,6 @@ try {
  await page.evaluate(()=>{game.loop.stop();const s=game.scene.getScene('play');s.physics.pause();s.sys.sceneUpdate=()=>{};s.cameras.main.scrollX=4100;game.renderer.preRender();game.scene.render(game.renderer);game.renderer.postRender()});
  await page.screenshot({path:`${output}/debug.png`});
  assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);
- writeFileSync(`${output}/visual-contract.json`,JSON.stringify({contract,resizeStates:resize.length,replay,errors,failed},null,2));
+ writeFileSync(`${output}/visual-contract.json`,JSON.stringify({contract,speedProbe,resizeStates:resize.length,replay,errors,failed},null,2));
  console.log('PASS: unchanged collision rectangles and bench trigger; no physics on art; all terrain top pixels match, seven portrait snapshots, resize, replay and dev debug overlay');
 }finally{await browser.close()}

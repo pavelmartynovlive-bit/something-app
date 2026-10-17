@@ -21,32 +21,34 @@ try{
     const si=Math.max(0,sections.findLastIndex(z=>x>=z.start));stats[si].seconds+=1/60;stats[si].food=s.foodCount;stats[si].boosts=s.boostsUsed;
     let jump=false,boost=false;
     const targets=[
-      {id:'gap1',x:tired?405:355}, {id:'rise1',x:tired?945:910},
+      {id:'gap1',x:tired?330:395,boost:tired}, {id:'rise1',x:tired?945:910},
       {id:'ledge',x:tired?1355:1320,boost:true},
-      {id:'platform1',x:tired?2815:2725,optional:true},
-      {id:'platform2',x:tired?2970:2905,optional:true},
-      {id:'platform3',x:tired?3110:3090,optional:true,boost:mode==='collector'},
+      {id:'platform1',x:tired?2660:2620,optional:true,boost:true},
+      {id:'platform2',x:tired?2990:2945,optional:true},
+      {id:'platform3',x:tired?3130:3100,optional:true},
+      {id:'upper-exit',x:3265,optional:true},
       {id:'longgap',x:tired?4255:4230,boost:true},
-      {id:'road',x:tired?4775:4730},
-      {id:'cascade',x:tired?6030:5980},
-      {id:'skipbench',x:7100,optional:true},
+      {id:'road',x:tired?4795:4730},
+      {id:'cascade',x:tired?5880:6005,boost:tired},
+      {id:'skipbench',x:tired?7170:7100,optional:true},
       {id:'step1',x:tired?7505:7460}, {id:'step2',x:tired?7825:7810,boost:mode==='collector'||tired},
       {id:'step3',x:tired?8355:8320,boost:true},
-      {id:'finalgap',x:tired?9565:9500},
+      {id:'finalgap',x:tired?9450:9530,boost:tired},
       {id:'granny',x:tired?10180:10140},
     ];
     if(grounded&&!s.restRemaining&&!s.recoveryRemaining){
      for(const z of targets){if(used.has(z.id)||x<z.x)continue;
       if(mode==='pit-fall'&&['gap1','longgap','cascade','finalgap'].includes(z.id)&&!missed.has(z.id)){used.add(z.id);missed.add(z.id);continue}
       if(z.optional&&((z.id==='skipbench'&&['bench','low-energy'].includes(mode))||
-        (mode==='platform-miss'&&z.id.startsWith('platform')&&z.id!=='platform1'))){used.add(z.id);continue}
+        (mode==='platform-miss'&&((z.id.startsWith('platform')&&z.id!=='platform1')||z.id==='upper-exit')))){used.add(z.id);continue}
       if(x-z.x>200){used.add(z.id);continue}
       jump=true;used.add(z.id);if(z.boost)boostDue=s.time.now+150;break;
      }
      if(b.blocked.right&&!jump){jump=true;boostDue=s.time.now+150;}
      // Pigeons are timed from their visible, moving location, not a hidden timer.
      if(mode!=='intentional-collision') {
-       jump ||= s.grannies.some(g=>Math.abs(g.sprite.body.bottom-b.bottom)<5&&g.sprite.x-x>0&&g.sprite.x-x<(tired?65:90));
+       const grannyNear=s.grannies.some(g=>Math.abs(g.sprite.body.bottom-b.bottom)<5&&g.sprite.x-x>0&&g.sprite.x-x<(tired?65:90));
+       jump ||= grannyNear; if(tired&&grannyNear&&boostDue===null)boostDue=s.time.now+150;
        jump ||= s.scooters.some(g=>g.sprite.body.enable&&g.launched&&Math.abs(g.sprite.body.bottom-b.bottom)<5&&g.sprite.x-x>0&&g.sprite.x-x<85);
      }
      if(s.pigeons.some(p=>Math.abs(p.perchY-b.bottom)<5&&p.sprite.x-x>0&&p.sprite.x-x<(tired?70:85)&&p.sprite.y>p.perchY-100)&&!((mode==='intentional-collision'&&x<3340)||(mode==='pit-fall'&&x>8800&&s.falls<4)))jump=true;
@@ -119,7 +121,7 @@ try{
   assert.ok(normal.energy>0&&normal.energy<25,'limited clean-run energy');
   assert.ok(rest.energy>normal.energy+25&&rest.time>normal.time+2,'bench is stronger and costs time');
   assert.equal(normal.lipton,3,'distributed fast-route bottles');assert.equal(rest.lipton,3,'late bottle still works after resting');
-  for(const route of [normal,low])for(const [x,width,y] of [[2860,120,365],[3040,80,330],[3230,100,390]])assert.ok(route.landings.some(p=>p.x>=x-12&&p.x<=x+width+12&&Math.abs(p.y-y)<1),'short chain reachable at both energies');
+  for(const route of [normal,low])for(const [x,width,y] of [[2860,120,317],[3040,80,261],[3190,100,205]])assert.ok(route.landings.some(p=>p.x>=x-12&&p.x<=x+width+12&&Math.abs(p.y-y)<1),'short chain reachable at both energies');
  }
 
  console.log(JSON.stringify({errors,runs:result.map(({trajectory,inputs,landings,stats,reveals,viewport,...r})=>({...r,last:trajectory.at(-1)}))},null,2));

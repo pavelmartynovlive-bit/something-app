@@ -15,7 +15,7 @@ const result=await page.evaluate(()=>{
   const danger=[...s.grannies.map(g=>[g.sprite,'granny']),...s.scooters.map(g=>[g.sprite,'scooter']),...s.pigeons.map(g=>[g.sprite,'pigeons'])].some(([sprite,kind])=>haz.touchesDanger(b,sprite,kind));
   const cameraErrorAtRestore=Math.abs(c.scrollX-expected),vyAtRestore=b.velocity.y,foodAtRestore=s.foodCount,footErrorAtRestore=Math.abs(b.bottom-terrain.groundYAt(x));
   const before=s.tanya.x;for(let i=0;i<10;i++)tick();
-  anchors.push({x,tired,frames,food:foodAtRestore,energyPreserved:Math.abs(Math.max(0,energy-10*cfg.energyDrainPerSecond/60)-s.energy)<.01,vyAtRestore,footErrorAtRestore,cameraErrorAtRestore,bodyEnabled:b.enable,cameraError:Math.abs(c.scrollX-expected),initialCameraError:Math.abs(expected-(x-c.width/c.zoom*s.framing.anchorX)),danger,progress:s.tanya.x-before,pit:cfg.interruptions.some(p=>x>=p.start&&x<p.start+p.width),surface:terrain.groundYAt(x)});
+  anchors.push({x,tired,frames,food:foodAtRestore,energyPreserved:Math.abs(Math.max(0,energy-10*cfg.energyDrainPerSecond/60)-s.energy)<.01,vyAtRestore,footErrorAtRestore,cameraErrorAtRestore,bodyEnabled:b.enable,cameraError:Math.abs(c.scrollX-expected),initialCameraError:Math.abs(expected-(x-c.width/c.zoom*s.framing.anchorX)),danger,progress:s.tanya.x-before,minimumProgress:(tired?cfg.tiredSpeed:cfg.speed)*10/60-1,pit:cfg.interruptions.some(p=>x>=p.start&&x<p.start+p.width),surface:terrain.groundYAt(x)});
  }
  const ground=[];
  // High downward velocity and multiple fixed steps per render reproduce the old
@@ -52,7 +52,7 @@ const result=await page.evaluate(()=>{
  return {anchors,ground,oldContact,drops,pocket};
 });
 writeFileSync('/tmp/tanya-v3-recovery.json',JSON.stringify(result,null,2));
-assert.deepEqual(errors,[]);assert.ok(result.anchors.every(a=>!a.pit&&!a.danger&&a.bodyEnabled&&a.progress>20&&a.food===23&&a.energyPreserved&&a.cameraErrorAtRestore<.01&&a.footErrorAtRestore<.01&&a.vyAtRestore===0),'every anchor safe and resumes');
+assert.deepEqual(errors,[]);assert.ok(result.anchors.every(a=>!a.pit&&!a.danger&&a.bodyEnabled&&a.progress>=a.minimumProgress&&a.food===23&&a.energyPreserved&&a.cameraErrorAtRestore<.01&&a.footErrorAtRestore<.01&&a.vyAtRestore===0),'every anchor safe and resumes');
 assert.ok(result.ground.every(g=>g.penetration<1&&g.landed&&g.falls===0),'ground at 15–120fps');assert.ok(result.drops.every(g=>g.penetration<1),'solid surface landing sweep');
 assert.ok(result.oldContact.some(g=>g.penetration>20),'old ramp bug reproduction');assert.ok(result.pocket.every(p=>p.x>7400),'pocket flow');assert.deepEqual(result.pocket.map(p=>[p.lipton,p.bench]),[[0,0],[0,1],[0,0]],'bench versus continuous route');
 assert.ok(result.pocket.every(p=>p.bottlesEnabled===3),'rest never disables distant bottles');

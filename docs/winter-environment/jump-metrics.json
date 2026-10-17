@@ -1,0 +1,162 @@
+[
+  {
+    "tired": false,
+    "delay": null,
+    "height": 107.33333333333337,
+    "seconds": 0.8000000000000146,
+    "distance": 192,
+    "boosts": 0
+  },
+  {
+    "tired": false,
+    "delay": 20,
+    "height": 107.33333333333337,
+    "seconds": 0.7999999999999782,
+    "distance": 192,
+    "boosts": 0
+  },
+  {
+    "tired": false,
+    "delay": 50,
+    "height": 213.89897945825402,
+    "seconds": 1.133333333333292,
+    "distance": 391.1666666666661,
+    "boosts": 1
+  },
+  {
+    "tired": false,
+    "delay": 100,
+    "height": 214.2499344700981,
+    "seconds": 1.1499999999999582,
+    "distance": 391.4999999999995,
+    "boosts": 1
+  },
+  {
+    "tired": false,
+    "delay": 150,
+    "height": 214.5537346353413,
+    "seconds": 1.1666666666666243,
+    "distance": 391.83333333333275,
+    "boosts": 1
+  },
+  {
+    "tired": false,
+    "delay": 200,
+    "height": 214.8564747658838,
+    "seconds": 1.1999999999999564,
+    "distance": 397.99999999999943,
+    "boosts": 1
+  },
+  {
+    "tired": false,
+    "delay": 250,
+    "height": 215.08568260141448,
+    "seconds": 1.2333333333332885,
+    "distance": 404.16666666666606,
+    "boosts": 1
+  },
+  {
+    "tired": false,
+    "delay": 270,
+    "height": 215.13050000125298,
+    "seconds": 1.2333333333333338,
+    "distance": 402.3333333333326,
+    "boosts": 1
+  },
+  {
+    "tired": false,
+    "delay": 300,
+    "height": 107.33333333333337,
+    "seconds": 0.8000000000000582,
+    "distance": 192,
+    "boosts": 0
+  },
+  {
+    "tired": false,
+    "delay": 450,
+    "height": 107.33333333333337,
+    "seconds": 0.8000000000000582,
+    "distance": 192,
+    "boosts": 0
+  },
+  {
+    "tired": true,
+    "delay": null,
+    "height": 85.16666666666669,
+    "seconds": 0.7000000000000509,
+    "distance": 59.50000000000007,
+    "boosts": 0
+  },
+  {
+    "tired": true,
+    "delay": 20,
+    "height": 85.16666666666669,
+    "seconds": 0.7000000000000509,
+    "distance": 59.50000000000007,
+    "boosts": 0
+  },
+  {
+    "tired": true,
+    "delay": 50,
+    "height": 194.15894031263483,
+    "seconds": 1.083333333333412,
+    "distance": 345.25,
+    "boosts": 1
+  },
+  {
+    "tired": true,
+    "delay": 100,
+    "height": 194.50284236425352,
+    "seconds": 1.10000000000008,
+    "distance": 338.50000000000006,
+    "boosts": 1
+  },
+  {
+    "tired": true,
+    "delay": 150,
+    "height": 194.7490105523676,
+    "seconds": 1.133333333333416,
+    "distance": 337.25000000000006,
+    "boosts": 1
+  },
+  {
+    "tired": true,
+    "delay": 200,
+    "height": 194.98491212537914,
+    "seconds": 1.1666666666667516,
+    "distance": 336.00000000000006,
+    "boosts": 1
+  },
+  {
+    "tired": true,
+    "delay": 250,
+    "height": 195.13884922900877,
+    "seconds": 1.2000000000000872,
+    "distance": 334.7500000000001,
+    "boosts": 1
+  },
+  {
+    "tired": true,
+    "delay": 270,
+    "height": 195.2100332844139,
+    "seconds": 1.2000000000000872,
+    "distance": 330.66666666666674,
+    "boosts": 1
+  },
+  {
+    "tired": true,
+    "delay": 300,
+    "height": 85.16666666666669,
+    "seconds": 0.7000000000000509,
+    "distance": 59.50000000000007,
+    "boosts": 0
+  },
+  {
+    "tired": true,
+    "delay": 450,
+    "height": 85.16666666666669,
+    "seconds": 0.7000000000000509,
+    "distance": 59.50000000000007,
+    "boosts": 0
+  }
+]

@@ -20,7 +20,7 @@ export const rewardJumps: number[] = [];
 export const routeChoices = [{x:2640,entrance:2860,end:3680}];
 export const rhythmDecisions: {x:number;targetX:number;kind:string}[] = [];
 export const settings = {
-  speed: 240, tiredSpeed: 170, jumpVelocity: 560, gravity: 1400, tiredJumpVelocity: 500,
+  speed: 240, tiredSpeed: 85, jumpVelocity: 560, gravity: 1400, tiredJumpVelocity: 500,
   liptonEnergy: 12, energyDrainPerSecond: 2.85,
   obstacleDamage: 15, grannyDamage: 15, grannySpeed: 12, hitCooldownMs: 1400,
   scooterSpeed: 210, scooterDamage: 12, scooterSlowMs: 650, scooterSlowSpeed: 100,
@@ -34,11 +34,11 @@ export const settings = {
   groundSpans, interruptions,
   obstacles: [] as Box[],
   routePlatforms: [
-    {x:2860,y:365,width:120,label:'Бонус ↑'},
-    {x:3040,y:330,width:80,label:''},
-    {x:3230,y:390,width:100,label:''},
-    {x:1050,y:350,width:110,label:''},
-    {x:8130,y:370,width:100,label:''},
+    {x:2860,y:317,width:120,label:'Бонус ↑'},
+    {x:3040,y:261,width:80,label:''},
+    {x:3190,y:205,width:100,label:''},
+    {x:1050,y:315,width:110,label:''},
+    {x:8130,y:348,width:100,label:''},
   ] as Platform[],
   bottles: [{x:1580,y:205},{x:4590,y:345},{x:8190,y:270}] as Point[], food,
   scooters: [{x:5360,launchAt:5190,left:4860,right:5380},{x:9360,launchAt:9150,left:8910,right:9480},{x:8160,launchAt:7990,left:7940,right:8380}],

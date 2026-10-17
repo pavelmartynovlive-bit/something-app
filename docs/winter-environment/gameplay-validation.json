@@ -1,161 +1,104 @@
 {
-  "baselineCommit": "28b0ab1",
-  "runComparison": "fresh before and after, all values match within 1e-6",
+  "baselineCommit": "29d4a28",
+  "scope": "Approved geometry/fatigue changes; results are new measurements, NOT a before/after equality claim. See clearance-and-fatigue.md.",
   "runs": [
     {
       "mode": "normal",
-      "time": 42.1,
-      "food": 98,
-      "energy": 15.825,
+      "time": 41.71667,
+      "food": 102,
+      "energy": 16.9175,
       "collisions": 0,
       "bench": 0,
       "lipton": 3,
-      "boosts": 3,
+      "boosts": 4,
       "falls": 0,
       "recoveries": 0,
-      "finished": true
+      "finished": true,
+      "longestEmpty": 0
     },
     {
       "mode": "collector",
-      "time": 41.23333,
-      "food": 103,
-      "energy": 6.295,
+      "time": 41.36667,
+      "food": 105,
+      "energy": 5.915,
       "collisions": 0,
       "bench": 0,
       "lipton": 2,
       "boosts": 5,
       "falls": 0,
       "recoveries": 0,
-      "finished": true
+      "finished": true,
+      "longestEmpty": 0
     },
     {
       "mode": "low-energy",
-      "time": 52.5,
-      "food": 92,
+      "time": 62.58333,
+      "food": 89,
       "energy": 10.0025,
       "collisions": 0,
       "bench": 1,
       "lipton": 3,
-      "boosts": 3,
+      "boosts": 9,
       "falls": 0,
       "recoveries": 0,
-      "finished": true
+      "finished": true,
+      "longestEmpty": 0
     },
     {
       "mode": "intentional-collision",
-      "time": 50.76667,
-      "food": 89,
+      "time": 70.55,
+      "food": 87,
       "energy": 0,
-      "collisions": 8,
+      "collisions": 9,
       "bench": 0,
       "lipton": 2,
-      "boosts": 4,
+      "boosts": 7,
       "falls": 0,
       "recoveries": 0,
-      "finished": true
+      "finished": true,
+      "longestEmpty": 0
     },
     {
       "mode": "pit-fall",
-      "time": 48.7,
-      "food": 98,
+      "time": 48.25,
+      "food": 103,
       "energy": 0,
       "collisions": 1,
       "bench": 0,
       "lipton": 3,
-      "boosts": 3,
+      "boosts": 4,
       "falls": 4,
       "recoveries": 4,
-      "finished": true
+      "finished": true,
+      "longestEmpty": 0
     },
     {
       "mode": "platform-miss",
-      "time": 42.11667,
-      "food": 90,
-      "energy": 15.7775,
+      "time": 41.71667,
+      "food": 89,
+      "energy": 16.9175,
       "collisions": 0,
       "bench": 0,
       "lipton": 3,
-      "boosts": 3,
+      "boosts": 4,
       "falls": 0,
       "recoveries": 0,
-      "finished": true
+      "finished": true,
+      "longestEmpty": 0
     },
     {
       "mode": "bench",
-      "time": 44.51667,
-      "food": 96,
-      "energy": 52.35,
+      "time": 44.13333,
+      "food": 100,
+      "energy": 53.4425,
       "collisions": 0,
       "bench": 1,
       "lipton": 3,
-      "boosts": 3,
+      "boosts": 4,
       "falls": 0,
       "recoveries": 0,
-      "finished": true
+      "finished": true,
+      "longestEmpty": 0
     }
-  ],
-  "terrainCollision": [
-    {
-      "start": 1900,
-      "tired": false,
-      "error": 0,
-      "air": 0,
-      "blocked": 0
-    },
-    {
-      "start": 1900,
-      "tired": true,
-      "error": 0,
-      "air": 0,
-      "blocked": 0
-    },
-    {
-      "start": 2520,
-      "tired": false,
-      "error": 0,
-      "air": 0,
-      "blocked": 0
-    },
-    {
-      "start": 2520,
-      "tired": true,
-      "error": 0,
-      "air": 0,
-      "blocked": 0
-    },
-    {
-      "start": 3760,
-      "tired": false,
-      "error": 0,
-      "air": 0,
-      "blocked": 0
-    },
-    {
-      "start": 3760,
-      "tired": true,
-      "error": 0,
-      "air": 0,
-      "blocked": 0
-    },
-    {
-      "start": 9840,
-      "tired": false,
-      "error": 0,
-      "air": 0,
-      "blocked": 0
-    },
-    {
-      "start": 9840,
-      "tired": true,
-      "error": 0,
-      "air": 0,
-      "blocked": 0
-    }
-  ],
-  "recovery": {
-    "anchors": 18,
-    "ground": 40,
-    "drops": 46
-  },
-  "latestVisualFollowup": "Repeated all seven runs after thick floating island art, pit rubbish and removal of lamps/middle garage/billboards. Time, food, energy, hits, bench/Lipton, boosts, falls and returns still match within 1e-4; sign-derived decision cues removed from audit."
+  ]
 }

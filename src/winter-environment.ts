@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { settings as s, groundYAt } from './settings';
 import { environmentAssets } from './winter-environment-assets';
+import { platformArtHeight } from './platform-art';
 
 type Art = typeof environmentAssets[number]['file'];
 const depth = { scenery: -30, terrain: 0, prop: 2, debug: 100 };
@@ -75,7 +76,7 @@ export class WinterEnvironment {
     }
     for (const p of s.routePlatforms) {
       const file = p.width <= 100 ? 'platform_floating_small.png' : 'platform_short.png';
-      const height = Math.max(30, Math.round(p.width * .32));
+      const height = platformArtHeight(p.width);
       const c = canvas(p.width * resolution, height * resolution), ctx = c.getContext('2d')!;
       const source = this.source(file), [x0, , x1, y1] = this.bounds(file);
       // Keep the full stone and icicle silhouette instead of compressing it
