@@ -9,7 +9,8 @@
     "preview": "vite preview --host 0.0.0.0",
     "test:level": "node scripts/measure-jumps.mjs && node scripts/audit-v3.mjs && node scripts/validate-collisions.mjs && node scripts/validate-recovery.mjs && node scripts/validate-scooter-lanes.mjs",
     "test:presentation": "node scripts/check-presentation.mjs",
-    "level:overview": "node scripts/overview.mjs"
+    "level:overview": "node scripts/overview.mjs",
+    "test:background": "node scripts/check-winter-background.mjs"
   },
   "dependencies": {
     "phaser": "3.90.0"

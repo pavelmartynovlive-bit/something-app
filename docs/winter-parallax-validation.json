@@ -1,0 +1,326 @@
+{
+  "referenceViewport": {
+    "width": 390,
+    "height": 844
+  },
+  "referenceLayers": [
+    {
+      "key": "winter:sky",
+      "type": "Image",
+      "depth": -100,
+      "body": false,
+      "width": 2207.3846153846152,
+      "height": 735.7948717948718,
+      "scaleX": 1.016291259385182,
+      "scaleY": 1.016291259385182,
+      "sourceWidth": 2172,
+      "sourceHeight": 724,
+      "factorX": 0.01,
+      "factorY": 0,
+      "left": 0,
+      "right": 2207.3846153846152,
+      "top": 0,
+      "bottom": 735.7948717948718,
+      "alpha": 1
+    },
+    {
+      "key": "winter:atmosphere",
+      "type": "Image",
+      "depth": -99,
+      "body": false,
+      "width": 755.6,
+      "height": 251.8666666666667,
+      "scaleX": 0.34788213627992637,
+      "scaleY": 0.34788213627992637,
+      "sourceWidth": 2172,
+      "sourceHeight": 724,
+      "factorX": 0.04,
+      "factorY": 0,
+      "left": 0,
+      "right": 755.6,
+      "top": 58.86358974358975,
+      "bottom": 310.73025641025646,
+      "alpha": 0.6
+    },
+    {
+      "key": "winter:far-city",
+      "type": "Image",
+      "depth": -98,
+      "body": false,
+      "width": 1275.1,
+      "height": 454.78566666666666,
+      "scaleX": 0.6071904761904762,
+      "scaleY": 0.6071904761904762,
+      "sourceWidth": 2100,
+      "sourceHeight": 749,
+      "factorX": 0.09,
+      "factorY": 0,
+      "left": 0,
+      "right": 1275.1,
+      "top": 119.8727948717949,
+      "bottom": 574.6584615384616,
+      "alpha": 1
+    },
+    {
+      "key": "winter:mid-city",
+      "type": "Image",
+      "depth": -97,
+      "body": false,
+      "width": 2002.4,
+      "height": 667.4666666666667,
+      "scaleX": 0.921915285451197,
+      "scaleY": 0.921915285451197,
+      "sourceWidth": 2172,
+      "sourceHeight": 724,
+      "factorX": 0.16,
+      "factorY": 0,
+      "left": 0,
+      "right": 2002.4,
+      "top": -63.37641025641028,
+      "bottom": 604.0902564102564,
+      "alpha": 0.7
+    },
+    {
+      "key": "winter:near-decor",
+      "type": "Image",
+      "depth": -96,
+      "body": false,
+      "width": 3457,
+      "height": 1152.3333333333333,
+      "scaleX": 1.5916206261510129,
+      "scaleY": 1.5916206261510129,
+      "sourceWidth": 2172,
+      "sourceHeight": 724,
+      "factorX": 0.3,
+      "factorY": 0,
+      "left": 0,
+      "right": 3457,
+      "top": -416.53846153846143,
+      "bottom": 735.7948717948718,
+      "alpha": 0.55
+    }
+  ],
+  "devices": [
+    {
+      "canvas": {
+        "width": 390,
+        "height": 844,
+        "zoom": 1.1470588235294117
+      },
+      "worldViewport": {
+        "width": 340,
+        "height": 735.7948717948718
+      },
+      "testedProgress": [
+        0,
+        0.1,
+        0.25,
+        0.5,
+        0.75,
+        0.9,
+        1
+      ]
+    },
+    {
+      "canvas": {
+        "width": 375,
+        "height": 667,
+        "zoom": 1.1029411764705883
+      },
+      "worldViewport": {
+        "width": 340,
+        "height": 604.7466666666667
+      },
+      "testedProgress": [
+        0,
+        0.1,
+        0.25,
+        0.5,
+        0.75,
+        0.9,
+        1
+      ]
+    },
+    {
+      "canvas": {
+        "width": 393,
+        "height": 852,
+        "zoom": 1.1558823529411764
+      },
+      "worldViewport": {
+        "width": 340.00000000000006,
+        "height": 737.0992366412214
+      },
+      "testedProgress": [
+        0,
+        0.1,
+        0.25,
+        0.5,
+        0.75,
+        0.9,
+        1
+      ]
+    },
+    {
+      "canvas": {
+        "width": 430,
+        "height": 932,
+        "zoom": 1.2647058823529411
+      },
+      "worldViewport": {
+        "width": 340,
+        "height": 736.9302325581396
+      },
+      "testedProgress": [
+        0,
+        0.1,
+        0.25,
+        0.5,
+        0.75,
+        0.9,
+        1
+      ]
+    },
+    {
+      "canvas": {
+        "width": 375,
+        "height": 896,
+        "zoom": 1.1029411764705883
+      },
+      "worldViewport": {
+        "width": 340,
+        "height": 812.3733333333332
+      },
+      "testedProgress": [
+        0,
+        0.1,
+        0.25,
+        0.5,
+        0.75,
+        0.9,
+        1
+      ]
+    },
+    {
+      "canvas": {
+        "width": 219.375,
+        "height": 390,
+        "zoom": 0.6452205882352942
+      },
+      "worldViewport": {
+        "width": 340,
+        "height": 604.4444444444445
+      },
+      "testedProgress": [
+        0,
+        0.1,
+        0.25,
+        0.5,
+        0.75,
+        0.9,
+        1
+      ]
+    },
+    {
+      "canvas": {
+        "width": 390,
+        "height": 844,
+        "zoom": 1.1470588235294117
+      },
+      "worldViewport": {
+        "width": 340,
+        "height": 735.7948717948718
+      },
+      "testedProgress": [
+        0,
+        0.1,
+        0.25,
+        0.5,
+        0.75,
+        0.9,
+        1
+      ]
+    }
+  ],
+  "replayBackgroundCount": 5,
+  "errors": [],
+  "failedRequests": [],
+  "gameplayComparison": [
+    {
+      "mode": "normal",
+      "time": 42.1,
+      "food": 98,
+      "energy": 15.825,
+      "sameResults": true
+    },
+    {
+      "mode": "collector",
+      "time": 41.2333,
+      "food": 103,
+      "energy": 6.295,
+      "sameResults": true
+    },
+    {
+      "mode": "low-energy",
+      "time": 52.5,
+      "food": 92,
+      "energy": 10.0025,
+      "sameResults": true
+    },
+    {
+      "mode": "intentional-collision",
+      "time": 50.7667,
+      "food": 89,
+      "energy": 0,
+      "sameResults": true
+    },
+    {
+      "mode": "pit-fall",
+      "time": 48.7,
+      "food": 98,
+      "energy": 0,
+      "sameResults": true
+    },
+    {
+      "mode": "platform-miss",
+      "time": 42.1167,
+      "food": 90,
+      "energy": 15.7775,
+      "sameResults": true
+    },
+    {
+      "mode": "bench",
+      "time": 44.5167,
+      "food": 96,
+      "energy": 52.35,
+      "sameResults": true
+    }
+  ],
+  "assets": [
+    {
+      "path": "public/assets/backgrounds/winter/atmosphere.png",
+      "sha256": "ba8d20156404bcdae5737080c9ae72b645ac434a87a55ca2754ac3088325d17f",
+      "bytes": 472348
+    },
+    {
+      "path": "public/assets/backgrounds/winter/far-city.png",
+      "sha256": "d419229cbc71d8cfd9edf2d529e0bb40c5273c0789926c43c1cb465abacc5a36",
+      "bytes": 1011552
+    },
+    {
+      "path": "public/assets/backgrounds/winter/mid-city.png",
+      "sha256": "feeca0b975716ff9140f152bb7038b8233a517e57e054a9b867457dc324870c2",
+      "bytes": 1250080
+    },
+    {
+      "path": "public/assets/backgrounds/winter/near-decor.png",
+      "sha256": "9cebd60ff30398b6444aa8cc458388cf12608c42f7b6e86271ceee0cdea6ca8b",
+      "bytes": 585433
+    },
+    {
+      "path": "public/assets/backgrounds/winter/sky.png",
+      "sha256": "565026ced79aea1fbe0fed5c13872843b69743c1137e00a70345ee831ea52a07",
+      "bytes": 1281320
+    }
+  ]
+}

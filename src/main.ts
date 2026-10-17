@@ -1,8 +1,9 @@
 import Phaser from 'phaser';
-import { settings as s, levelSections, groundYAt } from './settings';
+import { settings as s, groundYAt } from './settings';
 import { touchesDanger } from './hazard-shapes';
 import { TouchControls } from './controls';
 import { presentation, cameraFrame } from './presentation';
+import { WinterParallaxBackground } from './winter-parallax-background';
 import './style.css';
 import './pwa';
 
@@ -54,7 +55,10 @@ class PlayScene extends Phaser.Scene {
   private finished = false;
   private wasPortrait = false;
   private framing?: ReturnType<typeof cameraFrame>;
+  private winterBackground?: WinterParallaxBackground;
   constructor() { super('play'); }
+
+  preload() { WinterParallaxBackground.preload(this); }
 
   create() {
     this.energy = 100;
@@ -84,21 +88,12 @@ class PlayScene extends Phaser.Scene {
     this.resize();
     this.scale.on('resize', this.resize, this);
     this.events.once('shutdown', () => this.scale.off('resize', this.resize, this));
-    const scenery = this.add.graphics().setDepth(-2);
-    for (const [i, section] of levelSections.entries()) {
-      for (let x = section.start; x < section.end; x += 430) {
-        scenery.fillStyle(0xb6cfbe);
-        scenery.fillRoundedRect(x + 140, 280 - (i % 3) * 25, 140, 160 + (i % 3) * 25, 10);
-        scenery.fillRoundedRect(x + 310, 350, 95, 90, 8);
-        scenery.fillStyle(0xc7dfcf);
-        scenery.fillRect(x + 162, 315, 22, 28);
-        scenery.fillRect(x + 214, 315, 22, 28);
-        scenery.lineStyle(3, 0xa1bdab);
-        scenery.lineBetween(x + 75, 340, x + 75, 440);
-        scenery.fillStyle(0xa1bdab).fillCircle(x + 75, 339, 12);
-        scenery.fillStyle(0xaac6ad).fillEllipse(x + 30, 430, 38, 22);
-      }
-    }
+    this.winterBackground = new WinterParallaxBackground(this, s.levelWidth);
+    this.winterBackground.resize(this.cameras.main, s.floorY - this.framing!.baseY);
+    this.events.once('shutdown', () => {
+      this.winterBackground?.destroy();
+      this.winterBackground = undefined;
+    });
     const ground = this.physics.add.staticGroup();
     const obstacles = this.physics.add.staticGroup();
     const upperRoute = this.physics.add.staticGroup();
@@ -515,6 +510,7 @@ class PlayScene extends Phaser.Scene {
     this.cameras.main.setOrigin(0, 0);
     this.cameras.main.setZoom(this.framing.zoom);
     this.cameras.main.scrollY = this.framing.baseY + Phaser.Math.Clamp(this.cameras.main.scrollY - previousBase, -40, 0);
+    this.winterBackground?.resize(this.cameras.main, s.floorY - this.framing.baseY);
     controls?.reset();
   }
   private sign(x: number, text: string) {
