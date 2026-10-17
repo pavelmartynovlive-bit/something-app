@@ -5,7 +5,7 @@ try{
  const page=await browser.newPage({viewport:{width:390,height:844},hasTouch:true});const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(process.env.LEVEL_URL||'http://localhost:5173');await page.waitForSelector('canvas');
  await page.evaluate(async()=>{window.game=(await import(document.querySelector('script[src*="/src/main.ts"]').src)).game;window.cfg=(await import('/src/settings.ts')).settings;window.terrain=await import('/src/terrain.ts');window.haz=await import('/src/hazard-shapes.ts')});await page.waitForFunction(()=>game.scene.getScene('play')?.tanya?.body);
- await page.evaluate(()=>{game.loop.stop();let now=performance.now();window.tick=(n=1)=>{for(let i=0;i<n;i++)game.headlessStep(now+=1000/60,1000/60)};window.key=d=>window.dispatchEvent(new KeyboardEvent(d?'keydown':'keyup',{key:' ',code:'Space',keyCode:32,bubbles:true}));window.restart=(quiet=true)=>{key(false);game.scene.start('play');tick(4);const s=game.scene.getScene('play');if(quiet){for(const a of [...s.pigeons,...s.scooters,...s.grannies])a.sprite.destroy();s.pigeons=[];s.scooters=[];s.grannies=[];}return s};window.place=(s,x,y)=>{s.tanya.body.reset(x,y-26);s.tanya.setVelocity(0,0);tick(2)}});
+ await page.evaluate(()=>{game.loop.stop();let now=performance.now();window.tick=(n=1)=>{for(let i=0;i<n;i++)game.headlessStep(now+=1000/60,1000/60)};window.key=d=>window.dispatchEvent(new KeyboardEvent(d?'keydown':'keyup',{key:' ',code:'Space',keyCode:32,bubbles:true}));window.restart=(quiet=true)=>{key(false);const previous=game.scene.getScene('play');previous.update=Object.getPrototypeOf(previous).update;game.scene.start('play');tick(4);const s=game.scene.getScene('play');if(quiet){for(const a of [...s.pigeons,...s.scooters,...s.grannies])a.sprite.destroy();s.pigeons=[];s.scooters=[];s.grannies=[];}return s};window.place=(s,x,y)=>{s.tanya.body.reset(x,y-26);s.tanya.setVelocity(0,0);tick(2)}});
  const result=await page.evaluate(()=>{
   const transitions=[];
   for(const tr of terrain.terrainTransitions.filter(t=>t.rise>0&&!cfg.interruptions.some(g=>g.start+g.width===t.x)))for(const tired of [false,true])for(const offset of [-10,0,10]){
@@ -65,21 +65,20 @@ try{
     delay:(s.time.now-start)/1000,x:s.tanya.x,anchor:s.checkpoint,foot:s.tanya.body.bottom,ground:terrain.groundYAt(s.checkpoint),vy:s.tanya.body.velocity.y});
   }
   const oneWay=[];
-  for(const p of cfg.routePlatforms){const s=restart();place(s,p.x-20,terrain.groundYAt(p.x-20));key(true);tick();key(false);let hitHead=false,landed=false;for(let i=0;i<65;i++){tick();hitHead||=s.tanya.body.blocked.up;landed||=s.tanya.body.blocked.down&&Math.abs(s.tanya.body.bottom-p.y)<1}oneWay.push({x:p.x,hitHead,landed})}
+  for(const p of cfg.routePlatforms){const s=restart();place(s,p.x+p.width/2,terrain.groundYAt(p.x+p.width/2));const update=s.update;s.sys.sceneUpdate=function(t,d){update.call(this,t,d);this.tanya.setVelocityX(0)};s.tanya.setVelocityX(0);key(true);tick();key(false);let hitHead=false,landed=false;for(let i=0;i<65;i++){tick();hitHead||=s.tanya.body.blocked.up;landed||=s.tanya.body.blocked.down&&Math.abs(s.tanya.body.bottom-p.y)<1}oneWay.push({x:p.x,hitHead,landed})}
   const coyote=[];for(const frames of [4,12]){const s=restart(),p=cfg.routePlatforms[0];place(s,p.x+p.width-20,p.y);let i=0;while(s.tanya.body.blocked.down&&i++<30)tick();tick(frames-1);key(true);tick();key(false);coyote.push({frames,vy:s.tanya.body.velocity.y})}
   const buffer=(()=>{const s=restart();place(s,100,330);while(s.tanya.body.bottom<410)tick();key(true);tick();key(false);let fired=false;for(let i=0;i<12;i++){tick();fired||=s.tanya.body.velocity.y<0}return fired})();
   const scooters=[];
-  for(const tired of [false,true])for(const lead of [null,20,10,0]){
-   const s=restart(false);place(s,5020,401);if(tired)s.changeEnergy(-100);tick(2);s.cameras.main.scrollX=s.tanya.x-42;
-   const hits=[];s.hit=function(d){const ok=Object.getPrototypeOf(s).hit.call(this,d);if(ok)hits.push(d);return ok};let visible=null,tap=null,land=null;
-   for(let i=0;i<450&&s.tanya.x<5710;i++){
+  for(const tired of [false,true])for(const avoid of [false,true]){
+   const s=restart(false);place(s,5000,401);if(tired)s.changeEnergy(-100);tick(2);
+   const hits=[];s.hit=function(d){const ok=Object.getPrototypeOf(s).hit.call(this,d);if(ok)hits.push(d);return ok};let visible=null,tap=null;
+   for(let i=0;i<450&&s.tanya.x<5660;i++){
     const sc=s.scooters[0].sprite,c=s.cameras.main;if(visible===null&&sc.x+34<c.scrollX+c.width/c.zoom)visible=s.time.now;
-    if(lead!==null&&tap===null&&s.tanya.x>=5420-lead){key(true);tap=s.time.now}tick();key(false);
-    if(tap!==null&&s.tanya.body.blocked.down&&s.tanya.x>5500)land??=s.tanya.x;
+    if(avoid&&tap===null&&s.scooters[0].launched&&sc.x-s.tanya.x<85){key(true);tap=s.time.now}tick();key(false);
    }
-   scooters.push({tired,lead,hits,reaction:tap===null?null:(tap-visible)/1000,landing:land});
+   scooters.push({tired,avoid,hits,reaction:tap===null?null:(tap-visible)/1000});
   }
-  const benches=[];for(const jump of [false,true]){const s=restart();place(s,6800,545);s.changeEnergy(-100);tick(2);let once=false,rest=false;for(let i=0;i<230;i++){if(jump&&!once&&s.tanya.x>=6915){key(true);once=true}tick();key(false);rest||=s.restRemaining>0}benches.push({jump,rest,energy:s.energy})}
+  const benches=[];for(const jump of [false,true]){const s=restart();place(s,6800,545);s.changeEnergy(-100);tick(2);let once=false,rest=false;for(let i=0;i<330;i++){if(jump&&!once&&s.tanya.x>=7100){key(true);once=true}tick();key(false);rest||=s.restRemaining>0}benches.push({jump,rest,energy:s.energy})}
   const masks=[];const s=restart();for(const kind of ['scooter','pigeons','granny']){const source=s.textures.get(kind).getSourceImage(),c=document.createElement('canvas');c.width=source.width;c.height=source.height;const ctx=c.getContext('2d');ctx.drawImage(source,0,0);const pixels=ctx.getImageData(0,0,c.width,c.height).data;let outside=0;for(const r of haz.hazardShapes[kind])for(let y=r.y;y<r.y+r.height;y++)for(let x=r.x;x<r.x+r.width;x++)if(!pixels[(y*c.width+x)*4+3])outside++;masks.push({kind,outside})}
   const endings=[];for(const food of [cfg.requiredFood-1,cfg.requiredFood,cfg.bonusFood]){const s=restart();s.foodCount=food;s.feedCat();tick(100);endings.push({food,title:document.querySelector('#end-title').textContent,description:document.querySelector('#end-description').textContent,visible:!document.querySelector('#ending').hidden})}
   return {boostControls,transitions,shortGaps,longGap,ramps,escapes,oneWay,coyote,buffer,scooters,benches,masks,endings};
@@ -90,7 +89,7 @@ try{
  assert.ok(result.longGap.filter(g=>g.delay!==null).every(g=>g.land!==null&&g.deepest<426&&g.footMargin>20),'boosted long gap');assert.ok(result.longGap.filter(g=>g.delay===null).every(g=>g.falls>0),'standard jump cannot clear the long gap');
  assert.ok(result.ramps.every(r=>r.error<1&&r.air===0&&r.blocked===0),'analytic ramp contacts');assert.ok(result.escapes.every(e=>e.recovered&&e.falls===1&&e.food===17&&e.energyPreserved&&Math.abs(e.foot-e.ground)<.01&&e.vy===0&&e.delay>=.57&&e.delay<=.65),'automatic pit recovery');
  assert.ok(result.oneWay.every(p=>!p.hitHead&&p.landed),'readable one-way platforms');assert.ok(result.coyote[0].vy<0&&result.coyote[1].vy>=0);assert.ok(result.buffer);
- assert.ok(result.scooters.filter(s=>s.lead!==null).every(s=>!s.hits.length&&s.reaction>=.49),'scooter timing window');assert.ok(result.scooters.filter(s=>s.lead===null).every(s=>s.hits.includes(12)));
+ assert.ok(result.scooters.filter(s=>s.avoid).every(s=>!s.hits.length&&s.reaction>=.49),'scooter timing window');assert.ok(result.scooters.filter(s=>!s.avoid).every(s=>s.hits.includes(12)));
  assert.ok(result.benches[0].rest&&!result.benches[1].rest);assert.ok(result.masks.every(m=>m.outside===0));assert.match(result.endings[0].description,/Не хватило 1/);assert.match(result.endings[1].title,/накормлен/);assert.match(result.endings[2].title,/пир/);
  await page.evaluate(()=>restart());await page.touchscreen.tap(230,500);assert.ok(await page.evaluate(()=>{tick(2);return game.scene.getScene('play').tanya.body.velocity.y<0}));
  await page.evaluate(()=>tick(7));await page.touchscreen.tap(230,500);assert.equal(await page.evaluate(()=>{tick(2);return game.scene.getScene('play').boostsUsed}),1);

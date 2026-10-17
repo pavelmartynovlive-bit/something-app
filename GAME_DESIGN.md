@@ -1422,3 +1422,34 @@ platform fallback90). Display only resource count and feeding requirement.
 Local food cues follow new avoidance jumps and shifted landings, not empty-space
 filler. See LEVEL_AUDIT.md for exact widths, all playthroughs and remaining density
 limitations. Stop for manual phone testing; do not redesign the V3 macro again.
+
+## 29. Approved local density / distributed energy pass (2026-10-17)
+
+Latest user instruction supersedes §28's one-pocket exclusivity and exact enemy /
+platform numbers. Preserve the V3 macro, ten sections and original ground profile.
+Do not rebuild terrain motifs or insert long connectors.
+
+Three former airborne surfaces are halved to120/80/100px and locally repositioned
+at2860/3040/3230 so normal and tired jumps remain reachable. Two additional short
+single surfaces at1050 (110px) and8130 (100px) accent existing plateau jumps.
+All misses fail forward to continuous ground. No long upper highway.
+
+Five grannies:740–760,1820–1840,3690–3710,6300–6320,10230–10250.
+Three scooters: roadway, ascent terrace and final-drop approach. Each has an
+explicit flat movement lane with full sprite clearance; remove it before a wall
+or pit, disable its body and exclude it from damage when hidden. No stalled
+scooter in a lower pocket. Keep two pigeon groups and the previous pit system.
+Safe anchor8140 moves to8280 to avoid the new mid-ascent encounter.
+
+Drain2.85/s; each of three Liptons restores12, at1580,y205;4590,y345;8190,y270.
+One bench at7200 stops2.5s and restores36. No bottle in the bench pocket. Early
+bottles, bench and late bottle are independent single-use recoveries: collecting
+one must not globally disable distant recovery. Standing still never regenerates.
+Normal finish~16 energy with three bottles; collector~6 with two; bench~52 with
+three bottles and a time cost. Zero-start remains completable using the bench.
+Food requirement80 /bonus103 remain justified by new actual route budgets98 /103
+(normal /collector), and90 after platform misses. UI stays resource count only.
+
+Stable portrait scale, existing jump/boost envelopes, coyote and buffer unchanged.
+See current LEVEL_AUDIT.md and overview for measured local map / caveats. Do not
+claim automated visible-cue metrics are manual phone playtesting. Stop after tests.

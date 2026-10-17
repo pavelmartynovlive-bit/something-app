@@ -1,82 +1,233 @@
 {
+  "scooterLanes": [
+    {
+      "index": 0,
+      "fps": 15,
+      "spawn": 5360,
+      "left": 4860,
+      "right": 5380,
+      "flat": true,
+      "spawnInside": true,
+      "wall": false,
+      "stalls": 1,
+      "penetration": 0,
+      "launched": true,
+      "retired": 4856,
+      "visible": false,
+      "disabled": true
+    },
+    {
+      "index": 1,
+      "fps": 15,
+      "spawn": 9360,
+      "left": 8910,
+      "right": 9480,
+      "flat": true,
+      "spawnInside": true,
+      "wall": false,
+      "stalls": 1,
+      "penetration": 0,
+      "launched": true,
+      "retired": 8904,
+      "visible": false,
+      "disabled": true
+    },
+    {
+      "index": 2,
+      "fps": 15,
+      "spawn": 8160,
+      "left": 7940,
+      "right": 8380,
+      "flat": true,
+      "spawnInside": true,
+      "wall": false,
+      "stalls": 1,
+      "penetration": 0,
+      "launched": true,
+      "retired": 7936,
+      "visible": false,
+      "disabled": true
+    },
+    {
+      "index": 0,
+      "fps": 30,
+      "spawn": 5360,
+      "left": 4860,
+      "right": 5380,
+      "flat": true,
+      "spawnInside": true,
+      "wall": false,
+      "stalls": 1,
+      "penetration": 0,
+      "launched": true,
+      "retired": 4856,
+      "visible": false,
+      "disabled": true
+    },
+    {
+      "index": 1,
+      "fps": 30,
+      "spawn": 9360,
+      "left": 8910,
+      "right": 9480,
+      "flat": true,
+      "spawnInside": true,
+      "wall": false,
+      "stalls": 1,
+      "penetration": 0,
+      "launched": true,
+      "retired": 8905,
+      "visible": false,
+      "disabled": true
+    },
+    {
+      "index": 2,
+      "fps": 30,
+      "spawn": 8160,
+      "left": 7940,
+      "right": 8380,
+      "flat": true,
+      "spawnInside": true,
+      "wall": false,
+      "stalls": 1,
+      "penetration": 0,
+      "launched": true,
+      "retired": 7936,
+      "visible": false,
+      "disabled": true
+    },
+    {
+      "index": 0,
+      "fps": 60,
+      "spawn": 5360,
+      "left": 4860,
+      "right": 5380,
+      "flat": true,
+      "spawnInside": true,
+      "wall": false,
+      "stalls": 1,
+      "penetration": 0,
+      "launched": true,
+      "retired": 4859.5,
+      "visible": false,
+      "disabled": true
+    },
+    {
+      "index": 1,
+      "fps": 60,
+      "spawn": 9360,
+      "left": 8910,
+      "right": 9480,
+      "flat": true,
+      "spawnInside": true,
+      "wall": false,
+      "stalls": 1,
+      "penetration": 0,
+      "launched": true,
+      "retired": 8908.5,
+      "visible": false,
+      "disabled": true
+    },
+    {
+      "index": 2,
+      "fps": 60,
+      "spawn": 8160,
+      "left": 7940,
+      "right": 8380,
+      "flat": true,
+      "spawnInside": true,
+      "wall": false,
+      "stalls": 1,
+      "penetration": 0,
+      "launched": true,
+      "retired": 7939.5,
+      "visible": false,
+      "disabled": true
+    }
+  ],
   "runs": [
     {
       "mode": "normal",
       "finished": true,
-      "time": 42.11666666666363,
-      "food": 97,
-      "energy": 31.305833333333105,
+      "time": 42.09999999999829,
+      "food": 98,
+      "energy": 15.825000000001438,
       "collisions": 0,
       "hitsAt": [],
       "bench": 0,
-      "lipton": 1,
+      "lipton": 3,
       "falls": 0,
       "recoveries": 0,
       "boosts": 3,
       "resets": 0,
-      "longestRawInputGap": 3.916666666666096,
-      "longestInputDecisionGap": 2.099999999999696,
+      "longestRawInputGap": 3.683333333332797,
+      "longestInputDecisionGap": 2.1999999999996795,
       "decisionInterval": [
-        34.19999999999601,
-        36.299999999995705
+        25.300000000000736,
+        27.500000000000416
       ],
       "longestEmpty": 0,
-      "threeLayersRatio": 0.47393364928909953
+      "threeLayersRatio": 0.5249406175771971
     },
     {
       "mode": "collector",
       "finished": true,
-      "time": 41.16666666667865,
-      "food": 105,
-      "energy": 33.3483333333332,
+      "time": 41.23333333333893,
+      "food": 103,
+      "energy": 6.295000000001377,
       "collisions": 0,
       "hitsAt": [],
       "bench": 0,
-      "lipton": 1,
+      "lipton": 2,
       "falls": 0,
       "recoveries": 0,
       "boosts": 5,
       "resets": 0,
-      "longestRawInputGap": 3.266666666667618,
-      "longestInputDecisionGap": 2.0000000000005826,
+      "longestRawInputGap": 3.7000000000010758,
+      "longestInputDecisionGap": 2.2000000000006423,
       "decisionInterval": [
-        33.30000000000969,
-        35.30000000001027
+        24.800000000000814,
+        27.000000000001457
       ],
       "longestEmpty": 0,
-      "threeLayersRatio": 0.46601941747572817
+      "threeLayersRatio": 0.5278450363196125
     },
     {
       "mode": "low-energy",
       "finished": true,
-      "time": 55.84999999998444,
-      "food": 89,
-      "energy": 3.3675000000004465,
+      "time": 52.50000000000342,
+      "food": 92,
+      "energy": 10.002500000000403,
       "collisions": 0,
       "hitsAt": [],
       "bench": 1,
-      "lipton": 0,
+      "lipton": 3,
       "falls": 0,
       "recoveries": 0,
       "boosts": 3,
       "resets": 0,
-      "longestRawInputGap": 9.11666666666136,
-      "longestInputDecisionGap": 4.399999999997441,
+      "longestRawInputGap": 9.116666666668216,
+      "longestInputDecisionGap": 4.400000000000944,
       "decisionInterval": [
-        38.29999999999466,
-        42.6999999999921
+        34.90000000001016,
+        39.3000000000111
       ],
       "longestEmpty": 0,
-      "threeLayersRatio": 0.4937388193202147
+      "threeLayersRatio": 0.540952380952381
     },
     {
       "mode": "intentional-collision",
       "finished": true,
-      "time": 46.19999999997311,
-      "food": 91,
+      "time": 50.766666666637114,
+      "food": 89,
       "energy": 0,
-      "collisions": 6,
+      "collisions": 8,
       "hitsAt": [
+        {
+          "x": 708,
+          "time": 2.4999999999985447,
+          "damage": 15
+        },
         {
           "x": 1779.9999999999964,
           "time": 6.599999999996158,
@@ -88,47 +239,52 @@
           "damage": 6
         },
         {
-          "x": 5455.833333333311,
-          "time": 21.449999999987515,
-          "damage": 12
-        },
-        {
-          "x": 6272.833333333323,
-          "time": 25.233333333318647,
+          "x": 3655.9999999999964,
+          "time": 14.416666666658275,
           "damage": 15
         },
         {
-          "x": 9241.33333333327,
-          "time": 38.53333333331091,
+          "x": 5259.833333333311,
+          "time": 20.633333333321325,
           "damage": 12
         },
         {
-          "x": 10192.666666666768,
-          "time": 44.3833333333075,
+          "x": 6266.833333333225,
+          "time": 26.783333333317742,
           "damage": 15
+        },
+        {
+          "x": 8114.833333333055,
+          "time": 36.91666666664518,
+          "damage": 12
+        },
+        {
+          "x": 9228.999999999896,
+          "time": 43.016666666641626,
+          "damage": 12
         }
       ],
       "bench": 0,
-      "lipton": 1,
+      "lipton": 2,
       "falls": 0,
       "recoveries": 0,
-      "boosts": 3,
+      "boosts": 4,
       "resets": 0,
-      "longestRawInputGap": 5.583333333330085,
-      "longestInputDecisionGap": 1.9999999999988347,
+      "longestRawInputGap": 6.966666666662611,
+      "longestInputDecisionGap": 3.0999999999981966,
       "decisionInterval": [
-        35.8999999999791,
-        37.899999999977936
+        27.39999999998405,
+        30.499999999982247
       ],
       "longestEmpty": 0,
-      "threeLayersRatio": 0.461038961038961
+      "threeLayersRatio": 0.49803149606299213
     },
     {
       "mode": "pit-fall",
       "finished": true,
-      "time": 48.516666666638834,
+      "time": 48.69999999997165,
       "food": 98,
-      "energy": 16.849166666666875,
+      "energy": 0,
       "collisions": 1,
       "hitsAt": [
         {
@@ -138,76 +294,53 @@
         }
       ],
       "bench": 0,
-      "lipton": 1,
+      "lipton": 3,
       "falls": 4,
       "recoveries": 4,
       "boosts": 3,
       "resets": 4,
-      "longestRawInputGap": 5.283333333330258,
-      "longestInputDecisionGap": 2.0999999999987793,
+      "longestRawInputGap": 4.449999999997413,
+      "longestInputDecisionGap": 2.1999999999987168,
       "decisionInterval": [
-        38.399999999977645,
-        40.499999999976424
+        29.49999999998283,
+        31.699999999981546
       ],
       "longestEmpty": 0,
-      "threeLayersRatio": 0.5123456790123457
+      "threeLayersRatio": 0.5338809034907598
     },
     {
       "mode": "platform-miss",
       "finished": true,
-      "time": 42.10000000004901,
+      "time": 42.11666666668456,
       "food": 90,
-      "energy": 31.341666666666438,
+      "energy": 15.777500000001439,
       "collisions": 0,
       "hitsAt": [],
       "bench": 0,
-      "lipton": 1,
+      "lipton": 3,
       "falls": 0,
       "recoveries": 0,
       "boosts": 3,
       "resets": 0,
-      "longestRawInputGap": 6.1000000000071015,
-      "longestInputDecisionGap": 2.0000000000023306,
+      "longestRawInputGap": 3.6833333333376217,
+      "longestInputDecisionGap": 2.200000000002561,
       "decisionInterval": [
-        34.200000000039815,
-        36.200000000042145
+        25.299999999998313,
+        27.500000000000874
       ],
       "longestEmpty": 0,
-      "threeLayersRatio": 0.4750593824228028
-    },
-    {
-      "mode": "no-recovery",
-      "finished": true,
-      "time": 42.10000000004901,
-      "food": 94,
-      "energy": 9.341666666668619,
-      "collisions": 0,
-      "hitsAt": [],
-      "bench": 0,
-      "lipton": 0,
-      "falls": 0,
-      "recoveries": 0,
-      "boosts": 3,
-      "resets": 0,
-      "longestRawInputGap": 3.9166666666712278,
-      "longestInputDecisionGap": 2.0000000000023306,
-      "decisionInterval": [
-        34.200000000039815,
-        36.200000000042145
-      ],
-      "longestEmpty": 0,
-      "threeLayersRatio": 0.47268408551068886
+      "threeLayersRatio": 0.5308056872037915
     },
     {
       "mode": "bench",
       "finished": true,
       "time": 44.51666666671849,
-      "food": 95,
-      "energy": 41.77000000000093,
+      "food": 96,
+      "energy": 52.3500000000013,
       "collisions": 0,
       "hitsAt": [],
       "bench": 1,
-      "lipton": 0,
+      "lipton": 3,
       "falls": 0,
       "recoveries": 0,
       "boosts": 3,
@@ -219,39 +352,57 @@
         31.300000000036437
       ],
       "longestEmpty": 0,
-      "threeLayersRatio": 0.5022421524663677
+      "threeLayersRatio": 0.5582959641255605
     }
   ],
   "hazards": [
     {
       "kind": "grannies",
       "index": 0,
-      "visibleToTap": 0.6006275414548412,
+      "visibleToTap": 0.600627541454906,
       "tapX": 1735.9999999999964
     },
     {
       "kind": "grannies",
       "index": 1,
-      "visibleToTap": 0.7903440915427495,
-      "tapX": 6219.833333333311
+      "visibleToTap": 0.7809525571512701,
+      "tapX": 6217.666666666644
     },
     {
       "kind": "grannies",
       "index": 2,
-      "visibleToTap": 0.7292329804319237,
-      "tapX": 10143.83333333334
+      "visibleToTap": 0.7198414460400713,
+      "tapX": 10141.666666666673
     },
     {
       "kind": "scooters",
       "index": 0,
-      "visibleToTap": 0.9089683596874778,
-      "tapX": 5411.833333333311
+      "visibleToTap": 0.6358335183377086,
+      "tapX": 5241.666666666644
     },
     {
       "kind": "scooters",
       "index": 1,
-      "visibleToTap": 0.5448612961107742,
-      "tapX": 9219.83333333334
+      "visibleToTap": 0.5525001850005964,
+      "tapX": 9221.666666666673
+    },
+    {
+      "kind": "scooters",
+      "index": 2,
+      "visibleToTap": 0.6358335183421353,
+      "tapX": 8041.666666666644
+    },
+    {
+      "kind": "grannies",
+      "index": 3,
+      "visibleToTap": 0.7295323577898807,
+      "tapX": 664
+    },
+    {
+      "kind": "grannies",
+      "index": 4,
+      "visibleToTap": 0.7775134037123159,
+      "tapX": 3607.9999999999964
     }
   ],
   "normalSections": [
@@ -285,7 +436,7 @@
     },
     {
       "name": "Длинный разрыв",
-      "seconds": 3.1999999999999935,
+      "seconds": 3.183333333333327,
       "food": 51,
       "collisions": 0,
       "boosts": 2
@@ -299,29 +450,29 @@
     },
     {
       "name": "Каскад вниз",
-      "seconds": 3.866666666666658,
+      "seconds": 3.8833333333333244,
       "food": 62,
       "collisions": 0,
       "boosts": 2
     },
     {
       "name": "Отдых",
-      "seconds": 3.049999999999994,
-      "food": 69,
+      "seconds": 3.0333333333333274,
+      "food": 68,
       "collisions": 0,
       "boosts": 2
     },
     {
       "name": "Подъём",
-      "seconds": 5.749999999999985,
+      "seconds": 5.7666666666666515,
       "food": 83,
       "collisions": 0,
       "boosts": 3
     },
     {
       "name": "Финальная связка",
-      "seconds": 6.816666666666648,
-      "food": 97,
+      "seconds": 6.799999999999981,
+      "food": 98,
       "collisions": 0,
       "boosts": 3
     }
@@ -331,7 +482,7 @@
       "tired": false,
       "delay": null,
       "height": 107.33333333333337,
-      "seconds": 0.7999999999999708,
+      "seconds": 0.8000000000000146,
       "distance": 192,
       "boosts": 0
     },
@@ -339,7 +490,7 @@
       "tired": false,
       "delay": 20,
       "height": 107.33333333333337,
-      "seconds": 0.7999999999999708,
+      "seconds": 0.8000000000000055,
       "distance": 192,
       "boosts": 0
     },
@@ -371,7 +522,7 @@
       "tired": false,
       "delay": 200,
       "height": 214.8564747658838,
-      "seconds": 1.2000000000000128,
+      "seconds": 1.1999999999999564,
       "distance": 397.99999999999943,
       "boosts": 1
     },
@@ -379,7 +530,7 @@
       "tired": false,
       "delay": 250,
       "height": 215.08568260141448,
-      "seconds": 1.233333333333423,
+      "seconds": 1.2333333333332885,
       "distance": 404.16666666666606,
       "boosts": 1
     },
@@ -387,7 +538,7 @@
       "tired": false,
       "delay": 270,
       "height": 215.13050000125298,
-      "seconds": 1.233333333333423,
+      "seconds": 1.2333333333332885,
       "distance": 402.3333333333326,
       "boosts": 1
     },
@@ -500,7 +651,7 @@
   "minFootMargin": {
     "smallNormal": 46,
     "smallTired": 24.66666666666572,
-    "boostNormal": 61.66666666664787,
+    "boostNormal": 65.66666666664787,
     "boostTired": 47.66666666666424
   }
 }

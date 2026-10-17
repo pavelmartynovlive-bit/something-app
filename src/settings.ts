@@ -12,7 +12,7 @@ export const levelSections = [
   { name: 'Длинный разрыв', start: 3940, end: 4820, idea: 'tap → boost → long flight' },
   { name: 'Самокат', start: 4820, end: 5740, idea: 'see → wait → late tap' },
   { name: 'Каскад вниз', start: 5740, end: 6670, idea: 'drop → tap → drop' },
-  { name: 'Отдых', start: 6670, end: 7400, idea: 'Lipton OR bench' },
+  { name: 'Отдых', start: 6670, end: 7400, idea: 'bench OR maintain momentum' },
   { name: 'Подъём', start: 7400, end: 8870, idea: 'tap → tap/boost → boost' },
   { name: 'Финальная связка', start: 8870, end: 10580, idea: 'drop → wait → tap → land → tap → cat' },
 ];
@@ -21,11 +21,11 @@ export const routeChoices = [{x:2640,entrance:2860,end:3680}];
 export const rhythmDecisions: {x:number;targetX:number;kind:string}[] = [];
 export const settings = {
   speed: 240, tiredSpeed: 170, jumpVelocity: 560, gravity: 1400, tiredJumpVelocity: 500,
-  liptonEnergy: 22, energyDrainPerSecond: 2.15,
+  liptonEnergy: 12, energyDrainPerSecond: 2.85,
   obstacleDamage: 15, grannyDamage: 15, grannySpeed: 12, hitCooldownMs: 1400,
   scooterSpeed: 210, scooterDamage: 12, scooterSlowMs: 650, scooterSlowSpeed: 100,
   pigeonDamage: 6, pigeonTriggerDistance: 120,
-  benchDurationMs: 2500, benchEnergyPerSecond: 12.8, benchEnergyThreshold: 65,
+  benchDurationMs: 2500, benchEnergyPerSecond: 14.4, benchEnergyThreshold: 65,
   requiredFood: 80, bonusFood: 103, // V3 route budgets are recorded in LEVEL_AUDIT.md.
   coyoteMs: 130, jumpBufferMs: 150,
   boostMinMs: 40, boostWindowMs: 280, boostHeight: 220, tiredBoostHeight: 200,
@@ -34,17 +34,19 @@ export const settings = {
   groundSpans, interruptions,
   obstacles: [] as Box[],
   routePlatforms: [
-    {x:2860,y:365,width:240,label:'Бонус ↑'},
-    {x:3160,y:330,width:160,label:''},
-    {x:3400,y:390,width:200,label:''},
+    {x:2860,y:365,width:120,label:'Бонус ↑'},
+    {x:3040,y:330,width:80,label:''},
+    {x:3230,y:390,width:100,label:''},
+    {x:1050,y:350,width:110,label:''},
+    {x:8130,y:370,width:100,label:''},
   ] as Platform[],
-  bottles: [{x:6970,y:435}] as Point[], food,
-  scooters: [{x:5640,launchAt:4990},{x:9360,launchAt:9150}],
+  bottles: [{x:1580,y:205},{x:4590,y:345},{x:8190,y:270}] as Point[], food,
+  scooters: [{x:5360,launchAt:5190,left:4860,right:5380},{x:9360,launchAt:9150,left:8910,right:9480},{x:8160,launchAt:7990,left:7940,right:8380}],
   pigeons: [{x:2500,y:435},{x:9590,y:470}] as Point[],
   benches: [7200] as number[],
-  grannies: [{left:1820,right:1840},{left:6300,right:6320},{left:10230,right:10250}] as {left:number;right:number}[],
+  grannies: [{left:1820,right:1840},{left:6300,right:6320},{left:10230,right:10250},{left:740,right:760},{left:3690,right:3710}] as {left:number;right:number}[],
   recoveryDelayMs: 600,
-  recoveryAnchors: [100,240,1220,2660,4110,5880,7320,8140,9240],
+  recoveryAnchors: [100,240,1220,2660,4110,5880,7320,8280,9240],
   signs: levelSections.map(section => ({ x: section.start === 100 ? 260 : section.start === 1100 ? 1470 : section.start === 3940 ? 3990 : section.start === 8870 ? 9130 : section.start - 160, text: section.start === 1100 ? 'Тап → тап: выше' : section.start === 3940 ? 'Тап → тап: дальше' : section.start === 8870 ? 'Самокат → птицы → кот' : section.name })),
 };
 export { groundYAt };

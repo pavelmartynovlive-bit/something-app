@@ -28,7 +28,7 @@ const result=await page.evaluate(()=>{
  const oldContact=[];
  for(const fps of [15,20,30]){
   const s=restart();quiet(s);s.physics.world.off('worldstep',s.resolveTerrainContacts,s);
-  const update=s.update;s.update=function(t,delta){const b=this.tanya.body,r=cfg.groundSpans.find(g=>g.endY!==undefined&&b.center.x>=g.start&&b.center.x<g.end);if(r&&b.velocity.y>=0){const y=terrain.groundYAt(b.center.x),prev=terrain.groundYAt(b.prev.x+b.halfWidth),pb=b.prev.y+b.height;if(pb<=prev+4&&(b.bottom>=y||Math.abs(pb-prev)<4)){b.y=y-b.height;b.velocity.y=0;b.blocked.down=true}}update.call(this,t,delta)};
+  const update=s.update;s.sys.sceneUpdate=function(t,delta){const b=this.tanya.body,r=cfg.groundSpans.find(g=>g.endY!==undefined&&b.center.x>=g.start&&b.center.x<g.end);if(r&&b.velocity.y>=0){const y=terrain.groundYAt(b.center.x),prev=terrain.groundYAt(b.prev.x+b.halfWidth),pb=b.prev.y+b.height;if(pb<=prev+4&&(b.bottom>=y||Math.abs(pb-prev)<4)){b.y=y-b.height;b.velocity.y=0;b.blocked.down=true}}update.call(this,t,delta)};
   s.tanya.body.reset(1980,terrain.groundYAt(1980)-27-55);s.tanya.setVelocity(240,900);s.tanya.body.maxVelocity.y=900;let penetration=0;
   for(let i=0;i<fps*.6;i++){tick(1000/fps);penetration=Math.max(penetration,s.tanya.body.bottom-terrain.groundYAt(s.tanya.body.center.x))}
   oldContact.push({fps,penetration});
@@ -43,17 +43,18 @@ const result=await page.evaluate(()=>{
  for(const route of ['fast','rest','skip']){
   const s=restart();quiet(s);s.tanya.body.reset(6800,545-27);s.changeEnergy(-65);let jumped=false;
   for(let i=0;i<420&&s.tanya.x<7500;i++){
-   const x=s.tanya.x,launch=route==='fast'?6910:7100;
+   const x=s.tanya.x,launch=7100;
    if(route!=='rest'&&!jumped&&x>=launch){window.dispatchEvent(new KeyboardEvent('keydown',{key:' ',code:'Space',keyCode:32,bubbles:true}));jumped=true}
    tick();window.dispatchEvent(new KeyboardEvent('keyup',{key:' ',code:'Space',keyCode:32,bubbles:true}));
   }
-  pocket.push({route,lipton:s.liptonUses,bench:s.benchUses,choice:s.recoveryChoice,x:s.tanya.x});
+  pocket.push({route,lipton:s.liptonUses,bench:s.benchUses,bottlesEnabled:s.physics.world.staticBodies.entries.filter(b=>b.enable&&b.gameObject.texture?.key==='lipton').length,x:s.tanya.x});
  }
  return {anchors,ground,oldContact,drops,pocket};
 });
 writeFileSync('/tmp/tanya-v3-recovery.json',JSON.stringify(result,null,2));
 assert.deepEqual(errors,[]);assert.ok(result.anchors.every(a=>!a.pit&&!a.danger&&a.bodyEnabled&&a.progress>20&&a.food===23&&a.energyPreserved&&a.cameraErrorAtRestore<.01&&a.footErrorAtRestore<.01&&a.vyAtRestore===0),'every anchor safe and resumes');
 assert.ok(result.ground.every(g=>g.penetration<1&&g.landed&&g.falls===0),'ground at 15–120fps');assert.ok(result.drops.every(g=>g.penetration<1),'solid surface landing sweep');
-assert.ok(result.oldContact.some(g=>g.penetration>20),'old ramp bug reproduction');assert.ok(result.pocket.every(p=>p.x>7400),'pocket flow');assert.deepEqual(result.pocket.map(p=>[p.lipton,p.bench]),[[1,0],[0,1],[0,0]],'exclusive recovery trajectories');
+assert.ok(result.oldContact.some(g=>g.penetration>20),'old ramp bug reproduction');assert.ok(result.pocket.every(p=>p.x>7400),'pocket flow');assert.deepEqual(result.pocket.map(p=>[p.lipton,p.bench]),[[0,0],[0,1],[0,0]],'bench versus continuous route');
+assert.ok(result.pocket.every(p=>p.bottlesEnabled===3),'rest never disables distant bottles');
 console.log(JSON.stringify({oldContact:result.oldContact,anchors:result.anchors.length,ground:result.ground.length,drops:result.drops.length,pocket:result.pocket}));
 }finally{await browser.close()}

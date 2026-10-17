@@ -178,3 +178,10 @@ Before implementing a new section, ask:
 Ground is the main game.
 Upper geometry is a short bonus or challenge.
 Terrain, hazards and collectibles create the rhythm together.
+
+## 12. Current local V3 tuning
+
+The latest approved pass permits several brief aerial accents on the existing
+V3 macro. They remain short landing islands with safe ground below, never upper
+highways. Recovery is now distributed small Liptons plus one stronger bench;
+§29 of GAME_DESIGN.md supersedes the earlier single-pocket composition.

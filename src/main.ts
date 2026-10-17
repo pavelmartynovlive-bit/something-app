@@ -43,14 +43,13 @@ class PlayScene extends Phaser.Scene {
   private boostsUsed = 0;
   private restRemaining = 0;
   private foodCount = 0;
-  private scooters: { sprite: Phaser.Physics.Arcade.Sprite; spawnX: number; launchAt: number; launched: boolean }[] = [];
+  private scooters: { sprite: Phaser.Physics.Arcade.Sprite; spawnX: number; launchAt: number; left: number; right: number; launched: boolean }[] = [];
   private pigeons: { sprite: Phaser.Physics.Arcade.Sprite; flying: boolean; lowFlightRemaining: number; perchY: number }[] = [];
   private recoveryRemaining = 0;
   private falls = 0;
   private recoveries = 0;
   private benchUses = 0;
   private liptonUses = 0;
-  private recoveryChoice: 'none' | 'lipton' | 'bench' = 'none';
   private benchSprites: Phaser.Physics.Arcade.Sprite[] = [];
   private finished = false;
   private wasPortrait = false;
@@ -62,7 +61,7 @@ class PlayScene extends Phaser.Scene {
     this.exhausted = false;
     this.checkpoint = 100;
     this.recoveryRemaining = this.falls = this.recoveries = this.benchUses = this.liptonUses = 0;
-    this.recoveryChoice = 'none'; this.benchSprites = [];
+    this.benchSprites = [];
     this.lastGround = this.bufferedJump = -Infinity;
     this.hitUntil = this.slowUntil = 0;
     this.airborneSpeed = s.speed;
@@ -189,12 +188,11 @@ class PlayScene extends Phaser.Scene {
       bottle.setSize(42, 52);
     });
     this.physics.add.overlap(this.tanya, bottles, (_player, item) => {
-      if (this.finished || this.recoveryRemaining > 0 || this.recoveryChoice === 'bench') return;
+      if (this.finished || this.recoveryRemaining > 0) return;
       const bottle = item as Phaser.Physics.Arcade.Sprite;
       const label = this.add.text(bottle.x, bottle.y - 25, `+${s.liptonEnergy}`, { fontSize: '22px', color: '#326544', fontStyle: 'bold' }).setOrigin(.5);
       bottle.destroy();
-      this.liptonUses++; this.recoveryChoice = 'lipton';
-      for(const bench of this.benchSprites)bench.setAlpha(.45);
+      this.liptonUses++;
       this.changeEnergy(s.liptonEnergy);
       this.tweens.add({ targets: label, y: label.y - 45, alpha: 0, duration: 850, onComplete: () => label.destroy() });
       message(`Lipton! +${s.liptonEnergy} энергии`, 1200);
@@ -431,10 +429,10 @@ class PlayScene extends Phaser.Scene {
       this.tweens.add({ targets: label, y: label.y - 40, alpha: 0, duration: 750, onComplete: () => label.destroy() });
       this.updateHud();
     });
-    for (const {x,launchAt} of s.scooters) {
+    for (const {x,launchAt,left,right} of s.scooters) {
       const sprite = this.physics.add.sprite(x, groundYAt(x) - 28, 'scooter');
       this.physics.add.collider(sprite, ground);
-      this.scooters.push({ sprite, spawnX: x, launchAt, launched: false });
+      this.scooters.push({ sprite, spawnX: x, launchAt, left, right, launched: false });
     }
     for (const point of s.pigeons) {
       const sprite = this.physics.add.sprite(point.x, point.y - 16, 'pigeons');
@@ -453,12 +451,9 @@ class PlayScene extends Phaser.Scene {
     this.physics.add.overlap(this.tanya, benches, (_player, item) => {
       const bench = item as Phaser.Physics.Arcade.Sprite;
       const body = this.tanya.body as Phaser.Physics.Arcade.Body;
-      if (this.finished || this.recoveryRemaining > 0 || this.recoveryChoice === 'lipton' || this.restRemaining > 0 || bench.getData('used') || this.energy >= s.benchEnergyThreshold || body.velocity.y < 0 || !(body.blocked.down && Math.abs(body.bottom - groundYAt(this.tanya.x)) < 3)) return;
+      if (this.finished || this.recoveryRemaining > 0 || this.restRemaining > 0 || bench.getData('used') || this.energy >= s.benchEnergyThreshold || body.velocity.y < 0 || !(body.blocked.down && Math.abs(body.bottom - groundYAt(this.tanya.x)) < 3)) return;
       bench.setData('used', true);
-      this.benchUses++; this.recoveryChoice='bench';
-      for(const b of this.physics.world.staticBodies.entries)if(b.gameObject instanceof Phaser.Physics.Arcade.Sprite && b.gameObject.texture.key==='lipton') {
-        b.enable=false; b.gameObject.setAlpha(.3);
-      }
+      this.benchUses++;
       this.restRemaining = s.benchDurationMs;
       body.reset(bench.x, groundYAt(bench.x) - 26);
       this.tanya.setVelocity(0, 0).setTexture('tanya-sitting');
@@ -469,6 +464,13 @@ class PlayScene extends Phaser.Scene {
   }
   private updateNewObjects(dt: number) {
     for (const scooter of this.scooters) {
+      const body=scooter.sprite.body as Phaser.Physics.Arcade.Body;
+      if(!body.enable)continue;
+      // Retire after passing Tanya, before a wall, pit or terrain join.
+      // A disabled invisible scooter cannot remain as a hidden hazard.
+      if(scooter.launched && (body.center.x<=scooter.left || body.blocked.left || body.blocked.right)) {
+        body.stop(); body.enable=false; scooter.sprite.setVisible(false); continue;
+      }
       if (!scooter.launched && this.tanya.x >= scooter.launchAt) {
         scooter.launched = true;
         scooter.sprite.setVelocityX(-s.scooterSpeed);
@@ -494,7 +496,7 @@ class PlayScene extends Phaser.Scene {
       if (touchesDanger(player, granny.sprite, 'granny')) this.hit(s.grannyDamage);
     }
     for (const scooter of this.scooters) {
-      if (touchesDanger(player, scooter.sprite, 'scooter') && this.hit(s.scooterDamage)) {
+      if (scooter.sprite.body!.enable && touchesDanger(player, scooter.sprite, 'scooter') && this.hit(s.scooterDamage)) {
         this.slowUntil = this.time.now + s.scooterSlowMs;
         this.cameras.main.shake(90, .002);
       }
