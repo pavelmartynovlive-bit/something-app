@@ -5,64 +5,45 @@ type Platform = { x: number; y: number; width: number; label: string };
 type Point = { x: number; y: number };
 type Box = { x: number; width: number; height: number };
 export const levelSections = [
-  { name: 'Разрыв и низкий остров', start: 100, end: 1420, idea: 'Прыжок → остров → второй прыжок' },
-  { name: 'Птичья чаша', start: 1420, end: 2740, idea: 'Сход → ждать → птицы → выход' },
-  { name: 'Остров и бабушка', start: 2740, end: 4060, idea: 'Прыжок на остров → сразу бабушка → спуск' },
-  { name: 'Единственный верхний бонус', start: 4060, end: 5710, idea: 'Выбор → две разные опоры → безопасное падение' },
-  { name: 'Лесенка вниз', start: 5710, end: 7360, idea: 'Сойти → сойти → не прыгать → разрыв' },
-  { name: 'Самокат под эстакадой', start: 7360, end: 9010, idea: 'Подъём → посадка → ждать → поздний прыжок вниз' },
-  { name: 'Карман восстановления', start: 9010, end: 10330, idea: 'Lipton на прыжке ИЛИ лавочка внизу' },
-  { name: 'Три неравные высоты', start: 10330, end: 11980, idea: 'Дальний прыжок → короткое окно → спуск' },
-  { name: 'Спуск, птицы и разрыв', start: 11980, end: 13630, idea: 'Отложенный прыжок → посадка → быстрый второй тап' },
-  { name: 'Бабушка и кот', start: 13630, end: 15030, idea: 'Подъём → бабушка → спуск → кот' },
+  { name: 'Разрыв и остров', start: 100, end: 1100, idea: 'tap → land → tap' },
+  { name: 'Высокий уступ', start: 1100, end: 1900, idea: 'tap → early boost → high landing' },
+  { name: 'Спуск и птицы', start: 1900, end: 2520, idea: 'descend → wait → tap' },
+  { name: 'Неравные опоры', start: 2520, end: 3940, idea: 'tap → quick tap → longer jump' },
+  { name: 'Длинный разрыв', start: 3940, end: 4820, idea: 'tap → boost → long flight' },
+  { name: 'Самокат', start: 4820, end: 5740, idea: 'see → wait → late tap' },
+  { name: 'Каскад вниз', start: 5740, end: 6670, idea: 'drop → tap → drop' },
+  { name: 'Отдых', start: 6670, end: 7400, idea: 'Lipton OR bench' },
+  { name: 'Подъём', start: 7400, end: 8870, idea: 'tap → tap/boost → boost' },
+  { name: 'Финальная связка', start: 8870, end: 10580, idea: 'drop → wait → tap → land → tap → cat' },
 ];
-// Read-only audit annotations; these never drive gameplay.
 export const rewardJumps: number[] = [];
-export const routeChoices = [{ x: 4730, entrance: 4950, end: 5400 }];
-export const rhythmDecisions = [
-  { x: 1000, targetX: 1050, kind: 'read-bowl-descent' },
-  { x: 1350, targetX: 1720, kind: 'descend-before-pigeons' },
-  { x: 2400, targetX: 2740, kind: 'read-next-island' },
-  { x: 3130, targetX: 3410, kind: 'follow-island-descent' },
-  { x: 3900, targetX: 4950, kind: 'read-bonus-entrance' },
-  { x: 5420, targetX: 6060, kind: 'read-descending-staircase' },
-  { x: 6000, targetX: 6060, kind: 'walk-down-first-step' },
-  { x: 6300, targetX: 6390, kind: 'walk-down-second-step' },
-  { x: 7030, targetX: 7340, kind: 'read-roadway-approach' },
-  { x: 7900, targetX: 8240, kind: 'read-scooter-road-edge' },
-  { x: 8520, targetX: 8840, kind: 'read-lower-landing' },
-  { x: 9150, targetX: 9630, kind: 'Lipton-or-bench' },
-  { x: 10000, targetX: 10330, kind: 'read-unequal-islands' },
-  { x: 10920, targetX: 11050, kind: 'stay-low-on-short-island' },
-  { x: 11400, targetX: 11660, kind: 'follow-descending-trail' },
-  { x: 11940, targetX: 12290, kind: 'read-delayed-pigeon-timing' },
-  { x: 13000, targetX: 13350, kind: 'read-final-rise-approach' },
-  { x: 14600, targetX: 15030, kind: 'feed-cat' },
-];
+export const routeChoices = [{x:2640,entrance:2860,end:3680}];
+export const rhythmDecisions: {x:number;targetX:number;kind:string}[] = [];
 export const settings = {
-  speed: 330, tiredSpeed: 190, jumpVelocity: 560, gravity: 1400, tiredJumpVelocity: 500,
+  speed: 240, tiredSpeed: 170, jumpVelocity: 560, gravity: 1400, tiredJumpVelocity: 500,
   liptonEnergy: 22, energyDrainPerSecond: 2,
   obstacleDamage: 15, grannyDamage: 15, grannySpeed: 12, hitCooldownMs: 1400,
   scooterSpeed: 210, scooterDamage: 12, scooterSlowMs: 650, scooterSlowSpeed: 100,
-  pigeonDamage: 6, pigeonTriggerDistance: 210,
+  pigeonDamage: 6, pigeonTriggerDistance: 120,
   benchDurationMs: 2500, benchEnergyPerSecond: 22, benchEnergyThreshold: 65,
-  requiredFood: 150, bonusFood: 194, // Measured V2 budgets: normal 183, ground/rest 180, collector 201.
+  requiredFood: 80, bonusFood: 103, // V3 route budgets are recorded in LEVEL_AUDIT.md.
   coyoteMs: 130, jumpBufferMs: 150,
-  levelWidth: 15180, floorY: 440, viewHeight: 490, platformThickness: 12,
+  boostMinMs: 40, boostWindowMs: 280, boostHeight: 220, tiredBoostHeight: 200,
+  boostSpeed: 350, tiredBoostSpeed: 330,
+  levelWidth: 10730, floorY: 440, viewHeight: 490, platformThickness: 12,
   groundSpans, interruptions,
   obstacles: [] as Box[],
   routePlatforms: [
-    { x: 4950, y: 370, width: 240, label: 'Бонус ↑' },
-    { x: 5230, y: 346, width: 170, label: '' },
+    {x:2860,y:365,width:300,label:'Бонус ↑'},
+    {x:3200,y:330,width:180,label:''},
+    {x:3480,y:390,width:200,label:''},
   ] as Platform[],
-  bottles: [{ x: 9630, y: 450 }] as Point[],
-  food,
-  // Existing ground collision stops the approaching scooter at the visible road face.
-  scooters: [8460],
-  pigeons: [{ x: 1720, y: 456 }, { x: 12290, y: 564 }],
-  benches: [9700],
-  grannies: [{ left: 3020, right: 3044 }, { left: 14380, right: 14400 }],
+  bottles: [{x:7080,y:435}] as Point[], food,
+  scooters: [5640] as number[],
+  pigeons: [{x:2500,y:435},{x:9490,y:470}] as Point[],
+  benches: [7120] as number[],
+  grannies: [{left:10230,right:10250}] as {left:number;right:number}[],
   checkpoints: levelSections.map(section => section.start),
-  signs: levelSections.map(section => ({ x: section.start + 160, text: section.name })),
+  signs: levelSections.map(section => ({ x: section.start === 100 ? 260 : section.start === 1100 ? 1470 : section.start === 3940 ? 3990 : section.start === 8870 ? 9130 : section.start - 160, text: section.start === 1100 ? 'Тап → тап: выше' : section.start === 3940 ? 'Тап → тап: дальше' : section.start === 8870 ? '↓ Птицы → кот' : section.name })),
 };
 export { groundYAt };

@@ -4,6 +4,8 @@
 > It is not a request to copy art or exact level geometry.
 > Use the references only to understand composition, rhythm, signposting and route structure.
 
+> V3 override (2026-10-17): the user approved one early second-tap upward/forward boost. Earlier future-control or single-tap-only notes are historical. Keep portrait, ground-first composition and the richer authored terrain vocabulary; see GAME_DESIGN.md §27.
+
 ## 1. Main observation
 
 The strongest pattern is ground-first.

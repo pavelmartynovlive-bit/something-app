@@ -36,6 +36,11 @@ class PlayScene extends Phaser.Scene {
   private hitUntil = 0;
   private slowUntil = 0;
   private airborneSpeed = s.speed;
+  private jumpStartedAt = -Infinity;
+  private takeoffFloor = s.floorY;
+  private takeoffTired = false;
+  private boostUsed = false;
+  private boostsUsed = 0;
   private restRemaining = 0;
   private foodCount = 0;
   private scooters: { sprite: Phaser.Physics.Arcade.Sprite; spawnX: number; launched: boolean }[] = [];
@@ -52,6 +57,10 @@ class PlayScene extends Phaser.Scene {
     this.lastGround = this.bufferedJump = -Infinity;
     this.hitUntil = this.slowUntil = 0;
     this.airborneSpeed = s.speed;
+    this.jumpStartedAt = -Infinity;
+    this.takeoffFloor = s.floorY;
+    this.takeoffTired = this.boostUsed = false;
+    this.boostsUsed = 0;
     this.restRemaining = this.foodCount = 0;
     this.scooters = [];
     this.pigeons = [];
@@ -91,7 +100,15 @@ class PlayScene extends Phaser.Scene {
     };
     for (const span of s.groundSpans) {
       // Filled to one foundation: the terraces have no playable underside.
-      slab(span.start, span.y, span.end - span.start, 660 - span.y);
+      if (span.endY === undefined) slab(span.start, span.y, span.end - span.start, 660 - span.y);
+      else {
+        const shape = this.add.graphics();
+        shape.fillStyle(0x788c7b).fillPoints([
+          new Phaser.Geom.Point(span.start,span.y),new Phaser.Geom.Point(span.end,span.endY),
+          new Phaser.Geom.Point(span.end,660),new Phaser.Geom.Point(span.start,660),
+        ],true);
+        shape.lineStyle(8,0x96aa8c).lineBetween(span.start,span.y+4,span.end,span.endY+4);
+      }
     }
     for (const box of s.obstacles) {
       const y = groundYAt(box.x) - box.height;
@@ -194,14 +211,26 @@ class PlayScene extends Phaser.Scene {
     const body = this.tanya.body as Phaser.Physics.Arcade.Body;
     // Only solid surfaces establish grounding; collectible/rest overlaps
     // may set touching.down while Tanya is still airborne.
-    const grounded = body.blocked.down;
+    // Analytic ramp top: no invisible rectangular ceiling or staircase approximation.
+    const ramp = s.groundSpans.find(span => span.endY !== undefined && body.center.x >= span.start && body.center.x < span.end);
+    if (ramp && body.velocity.y >= 0) {
+      const surface = groundYAt(body.center.x);
+      const previousSurface = groundYAt(body.prev.x + body.halfWidth);
+      const previousBottom = body.prev.y + body.height;
+      if (previousBottom <= previousSurface + 4 && (body.bottom >= surface || Math.abs(previousBottom-previousSurface)<4)) {
+        body.y = surface-body.height; body.velocity.y=0;
+        body.blocked.down=true; body.touching.down=true;
+      }
+    }
+    const grounded = body.blocked.down && body.velocity.y >= 0;
     const jumpVelocity = this.exhausted ? s.tiredJumpVelocity : s.jumpVelocity;
-    if (grounded) this.lastGround = now;
+    if (grounded) { this.lastGround = now; body.maxVelocity.y = 700; }
     // Прочитать все запросы, чтобы JustDown не оставался от предыдущего кадра.
     const space = Phaser.Input.Keyboard.JustDown(this.keys.SPACE);
     const up = Phaser.Input.Keyboard.JustDown(this.keys.UP);
     const touch = controls.consumeJump();
-    if (space || up || touch) this.bufferedJump = now;
+    const jumpRequested = space || up || touch;
+    if (jumpRequested) this.bufferedJump = now;
     if (this.restRemaining > 0) {
       this.restRemaining = Math.max(0, this.restRemaining - delta);
       this.tanya.setVelocity(0, 0);
@@ -222,7 +251,25 @@ class PlayScene extends Phaser.Scene {
     }
     if (this.restRemaining === 0 && now - this.bufferedJump <= s.jumpBufferMs && now - this.lastGround <= s.coyoteMs) {
       this.tanya.setVelocityY(-jumpVelocity);
+      this.jumpStartedAt = now;
+      this.takeoffFloor = body.bottom;
+      this.takeoffTired = jumpVelocity === s.tiredJumpVelocity;
+      this.boostUsed = false;
       this.bufferedJump = this.lastGround = -Infinity;
+    } else if (this.restRemaining === 0 && jumpRequested && !grounded && !this.boostUsed &&
+      now - this.jumpStartedAt >= s.boostMinMs && now - this.jumpStartedAt <= s.boostWindowMs && body.velocity.y < 0) {
+      // A single early continuation of THIS takeoff, never an arbitrary air jump.
+      // Target a fixed apex relative to takeoff so different early tap timings
+      // do not produce radically different heights. Fatigue is committed at takeoff.
+      const height = this.takeoffTired ? s.tiredBoostHeight : s.boostHeight;
+      const rise = this.takeoffFloor - body.bottom;
+      body.maxVelocity.y = 900;
+      this.tanya.setVelocityY(-Math.sqrt(Math.max(0, 2 * s.gravity * (height - rise))));
+      this.airborneSpeed = this.takeoffTired ? s.tiredBoostSpeed : s.boostSpeed;
+      this.tanya.setVelocityX(this.airborneSpeed);
+      this.boostUsed = true;
+      this.boostsUsed++;
+      this.bufferedJump = -Infinity;
     }
     this.tanya.setAlpha(now < this.hitUntil ? (Math.floor(now / 100) % 2 ? .45 : 1) : 1);
     // Keep the trolley silhouette stable when the patrol reverses: flipping
@@ -270,7 +317,8 @@ class PlayScene extends Phaser.Scene {
   private respawn() {
     this.tanya.setPosition(this.checkpoint, groundYAt(this.checkpoint) - 26).setVelocity(0, 0);
     this.hitUntil = this.time.now + 800;
-    this.lastGround = this.bufferedJump = -Infinity;
+    this.lastGround = this.bufferedJump = this.jumpStartedAt = -Infinity;
+    this.boostUsed = true;
     controls.reset();
     message('Вернулись на безопасное место', 1500);
     this.cameras.main.scrollX = Math.max(0, this.checkpoint - this.cameras.main.width / this.cameras.main.zoom * this.framing!.anchorX);
@@ -357,7 +405,7 @@ class PlayScene extends Phaser.Scene {
     for (const flock of this.pigeons) {
       if (!flock.flying && Math.abs(this.tanya.body!.bottom - flock.perchY) < 60 && Math.abs(flock.sprite.x - this.tanya.x) < s.pigeonTriggerDistance) {
         flock.flying = true;
-        flock.lowFlightRemaining = .45;
+        flock.lowFlightRemaining = .75;
         // Сначала вспархивают низко: без прыжка можно задеть стаю.
         flock.sprite.setVelocity(-60, -45);
       }

@@ -4,6 +4,8 @@
 > Before changing gameplay, level geometry, pacing, collectibles, hazards, or camera behavior, read this document first.
 > Do not override these rules unless the user explicitly asks for a change.
 
+> **Active implementation: Level V3 (2026-10-17).** The user explicitly approved early second-tap boost and the ten-phrase V3 macro. Section 27 supersedes older V2 maps, fixed-single-tap-only restrictions and historical food budgets below. Remaining presentation/pacing findings are recorded in LEVEL_AUDIT.md; phone approval is pending.
+
 ## 0. Design principles and references
 
 Primary references:
@@ -1308,3 +1310,81 @@ After implementation:
 6. do not claim success merely because the level contains many platforms or objects.
 
 This document remains the source of truth unless the user explicitly overrides it.
+
+
+## 27. Level V3 — approved movement vocabulary and current implementation
+
+The user's V3 instruction replaces V2 composition rather than adding objects to it.
+Portrait framing and camera scale remain stable. Keep ground as the main spine.
+Target 45–55 seconds, preferring a stronger shorter run over padding. The current
+measured clean run is 42.1 seconds, slightly below that target; phone evaluation
+is pending. Do not extend the road merely to reach a number.
+
+### Approved control
+
+A tap / Space / ArrowUp starts the existing fixed jump. One further **new press**
+40–280ms after takeoff, while rising, adds upward and forward boost. It targets
+an apex relative to that same takeoff, not another jump from arbitrary midair.
+A held key, keyboard repeat, third tap or late tap cannot add another boost.
+Late requests may still use the existing 150ms landing buffer; coyote time stays
+130ms. Fatigue is committed at takeoff. No variable jump, hold-to-jump or combat.
+
+Current measured envelopes at 60Hz (body feet, level landing):
+
+| State | Standard height / reach | Boost height / reach |
+| --- | --- | --- |
+| Normal | 107.3 / 192px | 213.9–215.1 / 391–404px |
+| Tired | 85.2 / 119px | 194.2–195.2 / 347–356px |
+
+Run speeds are 240 / 170px/s; boosted flight 350 / 330px/s. Gravity and normal
+jump impulses remain 1400, 560 / 500. Energy values/rules remain unchanged.
+Pigeons start fluttering at 120px and retain low flight for 0.75s before the fast
+climb; this staging lets a tired standard jump clear the visible birds.
+
+### Authored macro, not reusable composition templates
+
+1. Short safe gap → low island → +25 landing: tap, land, tap.
+2. A 135px ledge: tap → early boost → high landing.
+3. Actual downhill ramp → ground → delayed pigeons. Do not tap on the descent.
+4. Three unequal one-way surfaces: wide/low → narrow/high → short/lower.
+   Optional boost earns a high reward; failures return to the sloped ground.
+5. A 270px long gap: boost flight; safe floor 140px below, boost out after a miss.
+6. Deliberately readable scooter approach → late standard jump → lower landing.
+7. Filled descending ground: drop → short interruption jump → drop.
+8. Only recovery pocket: airborne Lipton OR ground bench, then continuous exit.
+9. Filled unequal low → medium → tall ground, with boost on the last tall rise.
+10. High drop → delayed birds + short interruption → granny → final food → cat.
+
+Do not replace ramps with repeated tiny stairs, extend upper routes into highways,
+or insert standalone reward jumps / neutral connectors. Platforms are one-way:
+light undersides, directional markings and non-colliding support posts. Ground
+terraces are filled to their foundation, with no lower traversable tunnel.
+
+### Composition, food and validation
+
+Usually show current action, next situation and a hint after it. Existing signs
+are staged before phrases; they do not collide. Empty flat viewports are forbidden.
+Outside intentional anticipation/recovery, aim for <1.5s without input/decision.
+Seeing or collecting food alone does not count as input.
+
+Food uses individually authored movement groups: normal arc, vertical boost cue,
+downhill diagonal, unequal zig-zag, optional high reward, long boosted parabola,
+sparse scooter markers, recovery split, rising staircase and final descent/landing.
+No generic createArc/createPlatformSequence composition generator.
+
+Resource UI stays `Корм: X` / `Котику нужно: Y`, never X / all placed food.
+Measured normal / ground / collector budgets: 98 / 89 / 105. Minimum 80, bonus 103.
+The minimum is still relevant on the late climb/final phrase. Below it, explain
+what was missing and offer replay; minimum feeds the cat; bonus gives the feast.
+
+Before food/hazards were placed, inspect the compressed geometry silhouette.
+After implementation, test clean, collector, no optional boost, low energy,
+intentional error, and safe missed jumps. Keep raw input gaps separate from
+first-visible-cue gaps. A viewport containing something does not automatically
+pass the three-layer composition rule. See LEVEL_AUDIT.md for measured exceptions.
+
+Development-only overview: `npm run level:overview` with Vite running. This writes
+SVG/PNG artifacts under /tmp; it is not imported by the production game.
+
+**Stop after the validation report. No further autonomous level iteration before
+manual phone playtesting**. Report unresolved findings explicitly; phone approval is pending.

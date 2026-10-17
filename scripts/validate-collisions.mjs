@@ -1,142 +1,95 @@
-import { chromium } from 'playwright';
-import assert from 'node:assert/strict';
-import fs from 'node:fs';
-const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || (fs.existsSync('/usr/bin/chromium') ? '/usr/bin/chromium' : undefined), headless: true, args: ['--no-sandbox'] });
-try {
- const page = await browser.newPage({ viewport: { width: 390, height: 844 }, hasTouch: true });
- const errors=[];page.on('pageerror',e=>errors.push(e.message));
- await page.goto(process.env.LEVEL_URL || 'http://localhost:5173'); await page.waitForFunction(()=>!!document.querySelector('canvas'));
- await page.evaluate(async()=>{
-  window.game=(await import(document.querySelector('script[src*="/src/main.ts"]').src)).game;
-  const c=await import('/src/settings.ts');window.cfg=c.settings;window.choices=c.routeChoices;window.floorAt=c.groundYAt;
-  window.haz=await import('/src/hazard-shapes.ts');
- });
- await page.waitForFunction(()=>game.isRunning&&game.scene.getScene('play')?.tanya?.body);
- await page.evaluate(()=>{
-  game.loop.stop();window.simTime=performance.now();window.tick=(n=1)=>{for(let i=0;i<n;i++){simTime+=1000/60;game.headlessStep(simTime,1000/60);}};
-  window.key=d=>window.dispatchEvent(new KeyboardEvent(d?'keydown':'keyup',{key:' ',code:'Space',keyCode:32,bubbles:true}));
-  window.restart=()=>{key(false);game.scene.start('play');tick(4);const s=game.scene.getScene('play');s.hit=Object.getPrototypeOf(s).hit;s.respawn=Object.getPrototypeOf(s).respawn;return s;};
-  window.place=(s,x,y=floorAt(x)-26)=>{s.tanya.body.reset(x,y);s.tanya.setVelocity(0,0);tick(2);};
- });
+// V3 regression probes: actual Arcade contacts, controls and visible hazard masks.
+import {chromium} from 'playwright';import assert from 'node:assert/strict';import {writeFileSync} from 'node:fs';
+const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});
+try{
+ const page=await browser.newPage({viewport:{width:390,height:844},hasTouch:true});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(process.env.LEVEL_URL||'http://localhost:5173');await page.waitForSelector('canvas');
+ await page.evaluate(async()=>{window.game=(await import(document.querySelector('script[src*="/src/main.ts"]').src)).game;window.cfg=(await import('/src/settings.ts')).settings;window.terrain=await import('/src/terrain.ts');window.haz=await import('/src/hazard-shapes.ts')});await page.waitForFunction(()=>game.scene.getScene('play')?.tanya?.body);
+ await page.evaluate(()=>{game.loop.stop();let now=performance.now();window.tick=(n=1)=>{for(let i=0;i<n;i++)game.headlessStep(now+=1000/60,1000/60)};window.key=d=>window.dispatchEvent(new KeyboardEvent(d?'keydown':'keyup',{key:' ',code:'Space',keyCode:32,bubbles:true}));window.restart=(quiet=true)=>{key(false);game.scene.start('play');tick(4);const s=game.scene.getScene('play');if(quiet){for(const a of [...s.pigeons,...s.scooters,...s.grannies])a.sprite.destroy();s.pigeons=[];s.scooters=[];s.grannies=[];}return s};window.place=(s,x,y)=>{s.tanya.body.reset(x,y-26);s.tanya.setVelocity(0,0);tick(2)}});
  const result=await page.evaluate(()=>{
+  const transitions=[];
+  for(const tr of terrain.terrainTransitions.filter(t=>t.rise>0&&!cfg.interruptions.some(g=>g.start+g.width===t.x)))for(const tired of [false,true])for(const offset of [-10,0,10]){
+   const boosted=tr.rise>100;const lead=(boosted?(tired?110:130):(tired?(tr.rise>45?65:45):80))+offset;
+   const s=restart();place(s,tr.x-lead-(tired?6:8),tr.fromY);if(tired)s.changeEnergy(-100);tick(2);
+   const launch=s.tanya.x,start=s.time.now;key(true);tick();key(false);let sent=false,landing=null,blocked=0;
+   for(let i=0;i<100;i++){
+    if(boosted&&!sent&&s.time.now-start>=150){key(true);sent=true;}tick();key(false);blocked+=Number(s.tanya.body.blocked.right);
+    if(s.tanya.body.blocked.down&&s.tanya.x>tr.x+12&&Math.abs(s.tanya.body.bottom-tr.toY)<1){landing=s.tanya.x;break}
+   }
+   transitions.push({x:tr.x,rise:tr.rise,tired,offset,lead:tr.x-launch,boosted,landing,blocked,footMargin:landing===null?null:landing-tr.x-12});
+  }
+  const shortGaps=[];
+  for(const gap of cfg.interruptions.filter(g=>g.width<100))for(const tired of [false,true])for(const offset of [-10,0,10]){
+   const lead=(tired?25:60)+offset,from=terrain.groundYAt(gap.start-1),target=terrain.groundYAt(gap.start+gap.width+1);
+   const s=restart();place(s,gap.start-lead-(tired?6:8),from);if(tired)s.changeEnergy(-100);tick(2);key(true);tick();key(false);let land=null,blocked=0,deepest=from;
+   for(let i=0;i<75;i++){tick();blocked+=Number(s.tanya.body.blocked.right);deepest=Math.max(deepest,s.tanya.body.bottom);if(s.tanya.body.blocked.down&&s.tanya.x>gap.start+gap.width+12&&Math.abs(s.tanya.body.bottom-target)<2){land=s.tanya.x;break}}
+   shortGaps.push({start:gap.start,tired,offset,land,blocked,deepest,footMargin:land===null?null:land-gap.start-gap.width-12});
+  }
+  const longGap=[];
+  for(const tired of [false,true])for(const delay of [null,100,150,220]){
+   const s=restart(),lead=tired?25:50;place(s,4280-lead-(tired?6:8),425);if(tired)s.changeEnergy(-100);tick(2);const start=s.time.now;
+   key(true);tick();key(false);let sent=false,land=null,deepest=0;
+   for(let i=0;i<100;i++){
+    if(delay!==null&&!sent&&s.time.now-start>=delay){key(true);sent=true;}tick();key(false);deepest=Math.max(deepest,s.tanya.body.bottom);
+    if(s.tanya.body.blocked.down&&s.tanya.x>4562&&Math.abs(s.tanya.body.bottom-425)<1){land=s.tanya.x;break}
+   }
+   longGap.push({tired,delay,land,deepest,footMargin:land===null?null:land-4550-12});
+  }
+  const boostControls=[];
+  for(const mode of ['hold','third-tap','late','arrow']){
+   const s=restart();place(s,100,440);
+   if(mode==='arrow'){window.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowUp',code:'ArrowUp',keyCode:38,bubbles:true}));tick();window.dispatchEvent(new KeyboardEvent('keyup',{key:'ArrowUp',code:'ArrowUp',keyCode:38,bubbles:true}));}
+   else {key(true);tick();if(mode!=='hold')key(false);}
+   const initialVy=s.tanya.body.velocity.y;
+   for(let f=1;f<=32;f++){
+    if(mode==='hold'&&f===8)window.dispatchEvent(new KeyboardEvent('keydown',{key:' ',code:'Space',keyCode:32,repeat:true,bubbles:true}));
+    if(mode==='third-tap'&&(f===9||f===14))key(true);
+    if(mode==='late'&&f===20)key(true);
+    tick();if(mode!=='hold')key(false);
+   }
+   key(false);boostControls.push({mode,boosts:s.boostsUsed,initialVy});
+  }
+  const ramps=[];
+  for(const ramp of cfg.groundSpans.filter(g=>g.endY!==undefined))for(const tired of [false,true]){
+   const s=restart();place(s,ramp.start+20,terrain.groundYAt(ramp.start+20));if(tired)s.changeEnergy(-100);tick(2);let error=0,air=0,blocked=0;
+   for(let i=0;i<600&&s.tanya.x<ramp.end-20;i++){tick();const b=s.tanya.body;error=Math.max(error,Math.abs(b.bottom-terrain.groundYAt(b.center.x)));air+=Number(!b.blocked.down);blocked+=Number(b.blocked.right)}
+   ramps.push({start:ramp.start,tired,error,air,blocked});
+  }
+  const escapes=[];
+  for(const gap of cfg.interruptions)for(const tired of [false,true]){
+   const s=restart();const floor=terrain.groundYAt(gap.start+2);place(s,gap.start+gap.width-22,floor);if(tired)s.changeEnergy(-100);tick(2);const start=s.time.now;key(true);tick();key(false);let sent=false;
+   for(let i=0;i<140;i++){if(gap.depth>100&&!sent&&s.time.now-start>=150){key(true);sent=true}tick();key(false);if(s.tanya.body.blocked.down&&s.tanya.x>gap.start+gap.width+30)break}
+   escapes.push({start:gap.start,tired,x:s.tanya.x,escaped:s.tanya.x>gap.start+gap.width+30&&s.tanya.body.blocked.down});
+  }
+  const oneWay=[];
+  for(const p of cfg.routePlatforms){const s=restart();place(s,p.x-20,terrain.groundYAt(p.x-20));key(true);tick();key(false);let hitHead=false,landed=false;for(let i=0;i<65;i++){tick();hitHead||=s.tanya.body.blocked.up;landed||=s.tanya.body.blocked.down&&Math.abs(s.tanya.body.bottom-p.y)<1}oneWay.push({x:p.x,hitHead,landed})}
+  const coyote=[];for(const frames of [4,12]){const s=restart(),p=cfg.routePlatforms[0];place(s,p.x+p.width-20,p.y);let i=0;while(s.tanya.body.blocked.down&&i++<30)tick();tick(frames-1);key(true);tick();key(false);coyote.push({frames,vy:s.tanya.body.velocity.y})}
+  const buffer=(()=>{const s=restart();place(s,100,330);while(s.tanya.body.bottom<410)tick();key(true);tick();key(false);let fired=false;for(let i=0;i<12;i++){tick();fired||=s.tanya.body.velocity.y<0}return fired})();
   const scooters=[];
-  const edge=cfg.groundSpans.find(p=>p.y===472).end;
-  for(const tired of [false,true])for(const lead of [null,40,30,20,10,0,-10]){
-   const s=restart();place(s,edge-500);if(tired)s.changeEnergy(-100);tick(2);s.cameras.main.scrollX=s.tanya.x-42;
-   const hits=[];const base=Object.getPrototypeOf(s).hit;s.hit=function(d){const ok=base.call(this,d);if(ok)hits.push(d);return ok;};
-   let jumped=false,visibleAt=null,jumpedAt=null,visibleDistance=null,landingX=null;
-   for(let f=0;f<600&&s.tanya.x<edge+550;f++){
-    const sc=s.scooters[0].sprite,c=s.cameras.main;
-    if(visibleAt===null&&sc.x+34<c.scrollX+c.width/c.zoom){visibleAt=s.time.now;visibleDistance=sc.x-s.tanya.x;}
-    if(lead!==null&&!jumped&&s.tanya.x>=edge-lead){key(true);jumped=true;jumpedAt=s.time.now;}
-    tick();key(false);
-    if(jumped&&s.tanya.x>edge+68&&s.tanya.body.blocked.down)landingX??=s.tanya.x;
+  for(const tired of [false,true])for(const lead of [null,20,10,0]){
+   const s=restart(false);place(s,5020,401);if(tired)s.changeEnergy(-100);tick(2);s.cameras.main.scrollX=s.tanya.x-42;
+   const hits=[];s.hit=function(d){const ok=Object.getPrototypeOf(s).hit.call(this,d);if(ok)hits.push(d);return ok};let visible=null,tap=null,land=null;
+   for(let i=0;i<450&&s.tanya.x<5710;i++){
+    const sc=s.scooters[0].sprite,c=s.cameras.main;if(visible===null&&sc.x+34<c.scrollX+c.width/c.zoom)visible=s.time.now;
+    if(lead!==null&&tap===null&&s.tanya.x>=5420-lead){key(true);tap=s.time.now}tick();key(false);
+    if(tap!==null&&s.tanya.body.blocked.down&&s.tanya.x>5500)land??=s.tanya.x;
    }
-   scooters.push({tired,lead,hits,visibleDistance,reactionSeconds:jumpedAt===null?null:(jumpedAt-visibleAt)/1000,landingX,landingBeyondVisibleScooter:landingX===null?null:landingX-(edge+68)-12});
+   scooters.push({tired,lead,hits,reaction:tap===null?null:(tap-visible)/1000,landing:land});
   }
-  const benches=[];
-  for(const jump of [false,true]){
-   const s=restart();place(s,cfg.benches[0]-190);s.changeEnergy(-100);tick(2);let once=false,paused=false;
-   const count=()=>s.physics.world.staticBodies.entries.filter(b=>b.gameObject.texture?.key==='lipton').length;const before=count();
-   for(let f=0;f<210;f++){if(jump&&!once&&cfg.benches[0]-s.tanya.x<100){key(true);once=true;}tick();key(false);paused ||= s.restRemaining>0;}
-   benches.push({jump,paused,energy:s.energy,bottles:before-count()});
-  }
-  const misses=[];
-  for(const choice of choices){
-   const s=restart();place(s,choice.entrance-310);let attempted=false,resets=0,maxBottom=0;
-   s.respawn=()=>{resets++;};
-   for(let f=0;f<170;f++){if(!attempted&&s.tanya.x>=choice.entrance-280){key(true);attempted=true;}tick();key(false);maxBottom=Math.max(maxBottom,s.tanya.body.bottom);}
-   misses.push({kind:'early upper miss',entrance:choice.entrance,x:s.tanya.x,bottom:s.tanya.body.bottom,grounded:s.tanya.body.blocked.down,resets,maxBottom,expectedBottom:floorAt(choice.end+200)});
-  }
-  for(const pocket of cfg.interruptions){
-   const s=restart();place(s,pocket.start-100);let recovered=false,resets=0,maxBottom=0,contactTime=null;
-   s.respawn=()=>{resets++;};
-   for(let f=0;f<180;f++){
-    const b=s.tanya.body;if(!recovered&&b.blocked.down&&b.bottom>=floorAt(pocket.start-1)+pocket.depth-1){key(true);recovered=true;contactTime=s.time.now;}
-    tick();key(false);maxBottom=Math.max(maxBottom,b.bottom);if(s.tanya.x>pocket.start+pocket.width+80&&b.blocked.down)break;
-   }
-   misses.push({kind:'missed shallow interruption',entrance:pocket.start,expectedBottom:floorAt(pocket.start-1)+pocket.depth,x:s.tanya.x,bottom:s.tanya.body.bottom,grounded:s.tanya.body.blocked.down,resets,maxBottom,recovered,contactTime});
-  }
-  const pocketEscapes=[];
-  for(const pocket of cfg.interruptions)for(const tired of [false,true]){
-   const s=restart(),floor=floorAt(pocket.start-1);place(s,pocket.start+pocket.width-12,floor+pocket.depth-26);
-   if(tired)s.changeEnergy(-100);tick(2);key(true);tick();key(false);
-   let blocked=0;for(let f=0;f<120;f++){tick();blocked+=Number(s.tanya.body.blocked.right);if(s.tanya.x>pocket.start+pocket.width+30&&s.tanya.body.blocked.down)break;}
-   pocketEscapes.push({start:pocket.start,tired,x:s.tanya.x,bottom:s.tanya.body.bottom,grounded:s.tanya.body.blocked.down,escaped:s.tanya.x>pocket.start+pocket.width+30&&Math.abs(s.tanya.body.bottom-floorAt(s.tanya.x))<2,blocked});
-  }
-  const birdTiming=[];
-  for(const index of [0,1])for(const tired of [false,true])for(const lead of tired?[30,40,50]:[85,100,115]){
-   const s=restart(),p=cfg.pigeons[index];place(s,p.x-400);if(tired)s.changeEnergy(-100);tick(2);
-   const hits=[];const base=Object.getPrototypeOf(s).hit;s.hit=function(d){const ok=base.call(this,d);if(ok)hits.push(d);return ok;};
-   let jumped=false,launch=null;
-   for(let f=0;f<200&&s.tanya.x<p.x+260;f++){
-    if(!jumped&&s.pigeons[index].sprite.x-s.tanya.x<lead){key(true);jumped=true;launch=s.tanya.x;}
-    tick();key(false);
-   }
-   birdTiming.push({index,tired,lead,hits,launch,x:s.tanya.x});
-  }
-  const upperMistakes=[];
-  for(const index of [0]){
-   const s=restart(),p=cfg.routePlatforms[index];const hits=[];const base=Object.getPrototypeOf(s).hit;
-   s.hit=function(d){const ok=base.call(this,d);if(ok)hits.push(d);return ok;};
-   place(s,p.x+110,p.y-26);let resets=0;s.respawn=()=>{resets++;};
-   for(let f=0;f<160;f++)tick();
-   upperMistakes.push({index,hits,resets,x:s.tanya.x,bottom:s.tanya.body.bottom,grounded:s.tanya.body.blocked.down,expectedBottom:floorAt(s.tanya.x)});
-  }
-  const edgeReward=[];
-  for(const secondTap of [false,true]){
-   const s=restart(),p=cfg.routePlatforms[0];place(s,p.x-110);key(true);tick();key(false);let jumped=false;
-   for(let f=0;f<150;f++){if(secondTap&&!jumped&&s.tanya.body.blocked.down&&Math.abs(s.tanya.body.bottom-p.y)<2&&s.tanya.x>=p.x+p.width-80){key(true);jumped=true;}tick();key(false);}
-   edgeReward.push({secondTap,food:s.foodCount,bottom:s.tanya.body.bottom});
-  }
-  const passUnder=[];
-  for(const p of cfg.routePlatforms){
-   const s=restart();place(s,p.x-80);let blocked=0;for(let f=0;f<140&&s.tanya.x<p.x+p.width+80;f++){tick();blocked+=Number(s.tanya.body.blocked.right);}
-   passUnder.push({x:p.x,blocked,bottom:s.tanya.body.bottom,expectedBottom:floorAt(s.tanya.x),upperBirdsFlew:s.pigeons.some(g=>g.perchY===p.y&&Math.abs(g.sprite.x-p.x)<p.width&&g.flying)});
-  }
-  const solidTerraces=cfg.groundSpans.filter(p=>p.start>=10330&&p.start<11050).map(p=>{
-   const s=restart();const body=s.physics.world.staticBodies.entries.find(b=>b.gameObject.type==='Rectangle'&&Math.abs(b.left-p.start)<.01&&Math.abs(b.top-p.y)<.01);
-   return{start:p.start,top:p.y,filledTo:body?.bottom};
-  });
-  const oneWay=(()=>{const s=restart(),p=cfg.routePlatforms[0];place(s,p.x+20);key(true);tick();key(false);let hitHead=false,landed=false;for(let f=0;f<60;f++){tick();hitHead ||= s.tanya.body.blocked.up;landed ||= s.tanya.body.blocked.down&&Math.abs(s.tanya.body.bottom-p.y)<2;}return{hitHead,landed};})();
-  const coyote=[];for(const frames of [5,12]){
-   const s=restart(),p=cfg.routePlatforms[1];place(s,p.x+p.width-20,p.y-26);let guard=0;while(s.tanya.body.blocked.down&&guard++<30)tick();tick(frames-1);key(true);tick();key(false);coyote.push({frames,velocity:s.tanya.body.velocity.y});
-  }
-  const buffer=(()=>{const s=restart();place(s,100,cfg.floorY-130);while(s.tanya.body.bottom<cfg.floorY-30)tick();key(true);tick();key(false);let fired=false;for(let f=0;f<12;f++){tick();fired ||= s.tanya.body.velocity.y<0;}return fired;})();
-  const fatigueTransition=(()=>{const s=restart();key(true);tick();key(false);tick(10);s.changeEnergy(-100);tick(6);const air=s.tanya.body.velocity.x;while(!s.tanya.body.blocked.down)tick();tick(2);return{air,ground:s.tanya.body.velocity.x};})();
-  const silhouette=[];const scene=restart();
-  for(const kind of ['scooter','pigeons','granny']){
-   const source=scene.textures.get(kind).getSourceImage(),c=document.createElement('canvas');c.width=source.width;c.height=source.height;const ctx=c.getContext('2d');ctx.drawImage(source,0,0);const pixels=ctx.getImageData(0,0,c.width,c.height).data;let outside=0;
-   for(const r of haz.hazardShapes[kind])for(let y=r.y;y<r.y+r.height;y++)for(let x=r.x;x<r.x+r.width;x++)if(!pixels[(y*c.width+x)*4+3])outside++;
-   silhouette.push({kind,outside});
-  }
-  return{scooters,benches,misses,pocketEscapes,birdTiming,upperMistakes,edgeReward,passUnder,solidTerraces,oneWay,coyote,buffer,fatigueTransition,silhouette};
+  const benches=[];for(const jump of [false,true]){const s=restart();place(s,6930,545);s.changeEnergy(-100);tick(2);let once=false,rest=false;for(let i=0;i<230;i++){if(jump&&!once&&s.tanya.x>=cfg.benches[0]-85){key(true);once=true}tick();key(false);rest||=s.restRemaining>0}benches.push({jump,rest,energy:s.energy})}
+  const masks=[];const s=restart();for(const kind of ['scooter','pigeons','granny']){const source=s.textures.get(kind).getSourceImage(),c=document.createElement('canvas');c.width=source.width;c.height=source.height;const ctx=c.getContext('2d');ctx.drawImage(source,0,0);const pixels=ctx.getImageData(0,0,c.width,c.height).data;let outside=0;for(const r of haz.hazardShapes[kind])for(let y=r.y;y<r.y+r.height;y++)for(let x=r.x;x<r.x+r.width;x++)if(!pixels[(y*c.width+x)*4+3])outside++;masks.push({kind,outside})}
+  const endings=[];for(const food of [cfg.requiredFood-1,cfg.requiredFood,cfg.bonusFood]){const s=restart();s.foodCount=food;s.feedCat();tick(100);endings.push({food,title:document.querySelector('#end-title').textContent,description:document.querySelector('#end-description').textContent,visible:!document.querySelector('#ending').hidden})}
+  return {boostControls,transitions,shortGaps,longGap,ramps,escapes,oneWay,coyote,buffer,scooters,benches,masks,endings};
  });
- fs.writeFileSync('/tmp/tanya-ground-collision-audit.json',JSON.stringify(result,null,2));
- assert.equal(errors.length,0);
- for(const m of result.misses){assert.equal(m.resets,0);assert.ok(m.grounded);assert.ok(m.x>m.entrance+100);assert.ok(m.maxBottom<=m.expectedBottom);if(m.kind==='missed shallow interruption')assert.ok(m.recovered||m.maxBottom<m.expectedBottom);}
- assert.ok(result.pocketEscapes.every(p=>p.escaped));for(const b of result.birdTiming){
-  // An early tired tap into the visibly rising final flock is an intentional error,
-  // not a required route. The 30/40 leads and every full clean run must stay clear.
-  if(b.index===1&&b.tired&&b.lead===50)assert.deepEqual(b.hits,[6]);else assert.deepEqual(b.hits,[]);
- }
- assert.ok(result.upperMistakes.every(m=>m.resets===0&&m.grounded&&m.bottom===m.expectedBottom));assert.ok(result.upperMistakes[0].hits.length===0);assert.ok(result.edgeReward[1].food>result.edgeReward[0].food);
- assert.ok(result.passUnder.every(p=>p.blocked===0&&p.bottom===p.expectedBottom&&!p.upperBirdsFlew));
- assert.ok(result.solidTerraces.every(p=>p.filledTo===660));assert.ok(result.oneWay.landed&&!result.oneWay.hitHead);
- assert.equal(result.fatigueTransition.air,330);assert.equal(result.fatigueTransition.ground,190);
- assert.ok(!result.benches.find(b=>b.jump).paused);assert.ok(result.benches.find(b=>!b.jump).paused);assert.equal(result.benches.find(b=>b.jump).bottles,1);assert.equal(result.benches.find(b=>!b.jump).bottles,0);
- assert.ok(result.scooters.filter(s=>s.lead!==null).every(s=>!s.hits.length&&s.landingBeyondVisibleScooter>20));
- assert.ok(result.scooters.filter(s=>s.lead===null).every(s=>s.hits.includes(12)));
- assert.ok(result.scooters.filter(s=>s.lead!==null&&s.lead<=20).every(s=>s.reactionSeconds>=.49));
- assert.ok(result.silhouette.every(s=>s.outside===0));assert.ok(result.coyote[0].velocity<0&&result.coyote[1].velocity>=0);assert.ok(result.buffer);
- await page.evaluate(()=>restart());await page.touchscreen.tap(240,500);assert.ok(await page.evaluate(()=>{tick(2);return game.scene.getScene('play').tanya.body.velocity.y;})<0);
- await page.evaluate(()=>{restart();window.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowUp',code:'ArrowUp',keyCode:38,bubbles:true}));tick(2);});assert.ok(await page.evaluate(()=>game.scene.getScene('play').tanya.body.velocity.y)<0);
- const endings=await page.evaluate(()=>{
-  const results=[];for(const food of [cfg.requiredFood-1,cfg.requiredFood,cfg.bonusFood]){const s=restart();s.foodCount=food;s.feedCat();tick(100);results.push({food,title:document.querySelector('#end-title').textContent,description:document.querySelector('#end-description').textContent,icon:document.querySelector('.cat-icon').textContent,visible:!document.querySelector('#ending').hidden});}
-  document.querySelector('#replay').click();tick(4);return{results,replay:game.scene.getScene('play').foodCount,hud:document.querySelector('#food-count').textContent,hidden:document.querySelector('#ending').hidden};
- });
- assert.ok(endings.results.every(e=>e.visible));assert.match(endings.results[0].description,/Не хватило 1/);assert.match(endings.results[1].title,/накормлен/);assert.match(endings.results[2].title,/пир/);assert.notEqual(endings.results[1].icon,endings.results[2].icon);assert.equal(endings.replay,0);assert.equal(endings.hud,'Корм: 0');assert.ok(endings.hidden);
- assert.ok(await page.evaluate(()=>[...document.querySelectorAll('#hud button, #hud .goal, #hud .energy-card')].every(e=>{const r=e.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.top>=0;})));
- await page.screenshot({path:'/tmp/tanya-mobile-hud.png'});
- console.log(JSON.stringify(result,null,2));console.log('PASS: solid terraces, safe missed gaps/detours, visible hazard masks, bench tradeoff, one-way/pass-under, coyote/buffer, touch/ArrowUp, endings, mobile HUD');
-} finally {await browser.close();}
+ writeFileSync('/tmp/tanya-v3-collisions.json',JSON.stringify(result,null,2));
+ assert.deepEqual(errors,[]);assert.ok(result.boostControls.every(r=>r.boosts===(r.mode==='third-tap'?1:0)&&r.initialVy<0),'hold/repeat/third/late/ArrowUp');assert.ok(result.transitions.every(t=>t.landing!==null&&t.blocked===0),'mandatory terrain transitions');
+ assert.ok(result.shortGaps.every(g=>g.land!==null&&g.blocked===0&&g.footMargin>10),'short gaps at both energies');
+ assert.ok(result.longGap.filter(g=>g.delay!==null).every(g=>g.land!==null&&g.deepest<426&&g.footMargin>20),'boosted long gap');assert.ok(result.longGap.filter(g=>g.delay===null).every(g=>g.deepest>450),'standard jump cannot clear the long gap');
+ assert.ok(result.ramps.every(r=>r.error<1&&r.air===0&&r.blocked===0),'analytic ramp contacts');assert.ok(result.escapes.every(e=>e.escaped),'safe gap escape');
+ assert.ok(result.oneWay.every(p=>!p.hitHead&&p.landed),'readable one-way platforms');assert.ok(result.coyote[0].vy<0&&result.coyote[1].vy>=0);assert.ok(result.buffer);
+ assert.ok(result.scooters.filter(s=>s.lead!==null).every(s=>!s.hits.length&&s.reaction>=.49),'scooter timing window');assert.ok(result.scooters.filter(s=>s.lead===null).every(s=>s.hits.includes(12)));
+ assert.ok(result.benches[0].rest&&!result.benches[1].rest);assert.ok(result.masks.every(m=>m.outside===0));assert.match(result.endings[0].description,/Не хватило 1/);assert.match(result.endings[1].title,/накормлен/);assert.match(result.endings[2].title,/пир/);
+ await page.evaluate(()=>restart());await page.touchscreen.tap(230,500);assert.ok(await page.evaluate(()=>{tick(2);return game.scene.getScene('play').tanya.body.velocity.y<0}));
+ await page.evaluate(()=>tick(7));await page.touchscreen.tap(230,500);assert.equal(await page.evaluate(()=>{tick(2);return game.scene.getScene('play').boostsUsed}),1);
+ console.log('PASS: V3 terrain at both energies, boost margins, ramps, safe floors, one-way contacts, coyote/buffer, scooter, bench, masks, endings, touch boost');
+}finally{await browser.close()}

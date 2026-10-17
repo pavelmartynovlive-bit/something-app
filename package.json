@@ -7,8 +7,9 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc --noEmit && vite build && node scripts/build-sw.mjs",
     "preview": "vite preview --host 0.0.0.0",
-    "test:level": "node scripts/audit-level.mjs && node scripts/validate-collisions.mjs",
-    "test:presentation": "node scripts/check-presentation.mjs"
+    "test:level": "node scripts/measure-jumps.mjs && node scripts/audit-v3.mjs && node scripts/validate-collisions.mjs",
+    "test:presentation": "node scripts/check-presentation.mjs",
+    "level:overview": "node scripts/overview.mjs"
   },
   "dependencies": {
     "phaser": "3.90.0"
