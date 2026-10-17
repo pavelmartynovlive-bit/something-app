@@ -1,74 +1,57 @@
-// Movement notation, authored AFTER solid terrain and both jump envelopes passed.
-// A cluster records why it exists; none is generated to fill an empty screen.
+// Movement notation, authored AFTER the solid terrain and both jump envelopes passed.
+// Alternative trajectories are resources, never advertised as a collectible total.
 type FoodPoint = { x: number; y: number };
 export const food: FoodPoint[] = [];
 export const foodClusters: { purpose: string; points: FoodPoint[] }[] = [];
 function phrase(purpose: string, points: FoodPoint[]) {
   food.push(...points); foodClusters.push({ purpose, points });
 }
-function arc(purpose: string, launch: number, floor: number, times = [.16, .30, .46, .62]) {
-  phrase(purpose, times.map(t => ({ x: launch + 330 * t, y: floor - 25 - (560 * t - 700 * t * t) })));
+function arc(purpose: string, launch: number, floor: number, times = [.10, .22, .34, .46, .58, .70]) {
+  phrase(purpose, times.map(t => ({ x: launch + 330 * t, y: floor - 26 - 560 * t + 700 * t * t })));
 }
-function landing(purpose: string, x: number, floor: number, count = 3, spacing = 38) {
-  phrase(purpose, Array.from({ length: count }, (_, i) => ({ x: x + i * spacing, y: floor - 26 })));
+function landing(purpose: string, x: number, floor: number, count = 3) {
+  phrase(purpose, Array.from({ length: count }, (_, i) => ({ x: x + i * 38, y: floor - 26 })));
 }
 function fall(purpose: string, edge: number, floor: number, times: number[]) {
-  phrase(purpose, times.map(t => ({ x: edge + 330 * t, y: floor - 25 + 700 * t * t })));
+  phrase(purpose, times.map(t => ({ x: edge + 330 * t, y: floor - 26 + 700 * t * t })));
 }
-// 1: the street teaches up, down, interruption and an optional reward trajectory.
-arc('1: jump onto the low street rise', 480, 440);
-fall('1: walk off to the visible lower landing', 1320, 416, [.08, .14, .20]);
-arc('1: bridge the shallow interruption', 2042, 440, [.12, .24, .38, .52, .66]);
-landing('1: safe landing after the interruption', 2320, 440);
-arc('1: jump for the first earned reward', 2850, 440);
-// 2: downward notation deliberately differs from the delayed bird arcs.
-fall('2: descend before reading the first flock', 3710, 440, [.08, .14, .20]);
-arc('2: delayed jump over the low flock', 4115, 460);
-arc('2: jump from depression to the ground ledge', 4808, 460);
-arc('2: birds on raised ground change the takeoff height', 5237, 420);
-arc('2: optional airborne exit reward', 6040, 420);
-landing('2: reconnect with street before the next interruption', 6320, 440);
-// 3: main challenges come before the fork. Upper rewards require a second tap.
-arc('3: interruption before the granny', 6755, 440, [.12, .24, .38, .52, .66]);
-arc('3: granny jump leads to Lipton', 7448, 440, [.16, .28, .40, .54, .66]);
-landing('3: stay grounded and bypass the awning challenge', 8240, 440, 4);
-arc('3 upper: commit to the short awning', 8042, 440, [.16, .28, .44]);
-landing('3 upper: landing prepares the bird timing', 8240, 360, 3, 30);
-arc('3 upper: jump the visible flock', 8334, 360, [.12, .24, .38, .52, .66]);
-landing('3 upper: reward after birds, before falling', 8530, 360, 4, 30);
-fall('3 upper: trustworthy return to the common ground', 8670, 360, [.10, .22, .32]);
-arc('3: common reward after the reunion', 8894, 440);
-fall('3: descend into the shallow ground pocket', 9250, 440, [.08, .14, .20]);
-arc('3: recover from the ground pocket', 9676, 460);
-landing('3: wide landing prepares raised street', 9980, 440);
-// 4: terrain landing, oncoming timing, then two downward trajectories.
-arc('4: land on the raised scooter encounter street', 10676, 440);
-arc('4: scooter timing from the raised street', 11628, 416);
-landing('4: reward after the meeting', 11920, 416);
-arc('4: choose the airborne descent reward', 12585, 416);
-fall('4: equally safe walk-off descent', 12660, 416, [.08, .14, .20]);
-arc('4: low-ground landing reward', 13102, 440);
-landing('4: recovery approach', 13380, 440);
-// 5: fast recovery competes with a ground seat; the two food paths are exclusive.
-fall('5: enter the recoverable bench pocket', 14000, 440, [.08, .14, .20]);
-arc('5: jumping skips rest and reaches Lipton', 14345, 464);
-landing('5: bench/rest route reward', 14490, 464);
-arc('5: exit the depression with comfortable margin', 15236, 464);
-arc('5: prepare the forthcoming terrain climb', 16022, 440);
-// 6: this is SOLID rising ground, not an upper route or a lower/upper choice.
-arc('6: first filled terrace', 17178, 440);
-arc('6: second filled terrace', 17777, 396);
-arc('6: crest birds require a new tap after landing', 18327, 360, [.12, .24, .38, .52, .66]);
-fall('6: one safe drop back to the main ground', 18870, 360, [.14, .25, .34]);
-landing('6: clear landing before visible traffic', 19070, 440);
-// 7: scooter is shared BEFORE the bonus. The ledge rewards an edge-timed tap.
-arc('7: shared scooter after the terrain descent', 19984, 440);
-arc('7: earned Lipton before the final route choice', 20950, 440);
-landing('7: ground bypass of the last timing challenge', 21620, 440, 4);
-arc('7 upper: land on the short ledge', 21473, 440, [.16, .28, .44]);
-landing('7 upper: short landing window before the edge tap', 21690, 360, 3, 30);
-arc('7 upper: second tap earns the high arc', 21842, 360, [.12, .24, .38, .52, .66]);
-arc('7 upper: descent connects directly to the street', 21842, 360, [.70, .82, .92]);
-arc('7: common ground reward after the detour', 22265, 440);
-arc('7: final shallow interruption', 22820, 440, [.12, .24, .38, .52, .66]);
-landing('7: feeding payoff, no final surprise', 23120, 440, 4);
+// 1. Two grounded actions, not a separate reward jump after the lesson.
+arc('1: read the shallow interruption and its far landing', 424, 440);
+landing('1: confirm the first landing', 700, 440);
+arc('1: second tap onto the low solid ledge', 1040, 440);
+fall('1: release; walking off connects to the bowl', 1670, 416, [.08, .15, .22]);
+// 2. Fall first, delay the tap; then a separate, broad exit lip.
+fall('2: downward entry, not an instruction to jump early', 1840, 440, [.08, .15, .22]);
+arc('2: delayed bird jump from the bottom of the bowl', 2020, 464);
+landing('2: broad bowl landing after the flock', 2290, 464);
+arc('2: jump the exit from the bowl', 2938, 464);
+landing('2: settle before the shared granny encounter', 3190, 440);
+// 3. Granny is shared before the fork. Only ONE awning in the whole level.
+arc('3: shared granny clearance leads to the route choice', 4088, 440);
+landing('3: shared landing before commitment', 4380, 440);
+landing('3 lower: clear walk-under passage, modest reward', 5000, 440, 4);
+arc('3 upper: invite a short optional landing', 4841, 440, [.16, .28, .42]);
+landing('3 upper: short landing prepares the edge tap', 5100, 360);
+arc('3 upper: edge timing earns the high reward', 5270, 360);
+arc('3 upper: falling reward returns directly to the street', 5270, 360, [.82, .94]);
+// 4. Food sets up the edge jump; none invites a premature jump at the scooter.
+arc('4: jump onto the filled causeway', 5930, 440);
+landing('4: settle on the causeway before reading the lower street', 6190, 408);
+landing('4: short grounded lead-in points to the visible road edge', 7270, 408, 3);
+arc('4: late edge jump clears the approaching scooter below', 7404, 408, [.10, .24, .40, .58, .76, .88]);
+landing('4: safe lower-street landing after the scooter', 7740, 472);
+// 5. One recovery opportunity: airborne Lipton OR the grounded seat.
+fall('5: reveal the low resting plaza', 8570, 472, [.08, .15, .22]);
+arc('5: bypass the seat and reach Lipton in one existing jump', 9126, 496);
+landing('5: the bench route gets a modest grounded reward', 9280, 496, 4);
+// 6. The only two-rise ground episode, one descent, one combined final phrase.
+arc('6: first filled terrace', 10330, 496);
+landing('6: first terrace landing sets up the next tap', 10600, 464);
+arc('6: second filled terrace', 10979, 464);
+landing('6: crest landing before the descent choice', 11240, 432);
+fall('6: safe walk-off descent joins the main street', 11720, 432, [.10, .18, .26]);
+arc('6 optional: jumping off the same ground crest earns the high descent', 11644, 432, [.16, .30, .44, .60, .78, .94]);
+arc('6: one trajectory connects birds, shallow interruption and landing', 12464, 496);
+landing('6: generous landing before the following granny', 12740, 496);
+arc('6: last distinct granny tap after the combined landing', 13118, 496);
+landing('6: payoff points directly to the hungry cat', 13400, 496, 4);

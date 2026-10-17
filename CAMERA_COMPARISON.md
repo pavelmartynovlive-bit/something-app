@@ -1,3 +1,5 @@
+> Historical comparison of the previous seven-section level. The current six-scene revision uses portrait by default and stages the scooter differently. See LEVEL_AUDIT.md for current visibility and flow measurements.
+
 # A / B / C — same-level framing experiment
 
 Read the latest GAME_DESIGN.md (all 1,276 lines) and LEVEL_REFERENCES.md (all 183 lines) before changes. Baseline is published commit `bb9a855`. This experiment changes camera framing, orientation presentation and the comparison UI only. No winner is selected.

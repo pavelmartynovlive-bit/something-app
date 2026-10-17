@@ -167,8 +167,8 @@ class PlayScene extends Phaser.Scene {
     }
     this.createNewObjects(ground);
     const catX = s.levelWidth - 150;
-    this.add.image(catX, s.floorY - 22, 'cat');
-    this.add.text(catX, s.floorY - 75, 'Мяу…', { fontSize: '22px', color: '#29483e' }).setOrigin(.5);
+    this.add.image(catX, groundYAt(catX) - 22, 'cat');
+    this.add.text(catX, groundYAt(catX) - 75, 'Мяу…', { fontSize: '22px', color: '#29483e' }).setOrigin(.5);
     this.sign(catX - 260, 'Покорми котика');
     if (!controls) controls = new TouchControls(this.game.canvas, hideHint);
     element('#food-goal').textContent = `Котику нужно: ${s.requiredFood}. ${s.bonusFood}+ — кошачий пир!`;
@@ -289,8 +289,8 @@ class PlayScene extends Phaser.Scene {
     controls.reset();
     this.physics.pause();
     if (success) {
-      this.add.rectangle(s.levelWidth - 195, s.floorY - 7, feast ? 48 : 22, 10, 0xe5b83d);
-      if (feast) this.add.text(s.levelWidth - 170, s.floorY - 110, 'Мур! А добавка будет?', { fontSize: '22px', color: '#29483e' }).setOrigin(.5);
+      this.add.rectangle(s.levelWidth - 195, groundYAt(s.levelWidth - 150) - 7, feast ? 48 : 22, 10, 0xe5b83d);
+      if (feast) this.add.text(s.levelWidth - 170, groundYAt(s.levelWidth - 150) - 110, 'Мур! А добавка будет?', { fontSize: '22px', color: '#29483e' }).setOrigin(.5);
     }
     message(feast ? 'Кошачий пир! Кот требует звезду Мишлен.' : success ? 'Таня покормила котика' : 'Нужно ещё немного корма', 1800);
     this.time.delayedCall(1600, () => { ending.hidden = false; });

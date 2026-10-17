@@ -115,30 +115,25 @@ Project translation:
 keep one clearly vertical episode if useful, but avoid repeated:
 climb → climb → climb → descend → descend.
 
-## 7. Density in portrait vs our landscape
+## 7. Density and the approved portrait direction
 
-The reference game uses a narrow portrait viewport, which naturally places the next gameplay event close to the player.
+The reference uses a narrow portrait viewport. Manual phone playtesting has now explicitly selected portrait for this project too. This replaces the earlier landscape-only framing constraint; it does not authorize copying exact geometry or art.
 
-Our game currently uses landscape, which exposes much more horizontal space.
-This makes empty stretches visually obvious.
+Keep scale stable during play. Solve hazard readability through level staging, especially the scooter's approach and meeting position. Do not add a temporary zoom-out without approval.
 
-Do not switch orientation automatically.
-
-Instead compensate by:
-- reducing horizontal dead space;
-- making the next meaningful action readable before the current one ends;
-- using ground-profile changes to fill gameplay space;
-- avoiding a single lonely obstacle in a wide empty screen;
-- keeping calm beats intentional and short.
-
-Landscape must be designed more densely than the reference rather than copied literally.
+Portrait still needs authored rhythm:
+- reduce horizontal dead space;
+- reveal the next action before commitment;
+- use changing ground profiles;
+- keep calm beats deliberate and short;
+- preserve fair reaction time and tired-state reach.
 
 ## 8. What NOT to copy
 
 Do not import these mechanics just because they appear in the reference:
 - press-and-hold for a higher jump;
 - reference-specific enemies or rewards;
-- portrait orientation by default;
+- orientation or camera changes without approval;
 - exact level geometry.
 
 The project keeps its own identity:
@@ -173,7 +168,7 @@ Before implementing a new section, ask:
 6. What happens immediately after landing?
 7. Is the next action already readable?
 8. Is this action grammar different from the previous section?
-9. Is there any long empty landscape stretch with no decision?
+9. Is there any long empty viewport stretch with no decision?
 10. Can the same gameplay idea be expressed through terrain instead of another floating platform?
 
 ## 11. Working principle

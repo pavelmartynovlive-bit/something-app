@@ -430,11 +430,11 @@ Pigeons should feel funny rather than deadly.
 
 ### 9.1 Prototype duration
 
-For the current prototype, target approximately 60–90 seconds for a normal active run.
+For the current prototype, target approximately 45 seconds for a normal active run.
 
 Do not make the level longer merely to create a feeling of scale.
 
-If the level needs more than about 90 seconds, it should justify the extra time with a genuinely new section idea rather than more copies of existing patterns.
+If the level needs more than about 60 seconds, it should justify the extra time with a genuinely new section idea rather than more copies of existing patterns.
 
 Prefer:
 
@@ -448,9 +448,9 @@ long + varied-looking + repetitive.
 
 Do not build the level as one continuous sequence of similar platforms.
 
-Divide the level into approximately 6–8 clearly differentiated gameplay sections.
+Build the current prototype as six authored gameplay set pieces, not seven inherited sections or interchangeable platform templates.
 
-Each section should usually last about 8–15 seconds.
+Use unequal lengths (roughly 4–13 seconds) and contrast: dense actions, short release, anticipation, recovery, final combination. Prefer a strong shorter run over padding to reach 45 seconds.
 
 Each section must have:
 - one dominant gameplay idea;
@@ -470,7 +470,17 @@ Examples:
 - combined challenge;
 - final approach.
 
-The player should feel a meaningful change in gameplay roughly every 10–15 seconds.
+Neighboring set pieces must differ in at least three of terrain profile, movement, tap rhythm, hazard behavior, goal, vertical composition and recovery pressure. A change of hazard sprite alone is insufficient.
+
+### Current approved presentation and scope
+
+The approved direction is portrait, with stable framing and camera scale during gameplay. Do not introduce a temporary scooter zoom-out. Solve its readability through approach, meeting position, visible terrain and food anticipation; preserve about 0.5 seconds of readable reaction before the intended jump. If stable staging cannot do that, report the limitation before proposing a camera change.
+
+The current six-scene structure is: two edges → bird bowl → sole short awning choice → causeway/oncoming scooter → rest pocket → solid hill/final combination/cat. There is only one upper detour, in scene 3, about 1–3 seconds. Its reward requires landing and edge timing; missed jumps safely return to ground. No repeated climb/reward/descend chain, and no standalone reward jumps between scenes.
+
+Recovery remains concentrated in the rest pocket: one Lipton or the existing optional bench. Do not change energy rules. Food is placed after geometry validation, links actions, and uses Model B resource thresholds derived from coherent route budgets. Discard historical 128/170 targets; current measured balancing values belong in settings and LEVEL_AUDIT.md, not a fictitious completion total.
+
+Validate normal, collector, ground-only, low-energy and intentional-error runs. Report time, food, energy, collisions, bench use, longest input/decision interval, scooter visibility and normal/tired jump margins. Then stop for manual phone testing; do not autonomously redesign again.
 
 ### 9.3 Ground-first level grammar
 
@@ -998,7 +1008,7 @@ Goal:
 
 Current target:
 - one short level;
-- approximately 60–90 seconds on a normal run;
+- approximately 45 seconds on a normal run;
 - one final cat;
 - simple mobile controls;
 - placeholder visuals.
@@ -1087,7 +1097,7 @@ A short authored sequence is preferable to a large procedurally repeated one.
 ### 21.2 Before implementation
 
 Check:
-1. Is there a clear 6–8 section structure?
+1. Are there six distinct authored set pieces with different action rhythms and terrain silhouettes?
 2. Does each section have a different dominant idea or spatial pattern?
 3. Is the main route readable?
 4. Is the level ground-first rather than built around repeated upper highways?
@@ -1199,7 +1209,7 @@ After level changes, verify:
 - neighboring sections do not ask for the same finger rhythm with different objects.
 
 ### Scope
-- normal run remains approximately 60–90 seconds;
+- normal run remains approximately 45 seconds;
 - no new mechanics were added without approval.
 
 ---

@@ -1,7 +1,7 @@
 // Presentation only. No world data, actor sizes, physics or gameplay clocks.
 export type Presentation = 'a' | 'b' | 'c';
 const requested = new URLSearchParams(location.search).get('view')?.toLowerCase();
-export const presentation: Presentation = requested === 'b' || requested === 'c' ? requested : 'a';
+export const presentation: Presentation = requested === 'a' || requested === 'b' ? requested : 'c';
 document.body.dataset.view = presentation;
 
 for (const link of Array.from(document.querySelectorAll<HTMLAnchorElement>('#presentation-nav a'))) {
