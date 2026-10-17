@@ -118,19 +118,9 @@ class PlayScene extends Phaser.Scene {
       detail.strokeRect(box.x + 1, y + 1, box.width - 2, box.height - 2);
       detail.lineBetween(box.x + 3, y + 3, box.x + box.width - 3, groundYAt(box.x) - 3);
     }
-    for (const sign of s.signs) this.sign(sign.x, sign.text);
-    // Опоры находятся за игровой дорожкой: они поддерживают навес визуально,
-    // но не являются препятствиями в проходе перед ними.
-    const supports = this.add.graphics().setDepth(-1);
+    // Floating one-way platforms: only the existing physics proxy remains here.
     for (const platform of s.routePlatforms) {
-      const underside = platform.y + s.platformThickness;
-      supports.fillStyle(0xc1ccd6);
-      supports.lineStyle(3, 0xc1ccd6);
-      for (const postX of [platform.x + 16, platform.x + platform.width - 23]) {
-        supports.fillRect(postX, underside, 7, groundYAt(postX) - underside);
-        supports.lineBetween(postX + 3, underside + 25, postX + 24, underside);
-      }
-      // A light, open awning with a strong top edge communicates a one-way surface.
+      // The visual stone island is separate from this unchanged one-way proxy.
       const awning = this.add.rectangle(platform.x + platform.width / 2, platform.y + s.platformThickness / 2,
         platform.width, s.platformThickness, 0x788c7b, .55).setVisible(false);
       upperRoute.add(awning);
@@ -140,9 +130,7 @@ class PlayScene extends Phaser.Scene {
       const body = (upperRoute.getChildren().at(-1) as Phaser.GameObjects.Rectangle).body as Phaser.Physics.Arcade.StaticBody;
       // Односторонняя опора: края и низ никогда не блокируют автобег.
       body.checkCollision.left = body.checkCollision.right = body.checkCollision.down = false;
-      if (platform.label) this.add.text(platform.x + 22, platform.y - 28, platform.label, { fontSize: '15px', color: '#3c594b' });
     }
-    this.sign(s.levelWidth - 600, 'Ещё немного →');
     this.tanya = this.physics.add.sprite(100, s.floorY - 25, 'tanya');
     this.tanya.setSize(24, 50).setOffset(8, 4).setMaxVelocity(500, 700);
     this.physics.add.collider(this.tanya, ground);
@@ -190,7 +178,6 @@ class PlayScene extends Phaser.Scene {
     const catX = s.levelWidth - 150;
     this.add.image(catX, groundYAt(catX) - 22, 'cat').setDepth(8);
     this.add.text(catX, groundYAt(catX) - 75, 'Мяу…', { fontSize: '22px', color: '#29483e' }).setOrigin(.5);
-    this.sign(catX - 260, 'Покорми котика');
     if (!controls) controls = new TouchControls(this.game.canvas, hideHint);
     element('#food-goal').textContent = `Котику нужно: ${s.requiredFood}. ${s.bonusFood}+ — кошачий пир!`;
     this.tanya.setDepth(10);
@@ -507,10 +494,6 @@ class PlayScene extends Phaser.Scene {
     this.cameras.main.scrollY = this.framing.baseY + Phaser.Math.Clamp(this.cameras.main.scrollY - previousBase, -40, 0);
     this.winterBackground?.resize(this.cameras.main, s.floorY - this.framing.baseY);
     controls?.reset();
-  }
-  private sign(x: number, text: string) {
-    this.add.rectangle(x, groundYAt(x) - 30, 4, 60, 0x788c7b);
-    this.add.text(x, groundYAt(x) - 70, text, { fontSize: '17px', color: '#3c594b', backgroundColor: '#eef3df', padding: { x: 10, y: 7 } }).setOrigin(.5);
   }
   private makeTextures() {
     if (this.textures.exists('tanya')) return;

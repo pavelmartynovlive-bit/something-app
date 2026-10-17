@@ -107,5 +107,6 @@ export const environmentAssets = [
       1569,
       836
     ]
-  }
+  },
+  { file: "pit_rubbish_winter.png", contentBoundsAlpha128: [12, 390, 2161, 678] },
 ] as const;

@@ -1,5 +1,8 @@
 # Winter environment integration — 2026-10-17
 
+> Latest phone-feedback changes: [floating islands, pit rubbish, no lamps or billboards](phone-feedback.md).
+> Presentation numbers below describe the original integration; use the linked update for the current state.
+
 Base: `28b0ab1`. Read current GAME_DESIGN.md in full, LEVEL_REFERENCES.md, the
 scene, terrain, settings and PNG metadata before editing. Existing Level V3 is
 the sole geometry source. This pass changes rendering, not the level.

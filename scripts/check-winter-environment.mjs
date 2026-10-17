@@ -30,6 +30,9 @@ try {
   const platforms=cfg.routePlatforms.map(p=>{const image=visuals.find(o=>o.texture.key==='winter-art:platform:'+p.x);return {x:image.x,y:image.y,width:image.displayWidth,height:image.displayHeight,body:!!image.body}});
   const bench=s.benchSprites[0],b=bench.body;
   return {visualCount:visuals.length,visualsWithBodies:visuals.filter(o=>!!o.body).length,rects,expected,topSamples,platforms,
+   scenery: {lamps:visuals.filter(o=>o.texture?.key==='environment:streetlamp_winter.png').length,garages:visuals.filter(o=>o.texture?.key==='environment:garage_winter.png').map(o=>o.x),supports:s.children.list.filter(o=>o.type==='Graphics'&&o.depth===-1).length},
+   billboards:s.children.list.filter(o=>o.type==='Text'&&[...cfg.signs.map(sign=>sign.text),'Бонус ↑','Ещё немного →','Покорми котика'].includes(o.text)).map(o=>o.text),
+   rubbish:visuals.filter(o=>o.texture?.key.startsWith('winter-art:slush:')).map(o=>({x:o.x,y:o.y,width:o.displayWidth,height:o.displayHeight})),
    bench:{x:bench.x,y:bench.y,texture:bench.texture.key,textureWidth:bench.width,textureHeight:bench.height,width:b.width,height:b.height,offset:[b.offset.x,b.offset.y],enable:b.enable,visible:bench.visible},
    depth:{tanya:s.tanya.depth,enemies:[...s.grannies,...s.scooters,...s.pigeons].map(a=>a.sprite.depth),food:bodies.filter(b=>b.gameObject.texture?.key==='food').map(b=>b.gameObject.depth)},
    geometry:JSON.stringify({ground:cfg.groundSpans,platforms:cfg.routePlatforms,pits:cfg.interruptions,anchors:cfg.recoveryAnchors}),
@@ -40,7 +43,9 @@ try {
  assert.ok(contract.topSamples.every(t=>t.holes===0&&t.overhang===0&&t.maxError<=.51),'snow matches analytic ground to half a world pixel');
  assert.deepEqual(contract.bench,{x:7200,y:523,texture:'bench',textureWidth:90,textureHeight:44,width:24,height:32,offset:[33,12],enable:true,visible:false});
  assert.ok(contract.depth.enemies.every(d=>d<contract.depth.tanya));assert.ok(contract.depth.food.every(d=>d<Math.min(...contract.depth.enemies)));
- for(const [i,p] of contract.platforms.entries()){const raw=contract.expected.at(-contract.platforms.length+i);assert.deepEqual([p.x,p.y,p.width,p.height],raw)}
+ for(const [i,p] of contract.platforms.entries()){const raw=contract.expected.at(-contract.platforms.length+i);assert.deepEqual([p.x,p.y,p.width],raw.slice(0,3));assert.ok(p.height>=30&&p.height>raw[3],'thick one-way stone art')}
+ assert.deepEqual(contract.scenery,{lamps:0,garages:[160,10510],supports:0});assert.deepEqual(contract.billboards,[]);
+ assert.equal(contract.rubbish.length,4);for(const pit of contract.rubbish){assert.equal(pit.height,30);assert.ok(contract.expected.some(r=>r[0]===pit.x&&r[2]===pit.width),'rubbish stays inside original pit');}
  const resize=[];
  for(const [width,height] of [[375,667],[390,844],[430,932],[844,390],[390,844]]){
   await page.setViewportSize({width,height});await page.waitForTimeout(70);
@@ -49,7 +54,7 @@ try {
  assert.ok(resize.every(r=>JSON.stringify(r)===JSON.stringify(resize[0])),'world art stays fixed across resize');
  const run=JSON.parse(readFileSync('/tmp/tanya-v3-runs.json'))[0];
  // Actual full-run poses, not a staged alternate level or new input policy.
- for(const percent of [10,30,50,70,90]){
+ for(const percent of [10,26,30,40,50,70,90]){
   const x=(10730-150)*percent/100,p=run.trajectory.reduce((best,q)=>Math.abs(q.x-x)<Math.abs(best.x-x)?q:best);
   await page.evaluate(({p})=>{
    game.scene.start('play');game.scene.getScene('play').sys.sceneUpdate=Object.getPrototypeOf(game.scene.getScene('play')).update;let now=performance.now();for(let i=0;i<4;i++)game.headlessStep(now+=1000/60,1000/60);
@@ -72,5 +77,5 @@ try {
  await page.screenshot({path:`${output}/debug.png`});
  assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);
  writeFileSync(`${output}/visual-contract.json`,JSON.stringify({contract,resizeStates:resize.length,replay,errors,failed},null,2));
- console.log('PASS: unchanged collision rectangles and bench trigger; no physics on art; all terrain top pixels match, five portrait snapshots, resize, replay and dev debug overlay');
+ console.log('PASS: unchanged collision rectangles and bench trigger; no physics on art; all terrain top pixels match, seven portrait snapshots, resize, replay and dev debug overlay');
 }finally{await browser.close()}

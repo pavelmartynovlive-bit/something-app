@@ -64,7 +64,6 @@ try{
       for(const [i,p] of s.pigeons.entries())if(p.sprite.active)add('birds:'+i,p.sprite.x,p.sprite.y);
       for(const [i,p] of s.scooters.entries())if(p.sprite.body.enable)add('scooter:'+i,p.sprite.x+34,p.sprite.y);
       for(const [i,p] of s.grannies.entries())if(p.sprite.active)add('granny:'+i,p.sprite.x,p.sprite.y);
-      for(const sign of cfg.signs)add('sign:'+sign.x,sign.x,terrain.groundYAt(sign.x)-70,/Тап|Птицы → кот/.test(sign.text));
       for(const x of cfg.benches)add('bench:'+x,x,terrain.groundYAt(x));
       const objects=s.physics.world.staticBodies.entries.filter(z=>z.enable&&['food','lipton'].includes(z.gameObject.texture?.key));
       for(const o of objects)add(o.gameObject.texture.key+':'+o.gameObject.x,o.gameObject.x,o.gameObject.y,o.gameObject.texture.key==='lipton');

@@ -20,7 +20,7 @@ export class WinterEnvironment {
   static preload(scene: Phaser.Scene) {
     for (const { file } of environmentAssets) {
       // No current four-step staircase matches this sprite's silhouette.
-      if (file === 'stairs_winter.png') continue;
+      if (['stairs_winter.png', 'streetlamp_winter.png', 'hazard_slush.png'].includes(file)) continue;
       const key = `environment:${file}`;
       if (!scene.textures.exists(key)) scene.load.image(key, `${import.meta.env.BASE_URL}assets/environment/winter/${file}`);
     }
@@ -75,16 +75,23 @@ export class WinterEnvironment {
     }
     for (const p of s.routePlatforms) {
       const file = p.width <= 100 ? 'platform_floating_small.png' : 'platform_short.png';
-      const cap = this.snow(file, p.width, 5, 0, 1);
-      const c = canvas(p.width * resolution, s.platformThickness * resolution), ctx = c.getContext('2d')!;
-      ctx.scale(resolution, resolution);
-      ctx.fillStyle = '#9498b0'; ctx.fillRect(0, 0, p.width, s.platformThickness);
-      const source = this.source(file), [x0, , x1] = this.bounds(file);
-      ctx.drawImage(source, x0, 405, x1 - x0, 65, 0, 4, p.width, s.platformThickness - 4);
-      ctx.drawImage(cap, 0, 0, p.width, 5);
-      ctx.strokeStyle = '#5b7189'; ctx.setLineDash([5, 4]); ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(0, s.platformThickness - .5); ctx.lineTo(p.width, s.platformThickness - .5); ctx.stroke();
-      this.image(c, `platform:${p.x}`, p.x, p.y, depth.terrain);
+      const height = Math.max(30, Math.round(p.width * .32));
+      const c = canvas(p.width * resolution, height * resolution), ctx = c.getContext('2d')!;
+      const source = this.source(file), [x0, , x1, y1] = this.bounds(file);
+      // Keep the full stone and icicle silhouette instead of compressing it
+      // into the 12px physics proxy. Only the top is collidable (one-way).
+      const sample = canvas(source.width, source.height), sampleCtx = sample.getContext('2d')!;
+      sampleCtx.drawImage(source, 0, 0);
+      const pixels = sampleCtx.getImageData(0, 0, sample.width, sample.height).data;
+      for (let x = 0; x < c.width; x++) {
+        const sx = Math.min(x1 - 1, Math.floor(x0 + (x1 - x0) * x / c.width));
+        let top = 0;
+        while (top < y1 - 1 && pixels[(top * source.width + sx) * 4 + 3] < 128) top++;
+        ctx.drawImage(source, sx, top, 1, y1 - top, x, 0, 1, c.height);
+      }
+      // Solid terrain clips the decorative underside at the closest low ledge;
+      // it must never paint over a real lower-route surface.
+      this.image(c, `platform:${p.x}`, p.x, p.y, depth.terrain - .5);
     }
     WinterEnvironment.baked.set(scene.textures, this.bakedEntries);
     this.finishCreate();
@@ -131,15 +138,16 @@ export class WinterEnvironment {
   }
 
   private slush(x: number, width: number, y: number) {
-    const file = 'hazard_slush.png', [x0, y0, x1, y1] = this.bounds(file);
-    const c = canvas(width * resolution, 12 * resolution), ctx = c.getContext('2d')!;
+    const file = 'pit_rubbish_winter.png', [x0, y0, x1, y1] = this.bounds(file);
+    const height = 30;
+    const c = canvas(width * resolution, height * resolution), ctx = c.getContext('2d')!;
     ctx.scale(resolution, resolution);
-    // Whole silhouette for a small pit; repeated modules for the boost pit.
-    for (let dx = 0; dx < width; dx += 135) {
-      const w = Math.min(135, width - dx);
-      ctx.drawImage(this.source(file), x0, y0, (x1 - x0) * w / Math.min(width, 135), y1 - y0, dx, 0, w, 12);
+    const moduleWidth = 180;
+    for (let dx = 0; dx < width; dx += moduleWidth) {
+      const w = Math.min(moduleWidth, width - dx);
+      ctx.drawImage(this.source(file), x0, y0, (x1 - x0) * w / moduleWidth, y1 - y0, dx, 0, w, height);
     }
-    this.image(c, `slush:${x}`, x, y - 1, 1);
+    this.image(c, `slush:${x}`, x, y - height + 9, 1);
   }
 
   private image(c: HTMLCanvasElement, name: string, x: number, y: number, z: number) {
@@ -164,8 +172,7 @@ export class WinterEnvironment {
 
   private decorations() {
     // Presentation placements only; all props sit behind the playable lane.
-    for (const x of [160, 5000, 10510]) this.prop('garage_winter.png', x, groundYAt(x) + 8, 160, depth.scenery).setTint(0xc3d0de);
-    for (const x of [880, 1740, 4690, 5660, 7380, 8780, 10480]) this.prop('streetlamp_winter.png', x, groundYAt(x) + 3, 25, depth.scenery + 1).setTint(0xd6dfe7);
+    for (const x of [160, 10510]) this.prop('garage_winter.png', x, groundYAt(x) + 8, 160, depth.scenery).setTint(0xc3d0de);
     for (const x of [650, 1640, 5090, 7000, 8660]) this.prop('railing_winter.png', x, groundYAt(x) + 3, 105, depth.scenery + 2).setTint(0xc7d5e3);
   }
 
