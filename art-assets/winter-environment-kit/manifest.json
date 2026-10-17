@@ -2,7 +2,7 @@
   "name": "Winter Moscow modular environment kit",
   "generator": "GPT Image",
   "version": 1,
-  "integratedIntoGame": false,
+  "integratedIntoGame": true,
   "imagePostprocessing": "none; original generated PNG pixels and alpha preserved",
   "perspective": "front / side elevation, no isometric terrain",
   "referenceCharacterHeight": 96,
@@ -320,5 +320,12 @@
       "mirrorXUseful": true,
       "seamlessTile": false
     }
-  ]
+  ],
+  "integration": {
+    "report": "../../docs/winter-environment/README.md",
+    "runtimePath": "public/assets/environment/winter",
+    "renderedAssetCount": 11,
+    "unusedAsset": "stairs_winter.png — existing geometry has no matching four-step sequence",
+    "collisionPolicy": "existing geometry unchanged; PNG bounds are not colliders"
+  }
 }
