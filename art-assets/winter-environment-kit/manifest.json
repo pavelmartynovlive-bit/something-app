@@ -1,0 +1,324 @@
+{
+  "name": "Winter Moscow modular environment kit",
+  "generator": "GPT Image",
+  "version": 1,
+  "integratedIntoGame": false,
+  "imagePostprocessing": "none; original generated PNG pixels and alpha preserved",
+  "perspective": "front / side elevation, no isometric terrain",
+  "referenceCharacterHeight": 96,
+  "scaleConvention": "Reference content widths describe an art scale, not changes to existing game geometry. Multiply uniformScale by actual character height / 96. Preserve aspect ratio. Bounds use alpha >=128 to exclude antialias fringe; not collision masks.",
+  "assets": [
+    {
+      "file": "ground_snow_basic.png",
+      "label": "Снежная земля",
+      "role": "terrain",
+      "sourceSize": [
+        1774,
+        887
+      ],
+      "contentBoundsAlpha128": [
+        11,
+        309,
+        1764,
+        816
+      ],
+      "alphaZeroPercent": 43.83,
+      "sha256": "0cc1b88964fcf64abf20b778e50fedcd0c2fc8b8d139d8c010db875939d37965",
+      "referenceContentWidth": 384,
+      "referenceContentHeight": 111.06,
+      "uniformScale": 0.21905305,
+      "bottomCenterOrigin": [
+        0.50028185,
+        0.9199549
+      ],
+      "mirrorXUseful": false,
+      "seamlessTile": false
+    },
+    {
+      "file": "cliff_tall.png",
+      "label": "Высокий уступ",
+      "role": "terrain",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "contentBoundsAlpha128": [
+        79,
+        195,
+        945,
+        1435
+      ],
+      "alphaZeroPercent": 38.28,
+      "sha256": "839db13da3dc7730a6ea5da32b222bc2485bed1d975e8e696058b5a4ae2dbd83",
+      "referenceContentWidth": 128,
+      "referenceContentHeight": 183.279,
+      "uniformScale": 0.147806,
+      "bottomCenterOrigin": [
+        0.5,
+        0.93424479
+      ],
+      "mirrorXUseful": false,
+      "seamlessTile": false
+    },
+    {
+      "file": "platform_short.png",
+      "label": "Короткая платформа",
+      "role": "terrain",
+      "sourceSize": [
+        2172,
+        724
+      ],
+      "contentBoundsAlpha128": [
+        469,
+        241,
+        1703,
+        573
+      ],
+      "alphaZeroPercent": 78.67,
+      "sha256": "8d0160732984c9c3420877131e6e87358761a1845355dabb3eba11590cb5e4f6",
+      "referenceContentWidth": 112,
+      "referenceContentHeight": 30.133,
+      "uniformScale": 0.09076175,
+      "bottomCenterOrigin": [
+        0.5,
+        0.79143646
+      ],
+      "mirrorXUseful": false,
+      "seamlessTile": false
+    },
+    {
+      "file": "platform_floating_small.png",
+      "label": "Малая платформа",
+      "role": "terrain",
+      "sourceSize": [
+        2172,
+        724
+      ],
+      "contentBoundsAlpha128": [
+        669,
+        238,
+        1504,
+        599
+      ],
+      "alphaZeroPercent": 86.39,
+      "sha256": "a92d805a0b1f3ac776e0c2b80572010328bd7fd99709fbbbb9b575df5faabd1b",
+      "referenceContentWidth": 64,
+      "referenceContentHeight": 27.669,
+      "uniformScale": 0.07664671,
+      "bottomCenterOrigin": [
+        0.5002302,
+        0.82734807
+      ],
+      "mirrorXUseful": false,
+      "seamlessTile": false
+    },
+    {
+      "file": "slope_snow.png",
+      "label": "Скат",
+      "role": "terrain",
+      "sourceSize": [
+        1774,
+        887
+      ],
+      "contentBoundsAlpha128": [
+        101,
+        137,
+        1677,
+        779
+      ],
+      "alphaZeroPercent": 59.85,
+      "sha256": "60cef1052e46b27dc22ae87e104ba0b21227c1096b779cf1270913fd477d9cc6",
+      "referenceContentWidth": 192,
+      "referenceContentHeight": 78.213,
+      "uniformScale": 0.12182741,
+      "bottomCenterOrigin": [
+        0.5011274,
+        0.87824126
+      ],
+      "mirrorXUseful": true,
+      "seamlessTile": false
+    },
+    {
+      "file": "pit_edge.png",
+      "label": "Край ямы",
+      "role": "terrain",
+      "sourceSize": [
+        1086,
+        1448
+      ],
+      "contentBoundsAlpha128": [
+        57,
+        320,
+        1039,
+        1289
+      ],
+      "alphaZeroPercent": 49.37,
+      "sha256": "f1191832cc8ae25589664b69ea68b73808db2b2efc5deb2ff8dcb520287e174d",
+      "referenceContentWidth": 96,
+      "referenceContentHeight": 94.729,
+      "uniformScale": 0.09775967,
+      "bottomCenterOrigin": [
+        0.50460405,
+        0.89019337
+      ],
+      "mirrorXUseful": true,
+      "seamlessTile": false
+    },
+    {
+      "file": "hazard_slush.png",
+      "label": "Зимняя жижа",
+      "role": "hazard-visual",
+      "sourceSize": [
+        2172,
+        724
+      ],
+      "contentBoundsAlpha128": [
+        53,
+        376,
+        2115,
+        581
+      ],
+      "alphaZeroPercent": 80.71,
+      "sha256": "ca5bee56c78a542cbc2d73074913e8abd82d4292a2d35f9f282afff66cc90943",
+      "referenceContentWidth": 192,
+      "referenceContentHeight": 19.088,
+      "uniformScale": 0.09311348,
+      "bottomCenterOrigin": [
+        0.49907919,
+        0.80248619
+      ],
+      "mirrorXUseful": false,
+      "seamlessTile": false
+    },
+    {
+      "file": "garage_winter.png",
+      "label": "Гараж",
+      "role": "decoration",
+      "sourceSize": [
+        1586,
+        992
+      ],
+      "contentBoundsAlpha128": [
+        76,
+        164,
+        1502,
+        860
+      ],
+      "alphaZeroPercent": 41.94,
+      "sha256": "f5b0e1b5d4142abb415a710e10f486b902bce612d16a6628824102b3ddb676fb",
+      "referenceContentWidth": 240,
+      "referenceContentHeight": 117.139,
+      "uniformScale": 0.16830295,
+      "bottomCenterOrigin": [
+        0.49747793,
+        0.86693548
+      ],
+      "mirrorXUseful": false,
+      "seamlessTile": false
+    },
+    {
+      "file": "bench_winter.png",
+      "label": "Лавочка",
+      "role": "prop",
+      "sourceSize": [
+        1659,
+        948
+      ],
+      "contentBoundsAlpha128": [
+        82,
+        184,
+        1577,
+        885
+      ],
+      "alphaZeroPercent": 57.0,
+      "sha256": "22ab82647a59dfe9c73ba4990673cbcaa1b30d04ffa948ccb76f57cd98e75064",
+      "referenceContentWidth": 112,
+      "referenceContentHeight": 52.516,
+      "uniformScale": 0.07491639,
+      "bottomCenterOrigin": [
+        0.5,
+        0.9335443
+      ],
+      "mirrorXUseful": false,
+      "seamlessTile": false
+    },
+    {
+      "file": "streetlamp_winter.png",
+      "label": "Фонарь",
+      "role": "decoration",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "contentBoundsAlpha128": [
+        335,
+        37,
+        684,
+        1507
+      ],
+      "alphaZeroPercent": 84.38,
+      "sha256": "51830d438b044b598bdc1c19409609e02badee2682a98cf093b9addd4c223d42",
+      "referenceContentWidth": 44,
+      "referenceContentHeight": 185.33,
+      "uniformScale": 0.1260745,
+      "bottomCenterOrigin": [
+        0.49755859,
+        0.98111979
+      ],
+      "mirrorXUseful": false,
+      "seamlessTile": false
+    },
+    {
+      "file": "railing_winter.png",
+      "label": "Перила",
+      "role": "decoration",
+      "sourceSize": [
+        1983,
+        793
+      ],
+      "contentBoundsAlpha128": [
+        24,
+        99,
+        1958,
+        702
+      ],
+      "alphaZeroPercent": 58.51,
+      "sha256": "9de0be9189bb52029c23dbe86c666d2965c54441a78310f30734a75b224f3833",
+      "referenceContentWidth": 160,
+      "referenceContentHeight": 49.886,
+      "uniformScale": 0.08273009,
+      "bottomCenterOrigin": [
+        0.49974786,
+        0.8852459
+      ],
+      "mirrorXUseful": false,
+      "seamlessTile": false
+    },
+    {
+      "file": "stairs_winter.png",
+      "label": "Ступени",
+      "role": "terrain",
+      "sourceSize": [
+        1619,
+        971
+      ],
+      "contentBoundsAlpha128": [
+        77,
+        210,
+        1569,
+        836
+      ],
+      "alphaZeroPercent": 58.77,
+      "sha256": "dff16d5d349fdaab41c741be457baf4a4312270f5117793108892572bc689697",
+      "referenceContentWidth": 160,
+      "referenceContentHeight": 67.131,
+      "uniformScale": 0.10723861,
+      "bottomCenterOrigin": [
+        0.50833848,
+        0.86096807
+      ],
+      "mirrorXUseful": true,
+      "seamlessTile": false
+    }
+  ]
+}
