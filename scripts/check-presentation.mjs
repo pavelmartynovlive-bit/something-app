@@ -24,7 +24,7 @@ try {
   const box=await page.locator('canvas').boundingBox();if(mobile)await page.touchscreen.tap(box.x+box.width*.65,box.y+box.height*.55);else await page.keyboard.press('Space');
   if(mobile){await page.waitForFunction(()=>document.querySelector('#hint').hidden);}
   await page.evaluate(()=>{window.stepCallback=game.loop.callback;game.loop.stop();});
-  for(const [name,x,y] of [['street',500,390],['awning',5150,334],['terraces',11400,406]]){
+  for(const [name,x,y] of [['street',500,390],['awning',5120,344],['terraces',10800,486]]){
    await page.evaluate(({x,y})=>{
     const s=game.scene.getScene('play'),c=s.cameras.main,f=s.framing;s.physics.pause();s.tanya.body.reset(x,y);
     c.scrollX=Math.max(0,x-c.width/c.zoom*f.anchorX-(f.followX===12?25:63));c.scrollY=f.baseY+Math.max(-40,Math.min(0,(y-416)*.22));

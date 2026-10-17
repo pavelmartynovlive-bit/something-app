@@ -1,133 +1,157 @@
-# Six portrait set pieces — implementation and measured audit
+# Level V2 — implementation and measured audit
 
-## Scope and method
+## Scope, source and method
 
-Based on latest fetched `origin/main` at `330b737`. GAME_DESIGN.md and LEVEL_REFERENCES.md were read in full before implementation; the existing LEVEL_AUDIT.md was inspected. The user's approved six-scene, portrait, approximately-45-second brief supersedes the former seven-section / 60–90-second target. The result is **41.55 seconds** on clean runs; no filler was added to reach 45.
+Latest `origin/main` was fetched and matched `9f73496` before changes. GAME_DESIGN.md, LEVEL_REFERENCES.md and the previous LEVEL_AUDIT.md were read in full. The user's Level V2 replaces the former six-scene map with the ten specified timed phrases below. This is implementation of that map, not a new proposed structure.
 
-Geometry was first validated without food. Food was then authored against the actual actions, and Model B thresholds selected from coherent route budgets. Movement, fixed single-tap jump, fatigue, damage, recovery values, controls and placeholder art remain unchanged. Camera C is now the default. It has **no dynamic scale change**.
+Geometry was validated with no food first, including actual normal and zero-energy trajectories. Food was then authored as movement notation, route budgets measured, and only then thresholds chosen. Gameplay code in src/main.ts, controls, hazard masks, textures, energy values and portrait camera code are unchanged. No camera-scale animation, new mechanic, hold-jump, boost, lethal pit or new hazard was added.
 
-Playthroughs step the real Phaser Arcade scene at 60Hz and dispatch actual Space key events. Full runs neither teleport nor grant food/energy. Low-energy starts at zero; intentional errors omit the first gap jump, attempt the sole upper entry too early, omit the scooter jump, and use the bench. Isolated interaction tests may position actors or remove unrelated hazards. These are automated validations, not human phone playtests.
+Automated runs step the real Phaser Arcade scene at 60Hz and send real Space input. Full runs do not teleport, award food or grant energy. Low-energy starts at zero. The intentional-error policy misses the first gap timing, attempts the upper entry too early, omits the scooter jump and chooses rest. Separate interaction tests position actors or remove unrelated hazards. These are reproducible automated results, not claims about human phone enjoyment.
 
-## Six authored set pieces
+## Implemented phrase map
 
-Times and food are telemetry by x range. Anticipatory takeoffs may occur just before a section boundary (in particular the causeway entry jump); this is continuous terrain, not six rooms.
+Nominal time ranges are staging labels. A jump naturally starts before the next surface/section boundary; for example the island entry tap occurs just before 8s, and the first unequal-island tap just before 31s. Telemetry food below is bucketed by x position, not reassigned to hide such overlaps.
 
-| Scene / world x | Clean time | Finger / attention rhythm | Recognizable terrain and hazard context | Food N / G / C |
-| --- | ---: | --- | --- | ---: |
-| 1. Две кромки / 100–1740 | 4.93s | read arc → jump interruption → land → second tap onto ledge → short walk-off | 50px interruption with floor 24px below; low +24 solid ledge; no enemies | 18 / 18 / 18 |
-| 2. Птичья чаша / 1740–4000 | 6.85s | walk off → see birds → delay tap → jump flock → land → jump bowl exit | broad shallow U bowl, floor 24px lower; only this scene uses a bowl | 21 / 21 / 21 |
-| 3. Единственный козырёк / 4000–6050 | 6.20s | shared granny jump → choose → ground passage OR upper landing → timed edge tap → safe fall | one supported 400px awning at +80; clear lower passage; no hazard can be bypassed by choosing upper | 19 / 17 / 26 |
-| 4. Эстакада и встречный / 6050–8350 | 6.97s | rise/settle → read lower street and scooter → wait for edge → late jump → lower landing | filled +32 causeway, one 64px drop; no playable underside; oncoming scooter meets visible road face | 18 / 18 / 18 |
-| 5. Карман отдыха / 8350–9700 | 4.10s | read drop/energy → Lipton jump OR remain low for bench → release | one-way descent to broad low plaza, not a second U bowl; no exit step immediately after seat | 11 / 11 / 11 |
-| 6. Горка к коту / 9700–13900 | 12.50s | jump first rise → land → jump second rise → choose walk-off / high descent → birds+interruption in one jump → land → granny jump → cat | two FILLED 32px terraces, one 64px drop, shallow 40px interruption, safe final approach; no roof or platform chain | 41 / 41 / 43 |
+| Phrase / nominal position | Actual clean time | Action grammar | Terrain, hazards and decision | Food notation | Food N / G / C |
+| --- | ---: | --- | --- | --- | ---: |
+| 1. Разрыв и низкий остров / 0–4s / 100–1420 | 3.95s | gap → island landing → second jump to higher ground | 50px shallow interruption → 300px low island → +20 ground; no enemy | two linked arcs, island landing, low trail into bowl | 20 / 20 / 20 |
+| 2. Птичья чаша / 4–8s / 1420–2740 | 4.00s | walk off → see flock → wait → jump → bowl landing → exit jump | shallow bowl with one flock, then +24 exit; flock beyond the forced landing | low descending notation first, delayed arc, bowl landing and exit | 24 / 24 / 24 |
+| 3. Остров и бабушка / 8–12s / 2740–4060 | 4.00s | jump to raised island → immediately read granny → granny jump → descend | 40px safe gap → raised 340px island → short descending ground; granny at x3020 | landing immediately becomes granny arc, then descending notation | 15 / 15 / 15 |
+| 4. Единственный верхний бонус / 12–17s / 4060–5710 | 5.00s | choose ground OR first short upper landing → immediate second jump → safe return | only true alternate route: 240px / 170px surfaces at y370 / y346; clear ground underneath | small low group; upper entry, short landing, higher reward and safe fall | 8 / 8 / 26 |
+| 5. Лесенка вниз / 17–22s / 5710–7360 | 5.00s | step down → step down → do NOT jump → jump interruption | two visible down steps, then separate 50px shallow interruption; no enemies | descending diagonal turns into jump arc, then far landing | 15 / 15 / 15 |
+| 6. Самокат под эстакадой / 22–27s / 7360–9010 | 5.00s | +24 rise → settled landing → see scooter → wait → late edge jump → lower landing | raised roadway and 64px drop; scooter below; no extra hazard or reward jump | entry arc, settled landing/anticipation, late edge arc and lower landing | 21 / 21 / 21 |
+| 7. Карман восстановления / 27–31s / 9010–10330 | 4.00s | descend → read energy → Lipton jump OR stay low for bench → continue | single shallow recovery pocket; bench and one bottle; next ascent revealed before exit | fast airborne trajectory differs from grounded/rest reward | 18 / 15 / 18 |
+| 8. Три неравные высоты / 31–36s / 10330–11980 | 5.00s | longer ascent → shorter second takeoff window → short lower island → ground | unequal filled islands 330 / 210 / 140px; +24, then +28, then down; safe gap floor | first ascent, compact high reward, changing descending trail | 19 / 20 / 19 |
+| 9. Спуск, птицы и разрыв / 36–41s / 11980–13630 | 5.00s | land/drop → see birds → delay tap → jump → grounded landing → quick second jump | one flock at x12290, then separate safe interruption at x12700; no extra corridor | S-like rise/landing/rise notation linking the two actions | 25 / 24 / 25 |
+| 10. Бабушка и кот / 41–46s / 13630–15030 | 4.03s | rise → safe landing → read granny → jump → final food → descend → cat | short +24 rise, granny at x14380, shallow final descent; no scooter/recovery/platform | final rise/granny arcs and low descent toward the visible cat | 18 / 18 / 18 |
 
-N = ordinary mixed route (enter awning, walk off without edge reward); G = ground-only; C = awning with edge tap plus optional airborne descent from final ground crest. The crest is solid ground, **not another upper detour**.
+N = fast main/lower route with Lipton; G = no-bonus ground/rest choice; C = same shared hazards plus both surfaces of the sole upper detour. There is only one detour, not one detour per upper surface. The unequal islands are solid ground filled to y660, with no traversable lower route beneath them.
 
-Full action rhythm: **gap → ledge → fall / delayed birds → bowl exit → shared granny → sole short choice → causeway / anticipate / late scooter jump down → recovery choice → two filled rises / one descent → birds + interruption → separate granny tap → cat**.
+Full rhythm: **jump → jump → descend / wait / birds → island landing / immediate granny jump → short risk/reward detour → descend / descend / interruption → rise / settle / wait / late scooter jump down → recovery choice → longer / shorter / descend → birds / landing / separate interruption → rise / granny / cat**.
 
-Removed: the previous seven-section skeleton, second awning, extra intermediate pockets, second scooter, extra repeated bird phrases, two out-of-pocket bottles and all standalone reward jumps. The only two-rise phrase appears once, in the final hill. Flat releases have explicit roles (reading the bowl exit, choice, scooter anticipation, rest, cat), rather than being extended to achieve a duration target. Scene 4 has a longer readable approach on purpose.
+No third onboarding reward jump, no upper chain of three platforms, no Lipton outside recovery, no enemy in the descending staircase/recovery, and no extra final scooter or upper route. The old long canopy/climb/reward/descend template was not restored. Two-jump phrases intentionally recur in 1/3/8 as explicitly specified, but their height ordering, landing situation, purpose and terrain silhouette differ.
 
-## Food: actual route budgets, not a fictitious total
+## Coherent food budgets and Model B
 
-HUD: `Корм: X`, `Котику нужно: 100`. Thresholds are **100 feeding / 132 feast**; historical 128/170 targets are discarded. Below minimum explains the shortfall and offers replay; normal feeding and feast use distinct cat endings. No X / all-items total is displayed.
+HUD remains `Корм: X`, `Котику нужно: Y`, never X / world-total. Measured thresholds: **150 feeding / 194 feast**. They were chosen after the new geometry and food pass; previous 100/132 and 128/170 were not carried forward.
 
-| Coherent route | Food | Feeding margin | Feeding reached | Bonus |
+| Route | Food | Feeding margin | Minimum reached | Feast reached |
 | --- | ---: | ---: | ---: | --- |
-| Normal clean | 128 | +28 | 33.30s (80%) | not reached |
-| Ground-only / no bonus | 126 | +26 | 33.53s (81%) | not reached |
-| Collector | 137 | +37 | 31.57s (76%) | at 39.90s |
-| Low-energy (zero at start) | 110 | +10 | 61.22s (95%) | not reached |
-| Intentional errors | 113 | +13 | 40.93s (92%) | not reached |
+| Normal clean / fast | 183 | +33 | 37.33s (83%) | no |
+| No bonus / ground + rest | 180 | +30 | 40.43s (85%) | no |
+| Collector / both upper surfaces | 201 | +51 | 32.47s (72%) | 43.30s |
+| Low energy / zero at start | 163 | +13 | 66.17s (96%) | no |
+| Intentional errors | 169 | +19 | 43.40s (91%) | no |
 
-The collector's 137 is achieved in one continuous run, with five items above the feast requirement. Entering the awning alone does not grant feast: its edge tap rewards extra execution. Ground-only still feeds the cat with margin, while reaching the minimum remains late. The diagnostic permanently-zero route collects 105; this is an adversarial reachability check, not normal balance.
+The normal route has 33 items of feeding margin; collector adds 18 through the two-step upper detour. Feast requires 11 more than the observed normal budget and the collector has seven items of feast margin. Merely finishing or taking the bench does not grant feast. Minimum remains relevant until the later level, including the collector. Recovery-route food can be mutually exclusive, so the world item count is not advertised as 100% completion. Below minimum, normal feeding and feast retain the existing distinct endings/replay behavior.
 
-Food purposes by scene:
-1. Arc over interruption; next arc rises onto solid ledge; descending cluster releases the tap.
-2. Fall notation before delayed bird arc; bowl landing; exit arc and settled landing.
-3. Shared granny arc/landing; modest lower cluster; upper invitation, short landing and edge arc returning to street.
-4. Rise arc and landing; short grounded lead-in to the **edge**, then late arc over the scooter and down to the lower street. No early high arc invites an unsafe jump when the scooter first appears.
-5. Downward entry; airborne path toward Lipton; grounded seat reward. One jump both takes fast recovery and skips rest.
-6. Two actual ground rises and landings; alternatives from the same crest (walk-off cluster / higher airborne descent); combined birds-gap arc; separate final granny arc and cat approach.
-
-Cluster purposes and explicit positions are in src/food-layout.ts. They are not generated by traversing platform arrays or filling empty stretches.
+Every cluster has an authored purpose in src/food-layout.ts: ascent, landing, low/no-tap descent, delayed timing, route invitation, optional reward or final approach. No food is generated by iterating repeated platform templates, and no standalone food-only reward jump was added.
 
 ## Five required full runs
 
-| Run | Time | Food | Final energy | Accepted collisions | Bench | Lipton | Longest input/visible-decision gap |
+| Run | Time | Food | Final energy | Accepted collisions | Bench uses | Lipton | Longest input/visible-decision interval |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Normal clean | 41.55s | 128 | 38.77 | 0 | 0 | 1 | 3.58s |
-| Collector | 41.55s | 137 | 38.77 | 0 | 0 | 1 | 3.58s |
-| Ground-only / no bonus | 41.55s | 126 | 38.77 | 0 | 0 | 1 | 3.58s |
-| Low-energy (zero at start) | 64.37s | 110 | 27.63 | 0 | 1 | 0 | 5.92s |
-| Intentional errors | 44.45s | 113 | 59.37 | 1 | 1 | 0 | 5.25s |
+| Normal clean / fast | 44.98s | 183 | 31.90 | 0 | 0 | 1 | 4.63s |
+| No bonus / ground + rest | 47.43s | 180 | 65.40 | 0 | 1 | 0 | 4.63s |
+| Collector / both upper surfaces | 44.98s | 201 | 31.90 | 0 | 0 | 1 | 4.63s |
+| Low energy / zero at start | 68.77s | 163 | 23.47 | 0 | 1 | 0 | 7.98s |
+| Intentional errors | 47.87s | 169 | 52.53 | 1 | 1 | 0 | 4.63s |
 
-Additional permanently-zero diagnostic: 74.55s, 105 food, zero final energy, zero collisions, one bench (energy forced back to zero), zero resets. Every full run reaches the cat without a reset. Normal/collector/ground/low-energy contain zero unplanned blocked waits. Intentional errors incur one scooter hit for 12 energy plus existing slow, then use the bench.
+Additional diagnostic: energy forced to zero every frame, bottles disabled, bench jumped rather than used: **78.08s, 157 food, zero final energy, zero collisions, zero benches, zero blocked waits and zero resets**. This verifies continuous reachability without requiring recovery. All five requested runs finish; all full runs have zero resets and zero unplanned blocked waits. The intentional-error run takes one scooter collision (12 energy plus existing slow), loses food and recovers at the bench.
 
-### Flow and honest limits
+### Flow: what these numbers mean
 
-Input/decision gaps use real jump/rest events plus authored **visible** route, landing or recovery reveals. A target beyond the camera's current look-ahead is not counted yet. Automatic food collection is never counted as input. Decisions are opportunities, not proof that a human noticed them.
+The 44.98s result is approximately 45 seconds, inside the requested approximate 45–50s direction. Ground/rest takes about 2.45s longer. The slower zero-energy portion is not artificially accelerated to force its total into the clean-run target.
 
-The longest clean gap is **3.58s**, from the causeway entry takeoff near x5930 to the visible edge reveal near x7118. This includes the jump/landing and intentional approach/anticipation. A pure tap-only measurement is longer: **5.58s** on ground-only, because choosing to stay down does not require a tap. Both numbers are retained rather than hiding the distinction.
+Meaningful-event measurements include actual jumps/rest choices plus authored cues **only when their actual target is within the current camera look-ahead**. Food pickups themselves are never counted as input. These are visible opportunities, not proof that a human made or noticed a decision.
 
-With zero initial energy, the longest gap is **5.92s**, between the bowl exit and the next granny jump. The lower speed stretches that existing recovery-pressure phrase. In the intentional-error run the maximum is **5.25s**, including the deliberate 2.5s bench rest and exit/reveal. These longer low-energy intervals remain phone-playtest questions; this implementation does not silently redesign them after validation.
+The longest clean interval is **4.63s**, x3130→4659: descending after the first granny until the actual upper entrance becomes visible. It becomes **7.98s** at tired speed. An earlier diagnostic counted a tiny intermediate ground edge as the bonus reveal; the final measurement explicitly uses the platform itself, so that misleading shorter result is discarded.
 
-There are no compulsory bench stops. Zero-energy bench bypass separately clears the seat and collects Lipton; remaining grounded activates rest and misses the bottle. The collector's sole upper excursion lasts **2.23s** (ordinary entry/walk-off 1.90s), measured from takeoff to returning to ground. Missing entry or skipping the edge tap loses rewards and returns to a clear lower route. No repeated climb/reward/descend phrase was recreated across scenes.
+Separately, the longest **tap-only** interval is **11.18s** on the normal/ground route (19.40s during the initial tired portion): first granny → decline bonus → descending staircase → interruption. Collector reduces the tap-only maximum to 5.87s because it takes both upper jumps. This is the no-tap behavior of the supplied lower-route/staircase grammar, not evidence that the whole time requires active decisions. It is a remaining phone-playtest risk; no unapproved hazard or reward jump was added to hide it.
 
-## Stable portrait scooter staging
+Clean runs never need to stop for geometry. The optional bench is the only deliberate stop. Zero-energy bench bypass separately clears the marked seat and collects Lipton; grounded rest gives stronger recovery, misses the bottle and resumes automatically.
 
-Phone test viewport 390×844; world width 340, zoom **1.1470588**, unchanged for every frame of every run. Portrait at other screen widths scales once with the viewport, not with hazard proximity. Vertical follow is the existing smooth offset.
+## Portrait composition and empty-space measurements
 
-The scooter starts at x7630 on the lower street (y472), runs left at the existing 210px/s, and meets the visible filled causeway face x7410. Ordinary ground collision stops it at center x7444. No hidden barrier, freeze timer, altered speed, actor scaling or camera animation was introduced. The intended jump is at the road edge near x7400, landing on the lower street beyond the scooter. Without jumping, both normal and tired tests take a real scooter hit.
+Viewport: 390×844, 340 world px wide, zoom **1.1470588**. Zoom is identical in every sampled frame of every run. No camera, sprite scale, collision size or orientation change was introduced for V2.
 
-Full-run full-sprite visibility → intended tap: **0.57s normal**, **1.22s tired**. Isolated tests with tap 20px before the edge give 0.50s / 1.15s; 10px before gives 0.53s / 1.20s. From 40px before through 10px after the edge, all six sampled jump timings clear at both speeds. More time is not claimed by counting food cues as scooter visibility. The scooter may already be stopped against the face when the player commits; that is the actual staging, not an uninterrupted flat-road crossing.
+Every simulation frame records visible categories: current terrain interaction, upcoming terrain change, food, hazard, recovery, route, goal. Terrain edges must be inside the actual viewport; objects must overlap it in both dimensions. Current interaction and next-change categories use different sides of Tanya, avoiding counting the same future edge twice. Screens with neither a terrain edge nor an interactive object/route/goal are classified as empty; background decoration does not rescue them.
 
-## Measured jump envelope and mandatory margins
+| Run | Longest visible empty interval | Frames with at least two categories | Longest interval with fewer than two |
+| --- | ---: | ---: | ---: |
+| Normal clean / fast | 0.00s | 91.4% | 0.67s |
+| No bonus / ground + rest | 0.00s | 91.8% | 0.67s |
+| Collector / both upper surfaces | 0.00s | 91.4% | 0.67s |
+| Low energy / zero at start | 0.00s | 90.6% | 1.18s |
+| Intentional errors | 0.00s | 91.9% | 0.67s |
 
-| Measurement | Normal | Tired |
+These categorical metrics include small real terrain changes (some connecting grades are 2–8px). They establish that the frame contains changing physical geometry/items, not that every small grade has equal perceptual importance. Readability and whether the lower route still feels passive require a phone test. They should not be confused with a human attention measurement.
+
+Longest traversed flat: **600px / 1.82s normal**, the specifically allowed scooter anticipation roadway. All other traversed constant-height surfaces are **340px or less**. Adjacent equal-height spans are merged before measuring; section labels cannot hide a long flat. The start/end are clipped to the portion actually traversed before feeding.
+
+## Terrain-window and repetition audit
+
+The audit compares adjacent **3/4/5-second** windows at **0.5-second phase offsets**: 222 adjacent comparisons, **zero repeated pairs**, maximum identical consecutive sequence **one window**. Signatures use signed terrain height changes and visible upper-surface widths/heights, not hazard sprite types. Equal signatures would be flagged even if enemy types differed.
+
+All sampled neighboring windows differ structurally. This is a finite structural check, not a claim that every possible continuous-time screenshot is perceptually unique. It cannot certify that 2px contour changes are memorable. Section map, terrain data and phone screenshots remain the qualitative check. No repeated giant upper highway or repeated climb/reward/descend chain was introduced. The only true alternate route is phrase 4; phrase 8 is the expressly requested unequal solid-ground sequence.
+
+## Upper detour and scooter visibility
+
+The sole upper excursion takes **2.12s**, from the actual entry tap until returning to ground. Surface widths **240/170px**, y370/y346, with 40px between surfaces. Entry → first landing → second tap → second landing → safe fall, with no third upper jump. Shared hazards remain on the main flow before/after it; higher reward requires extra timing and can be lost by falling. Ground bypass remains unobstructed, with underside clearances **68/94px**, body height 50px and art height 56px. Posts remain nonblocking background supports.
+
+Scooter: unchanged speed 210px/s, spawn x8460 on the lower street, natural collision at the visible roadway face x8240 stops its center at x8274. Road rises 24px, then drops 64px to the safe lower landing. The entry jump finishes before the late scooter jump. No invisible stop, spawn timer, altered speed or temporary camera zoom is used.
+
+Fully visible scooter → intended edge jump: **0.57s normal / 1.22s tired**. Isolated 20px-before-edge input provides about 0.50s normal; 10px-before about 0.53s. Six sampled tap positions, 40px before through 10px after the edge, clear at both speeds. Omitting the jump produces a real hit at either speed. The scooter may have stopped against the face before commitment; the test does not misdescribe it as a continuous unobstructed flat-road crossing.
+
+## Measured mandatory jump margins
+
+| Metric | Normal | Tired |
 | --- | ---: | ---: |
-| Maximum height | 107.33 | 85.17 |
-| Level-ground duration | 0.80 | 0.70 |
-| Level-ground horizontal reach | 264.00 | 133.00 |
+| Maximum height (px) | 107.33 | 85.17 |
+| Level-ground duration (s) | 0.80 | 0.70 |
+| Level-ground reach (px) | 264.00 | 133.00 |
 
-Heights/reaches are world px, durations seconds. These are discrete 60Hz measurements, not a made-up tile grid. Actor body remains 24×50; art 40×56. Mandatory rises are only 24 or 32px, leaving 83.33/61.17px and 75.33/53.17px height margin respectively.
+Required same-ground step-ups are 20/24px. Gap landings rise by 0/20/28px relative to the departure street. Worst required height margin is **79.33px normal / 57.17px tired**. Recovering from the deepest relative exit (the 52px rise out of the unequal-island safety pocket) still leaves 55.33/33.17px; recovery from all five pocket bottoms is tested at both speeds.
 
-“Landing margin” below is measured at the first full-foot landing: center beyond the landing edge minus body half-width 12px. Values are the worst of three tested takeoff leads (normal 105/125/145, tired 35/45/55). This is a sampled safety window, not a claimed exhaustive human timing limit.
+“Full-foot landing margin” is center beyond the landing edge minus body half-width 12px, at the first landing. Rise tests stop at that landing rather than incorrectly treating the next required obstacle as a failure of the previous jump. Gap tests require landing on the intended finite surface at its real height, with room remaining before its far edge; they do not accept overshooting and landing somewhere lower later.
 
-| Required rise x | Rise | Normal height margin | Tired height margin | Worst normal landing margin | Worst tired landing margin |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| 1160 | 24 | 83.33 | 61.17 | 90.50 | 56.83 |
-| 3060 | 24 | 83.33 | 61.17 | 90.50 | 56.83 |
-| 6050 | 32 | 75.33 | 53.17 | 85.00 | 53.67 |
-| 10450 | 32 | 75.33 | 53.17 | 85.00 | 53.67 |
-| 11100 | 32 | 75.33 | 53.17 | 85.00 | 53.67 |
+| Mandatory step x | Height | Worst normal landing margin | Worst tired landing margin |
+| --- | ---: | ---: | ---: |
+| 750 | 20 | 90.50 | 60.00 |
+| 2140 | 24 | 90.50 | 56.83 |
+| 7640 | 24 | 90.50 | 56.83 |
+| 10330 | 24 | 90.50 | 56.83 |
+| 14100 | 24 | 90.50 | 56.83 |
 
-Short interruptions are validated as actual full trajectories from the preceding street, separately from rise tests. This avoids placing a takeoff inside solid ground when a pocket is shorter than a standard lead.
+Rise leads sampled: normal 105/125/145px, tired 35/45/55px. All clear without side contact. Gap leads sampled: normal 80/100/120px, tired 28/38/48px.
 
-| Interruption | Width / safety depth | Worst normal landing margin | Worst tired landing margin |
-| --- | --- | ---: | ---: |
-| x520 | 50 / 24 | 82.00 | 23.33 |
-| x12590 | 40 / 24 | 92.00 | 33.33 |
+| Gap x | Width | Landing rise | Worst normal near-edge margin | Worst tired near-edge margin | Worst normal room before far edge | Worst tired room before far edge |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 400 | 50 | 0 | 82.00 | 23.33 | 154.00 | 232.67 |
+| 2740 | 40 | 20 | 75.50 | 27.00 | 200.50 | 269.00 |
+| 6690 | 50 | 0 | 82.00 | 23.33 | 154.00 | 232.67 |
+| 10660 | 40 | 28 | 70.00 | 23.83 | 76.00 | 142.17 |
+| 12700 | 50 | 0 | 82.00 | 23.33 | 154.00 | 232.67 |
 
-Gap takeoff leads sampled: normal 80/100/120, tired 28/38/48. All clear without side contact or dipping below the takeoff surface. Missed interruptions have a real safe bottom; jumping out from each bottom is tested at both speeds. A very short interruption can also be crossed by a small safe dip without reaching its bottom; a floor hit is not falsely required for fail-forward.
+The narrow taller island therefore retains at least 76px of far-edge room on normal samples and 142px tired, rather than relying on a maximal jump. The 140px lower island requires no new jump. No arbitrary tile grid or movement constant was introduced.
 
-The final flock+interruption uses a later tap at tired speed. Both actual full-run and isolated bird timing tests pass without unavoidable hits. Sampled bird jump leads: normal 85/100/115 to the moving flock, tired first flock 30/40/50, tired final flock 0/10/20. Granny clearances are exercised in all normal and zero-energy full runs. No required jump needs the optional 80px awning; it is below normal apex by 27.33px but is intentionally not the tired main route.
+Both granny jumps and bird sequences clear in the normal and permanently-zero full runs. Isolated normal bird inputs 85/100/115px clear; tired 30/40 clear both flocks. A deliberately earlier tired final-flock tap at 50px takes 6 energy and continues, as an expected mistiming; it is not silently counted as a passing avoidance test. Static granny danger reaches about 54px above street, below the 107/85px apex; actual moving collision avoidance is checked through full runs rather than inferred solely from that apex.
 
-The 64px scooter drop extends flight. The most conservative of six tested scooter taps lands with the full body **187px beyond visible danger at normal speed / 40.67px tired**. At the intended 10px-before-edge tap the margins are 214.5 / 69.17px. Filled terrain landings are hundreds of pixels wide; no mandatory needle-width landing exists.
+Scooter drop extends airtime: sampled tired landings retain over 20px beyond the visible scooter with the full body clear, normal margins are larger. Full coyote/buffer behavior is retained; energy changing in flight does not alter committed horizontal speed.
 
-## Visual-collision validation
+## Collision, interaction and presentation checks
 
-- Zero rectangle visual-edge/body-edge mismatches across all ground and one-way surfaces.
-- Terraces extend to y660: no traversable underside, fake ledge or invisible parallel path.
-- Only one upper platform, in scene 3. Top edge, translucent underside and arrows retain existing one-way notation. Upward passage and descending landing both tested; side/underside never block.
-- Ground-to-awning underside clearance **68px**, versus body height 50px and art 56px. The clear lower route contains no boxes or hidden hazards. Support posts are background elements with no body.
-- No boxes remain; therefore no box-under-roof ambiguity or drawn-passable solid crate.
-- Scooter, pigeon and granny damage rectangles remain entirely inside opaque silhouette pixels (zero transparent-area violations). Scooter rider/stem/deck/wheels and individual visible birds retain their existing masks; flying birds do not become invisibly harmless.
-- Bench trigger matches the marked 24px seat, not the entire 90px prop; airborne passage does not trigger a stop.
-- Coyote tests: 5 frames after leaving a surface still jump; 12 do not. Buffered pre-landing tap fires. Changing energy during flight preserves committed horizontal speed until landing.
-- Touch, Space/ArrowUp, all three endings and replay reset pass. A/B/C debugging views retain identical world physics. Portrait HUD bounds, orientation pause/resume and manifest pass.
+- Zero visible rectangle edge / actual body mismatches.
+- All terrain islands are filled to y660; no fake underpass or unsupported collision slab.
+- All five missed interruptions and both failed upper jumps safely continue, with zero resets. Pocket-bottom exits pass normal and tired tests.
+- One-way upward passage and downward landing pass. Both roof undersides/edges allow the visible lower passage; supports do not block it. No boxes are present.
+- Scooter/granny/individual-pigeon hazard rectangles have zero transparent-pixel violations against the existing art. Flying pigeons remain visibly dangerous.
+- Seat sensor still matches the marked 24px part of the bench; tired bypass collects the bottle without rest, grounded choice rests and misses it.
+- Coyote (5 frames yes / 12 no), pre-landing buffer, touch, Space/ArrowUp, replay reset, three endings, HUD bounds and portrait rotation guards pass.
+- Build passes. Presentation A/B/C still shares the same world/physics; portrait C remains active by default and scale stays stable throughout every run.
 
-## Reproduce and next step
+## Reproduce / stop condition
 
-Run a Vite dev server, then `npm run test:level`, `npm run test:presentation`, and `npm run build`. Browser executable may be supplied with CHROMIUM_PATH. JSON evidence is written to `/tmp/tanya-ground-first-audit.json` and `/tmp/tanya-ground-collision-audit.json`; presentation screenshots and UI records also go to /tmp.
+With the Vite dev server running: `npm run test:level`, `npm run test:presentation`, `npm run build`. Actual run evidence: `/tmp/tanya-ground-first-audit.json`; collision/interactions: `/tmp/tanya-ground-collision-audit.json`. CHROMIUM_PATH selects a browser executable. Playwright uses system Chromium if available.
 
-Next step is manual **portrait phone playtesting**: delayed bird taps, sole bonus entry/edge timing, lower-street scooter reveal, recovery choice, tired reach and final food outcomes. Automated Chromium checks do not establish Safari timing or subjective rhythm quality. No further autonomous level-design iteration follows these results.
+Implementation is frozen for manual portrait-phone playtesting. In particular, evaluate the 4.63s descent-to-choice interval and 11.18s tap-free lower bypass/staircase, tiny connecting grade readability, delayed bird timing, two upper landings, scooter anticipation, recovery choice and the last food requirement. No further autonomous structure change or polish is included after these tests.

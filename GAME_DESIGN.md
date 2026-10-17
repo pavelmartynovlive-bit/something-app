@@ -430,7 +430,7 @@ Pigeons should feel funny rather than deadly.
 
 ### 9.1 Prototype duration
 
-For the current prototype, target approximately 45 seconds for a normal active run.
+For the current prototype, target approximately 45–50 seconds for a normal active run.
 
 Do not make the level longer merely to create a feeling of scale.
 
@@ -448,9 +448,9 @@ long + varied-looking + repetitive.
 
 Do not build the level as one continuous sequence of similar platforms.
 
-Build the current prototype as six authored gameplay set pieces, not seven inherited sections or interchangeable platform templates.
+Implement the user-specified Level V2: ten timed gameplay phrases. Do not preserve or creatively redesign the previous six-set-piece structure.
 
-Use unequal lengths (roughly 4–13 seconds) and contrast: dense actions, short release, anticipation, recovery, final combination. Prefer a strong shorter run over padding to reach 45 seconds.
+Use the specified 4–5 second phrases and recognizable action grammar. No unrequested set pieces, added mechanics or autonomous polishing after validation.
 
 Each section must have:
 - one dominant gameplay idea;
@@ -476,11 +476,35 @@ Neighboring set pieces must differ in at least three of terrain profile, movemen
 
 The approved direction is portrait, with stable framing and camera scale during gameplay. Do not introduce a temporary scooter zoom-out. Solve its readability through approach, meeting position, visible terrain and food anticipation; preserve about 0.5 seconds of readable reaction before the intended jump. If stable staging cannot do that, report the limitation before proposing a camera change.
 
-The current six-scene structure is: two edges → bird bowl → sole short awning choice → causeway/oncoming scooter → rest pocket → solid hill/final combination/cat. There is only one upper detour, in scene 3, about 1–3 seconds. Its reward requires landing and edge timing; missed jumps safely return to ground. No repeated climb/reward/descend chain, and no standalone reward jumps between scenes.
+The current approved map is Level V2:
 
-Recovery remains concentrated in the rest pocket: one Lipton or the existing optional bench. Do not change energy rules. Food is placed after geometry validation, links actions, and uses Model B resource thresholds derived from coherent route budgets. Discard historical 128/170 targets; current measured balancing values belong in settings and LEVEL_AUDIT.md, not a fictitious completion total.
+| Approximate time | Phrase | Required action grammar |
+| --- | --- | --- |
+| 0–4s | Short gap + low island | jump interruption → island landing → jump to +20 ground |
+| 4–8s | Bird bowl | step down without tap → wait → pigeons jump → bowl landing → +24 exit |
+| 8–12s | Narrow island + granny | gap/island jump → immediately read granny → jump → descend |
+| 12–17s | Only upper bonus detour | ground bypass OR first short platform → second higher/smaller platform → safe return |
+| 17–22s | Descending ground staircase | step down → step down → do not tap → jump interruption |
+| 22–27s | Scooter overpass | +24 rise → settle → see scooter → wait → late jump to lower landing |
+| 27–31s | Recovery pocket | descend → Lipton jump OR grounded bench → continue |
+| 31–36s | Three unequal heights | longer ascent → shorter timing window → short lower island → ground |
+| 36–41s | Descent + pigeons + interruption | delay pigeon jump → comfortable landing → nearly immediate separate gap jump |
+| 41–46s | Final granny + cat | rise → safe landing → granny jump → final food → descend → cat |
 
-Validate normal, collector, ground-only, low-energy and intentional-error runs. Report time, food, energy, collisions, bench use, longest input/decision interval, scooter visibility and normal/tired jump margins. Then stop for manual phone testing; do not autonomously redesign again.
+Only the fourth phrase has a true upper alternate route: two short platforms of different widths/heights, total excursion about 2–2.5 seconds. Missing either safely falls onto ground. The three unequal islands are filled terrain, not a second upper bypass. No Lipton outside the single recovery pocket. Single fixed jump, existing energy values, hazards and food resource model are preserved.
+
+Critical composition rules:
+- normally show at least two of current terrain interaction, next terrain change, food trajectory, hazard, recovery, route choice or cat;
+- never leave a complete portrait frame containing only flat ground and background;
+- calm lasts about 1–1.5 seconds, with the next meaningful element already visible;
+- avoid a flat stretch longer than roughly one portrait viewport, except explicit anticipation of the moving scooter;
+- consecutive 3–5 second windows must differ in terrain silhouette, not merely hazard sprite;
+- preserve the exact action grammar; food denotes movement, not empty-space filler;
+- all interruptions have a safe bottom; low-energy play must remain completable;
+- set food thresholds only after full geometry and coherent route budgets are measured;
+- keep portrait camera scale stable; no temporary scooter zoom-out.
+
+Validate normal clean, mostly-ground/no-bonus, collector, low-energy and intentional-error runs. Report time, food, energy, collisions, bench use, longest input/decision interval, visible emptiness, flat distance, repeated-window count, upper-detour duration, scooter readability and normal/tired mandatory jump margins. Stop for manual phone testing; do not redesign or polish beyond this specification.
 
 ### 9.3 Ground-first level grammar
 
@@ -1008,7 +1032,7 @@ Goal:
 
 Current target:
 - one short level;
-- approximately 45 seconds on a normal run;
+- approximately 45–50 seconds on a normal run;
 - one final cat;
 - simple mobile controls;
 - placeholder visuals.
@@ -1097,7 +1121,7 @@ A short authored sequence is preferable to a large procedurally repeated one.
 ### 21.2 Before implementation
 
 Check:
-1. Are there six distinct authored set pieces with different action rhythms and terrain silhouettes?
+1. Does implementation follow the ten specified Level V2 phrases without inventing extra set pieces or repeated action templates?
 2. Does each section have a different dominant idea or spatial pattern?
 3. Is the main route readable?
 4. Is the level ground-first rather than built around repeated upper highways?
@@ -1209,7 +1233,7 @@ After level changes, verify:
 - neighboring sections do not ask for the same finger rhythm with different objects.
 
 ### Scope
-- normal run remains approximately 45 seconds;
+- normal run remains approximately 45–50 seconds;
 - no new mechanics were added without approval.
 
 ---

@@ -1,4 +1,4 @@
-> Historical comparison of the previous seven-section level. The current six-scene revision uses portrait by default and stages the scooter differently. See LEVEL_AUDIT.md for current visibility and flow measurements.
+> Historical comparison of the previous seven-section level. The current Level V2 uses portrait by default and stages the scooter differently. See LEVEL_AUDIT.md for current visibility and flow measurements.
 
 # A / B / C — same-level framing experiment
 
