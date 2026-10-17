@@ -79,8 +79,8 @@
       "factorY": 0,
       "left": 0,
       "right": 2002.4,
-      "top": -63.37641025641028,
-      "bottom": 604.0902564102564,
+      "top": 10.203076923076878,
+      "bottom": 677.6697435897436,
       "alpha": 1,
       "visible": true
     }
@@ -409,5 +409,10 @@
     "resizeStatesTested": 7,
     "replayBackgroundCount": 4
   },
-  "gameplayComparisonNote": "Full-run results below were measured during initial background integration. This follow-up changes only background render visibility; gameplay sources and asset pixels are unchanged. Full gameplay simulations were not repeated."
+  "gameplayComparisonNote": "Full-run results below were measured during initial background integration. This follow-up changes only background render visibility; gameplay sources and asset pixels are unchanged. Full gameplay simulations were not repeated.",
+  "midCityPlacement": {
+    "bottomOffsetViewportHeight": 0.22,
+    "shiftDownViewportHeight": 0.1,
+    "reason": "Hide transparent bottom padding below gameplay baseline; prevent far city strip peeking below courtyard."
+  }
 }

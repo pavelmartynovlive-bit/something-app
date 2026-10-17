@@ -140,3 +140,14 @@ retained as historical integration evidence, not claimed as rerun here.
 
 Changed in this follow-up: background module, existing background check, this
 report, validation JSON and rendered preview.
+
+
+## Lower courtyard alignment
+
+The mid-city PNG has transparent padding beneath its snow line. Its bottom anchor
+now sits at groundScreenY + viewportHeight × .22 (previously .12), moving only
+that panorama down by 10% of viewport height: about 84 screen pixels at 390×844.
+The far skyline no longer forms a separate strip below the courtyard in inspected
+start/end gameplay frames. Asset scale, parallax, opacity/progress rules, camera
+and gameplay remain unchanged. Background coverage/resize/replay checks and
+production build pass. Preview now shows the corrected opening courtyard.

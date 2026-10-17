@@ -60,7 +60,9 @@ export class WinterParallaxBackground {
       let y = 0;
       if (spec.placement === 'air') y = height * .08;
       if (spec.placement === 'far') y = groundScreenY + height * .08 - image.displayHeight;
-      if (spec.placement === 'mid') y = groundScreenY + height * .12 - image.displayHeight;
+      // The courtyard PNG has transparent padding below the snow. Sink that
+      // padding below the gameplay baseline so the skyline cannot peek under it.
+      if (spec.placement === 'mid') y = groundScreenY + height * .22 - image.displayHeight;
       image.setPosition(0, y);
     }
     this.updateVisibility();
