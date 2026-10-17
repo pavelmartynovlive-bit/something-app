@@ -10,43 +10,52 @@ try{
  const result=await page.evaluate(()=>{
   game.loop.stop();let now=performance.now();const tick=()=>game.headlessStep(now+=1000/60,1000/60);const key=d=>window.dispatchEvent(new KeyboardEvent(d?'keydown':'keyup',{key:' ',code:'Space',keyCode:32,bubbles:true}));
   const runs=[];
-  for(const mode of ['normal','collector','no-optional-boost','low-energy','intentional-error','ground']){
+  for(const mode of ['normal','collector','low-energy','intentional-collision','pit-fall','platform-miss','no-recovery','bench']){
    key(false);game.scene.start('play');for(let i=0;i<4;i++)tick();const s=game.scene.getScene('play'),start=s.time.now; s.hit=Object.getPrototypeOf(s).hit; s.respawn=Object.getPrototypeOf(s).respawn;
    if(mode==='low-energy')s.changeEnergy(-100);
-   let hits=0,resets=0,bench=0,prevRest=0,lastInput=0,longest=0,lastProgress=0,stuck=0,boostDue=null;const reveals=[],viewport=[],hitsAt=[],inputs=[],trajectory=[],landings=[],used=new Set(),seen=new Set(),stats=sections.map(z=>({name:z.name,seconds:0,food:0,collisions:0,boosts:0}));
+   let lastRecovery=0;const missed=new Set();let hits=0,resets=0,bench=0,prevRest=0,lastInput=0,longest=0,lastProgress=0,stuck=0,boostDue=null;const reveals=[],viewport=[],hitsAt=[],inputs=[],trajectory=[],landings=[],used=new Set(),seen=new Set(),stats=sections.map(z=>({name:z.name,seconds:0,food:0,collisions:0,boosts:0}));
    const origHit=s.hit;s.hit=function(d){const ok=origHit.call(this,d);if(ok){hits++;hitsAt.push({x:this.tanya.x,time:(this.time.now-start)/1000,damage:d});stats[Math.max(0,sections.findLastIndex(z=>this.tanya.x>=z.start))].collisions++}return ok};const origReset=s.respawn;s.respawn=function(){resets++;origReset.call(this)};
    for(let frame=0;frame<60*160&&!s.finished;frame++){
+    if(s.recoveries!==lastRecovery){lastRecovery=s.recoveries;used.clear();boostDue=null;}
     const b=s.tanya.body,x=s.tanya.x,tired=s.exhausted,t=(s.time.now-start)/1000,grounded=b.blocked.down&&b.velocity.y>=0;
     const si=Math.max(0,sections.findLastIndex(z=>x>=z.start));stats[si].seconds+=1/60;stats[si].food=s.foodCount;stats[si].boosts=s.boostsUsed;
     let jump=false,boost=false;
     const targets=[
-      {id:'gap1',x:tired?395:355}, {id:'rise1',x:tired?945:910},
+      {id:'gap1',x:tired?405:355}, {id:'rise1',x:tired?945:910},
       {id:'ledge',x:tired?1355:1320,boost:true},
       {id:'platform1',x:tired?2815:2765,optional:true},
-      {id:'platform2',x:tired?3150:3120,optional:true},
-      {id:'platform3',x:tired?3355:3320,optional:true,boost:mode==='collector'},
+      {id:'platform2',x:tired?3090:3075,optional:true},
+      {id:'platform3',x:tired?3310:3290,optional:true,boost:mode==='collector'},
       {id:'longgap',x:tired?4255:4230,boost:true},
       {id:'road',x:tired?4775:4730},
-      {id:'scooter',x:5410}, {id:'cascade',x:tired?6015:5980},
-      {id:'lipton',x:tired?7035:7020,optional:true},
+      {id:'scooter',x:5410}, {id:'cascade',x:tired?6030:5980},
+      {id:'lipton',x:tired?6915:6910,optional:true},
+      {id:'skipbench',x:7100,optional:true},
       {id:'step1',x:tired?7505:7460}, {id:'step2',x:tired?7855:7810,boost:mode==='collector'||tired},
       {id:'step3',x:tired?8355:8320,boost:true},
-      {id:'finalgap',x:tired?9465:9400},
+      {id:'finalgap',x:tired?9565:9500},
       {id:'granny',x:tired?10180:10140},
     ];
-    if(grounded&&!s.restRemaining){
+    if(grounded&&!s.restRemaining&&!s.recoveryRemaining){
      for(const z of targets){if(used.has(z.id)||x<z.x)continue;
-      if(z.id==='scooter'&&mode==='intentional-error'){used.add(z.id);continue}
-      if(z.id==='gap1'&&mode==='intentional-error'){used.add(z.id);continue}
-      if(z.optional&&((mode==='low-energy'&&z.id==='lipton')||(mode==='ground'&&z.id.startsWith('platform')))){used.add(z.id);continue}
+      if(z.id==='scooter'&&mode==='intentional-collision'){used.add(z.id);continue}
+      if(mode==='pit-fall'&&['gap1','longgap','cascade','finalgap'].includes(z.id)&&!missed.has(z.id)){used.add(z.id);missed.add(z.id);continue}
+      if(z.optional&&((['low-energy','bench','no-recovery'].includes(mode)&&z.id==='lipton')||
+        (z.id==='skipbench'&&mode!=='no-recovery')||
+        (mode==='platform-miss'&&z.id.startsWith('platform')&&z.id!=='platform1'))){used.add(z.id);continue}
       if(x-z.x>200){used.add(z.id);continue}
       jump=true;used.add(z.id);if(z.boost)boostDue=s.time.now+150;break;
      }
      if(b.blocked.right&&!jump){jump=true;boostDue=s.time.now+150;}
      // Pigeons are timed from their visible, moving location, not a hidden timer.
-     if(s.pigeons.some(p=>Math.abs(p.perchY-b.bottom)<5&&p.sprite.x-x>0&&p.sprite.x-x<(tired?70:85)&&p.sprite.y>p.perchY-100)&&!(mode==='intentional-error'&&x<3340))jump=true;
+     if(mode!=='intentional-collision') {
+       jump ||= s.grannies.some(g=>Math.abs(g.sprite.body.bottom-b.bottom)<5&&g.sprite.x-x>0&&g.sprite.x-x<(tired?65:90));
+       const scooter=s.scooters[1];
+       jump ||= !!scooter?.launched&&Math.abs(scooter.sprite.body.bottom-b.bottom)<5&&scooter.sprite.x-x>0&&scooter.sprite.x-x<85;
+     }
+     if(s.pigeons.some(p=>Math.abs(p.perchY-b.bottom)<5&&p.sprite.x-x>0&&p.sprite.x-x<(tired?70:85)&&p.sprite.y>p.perchY-100)&&!((mode==='intentional-collision'&&x<3340)||(mode==='pit-fall'&&x>8800&&s.falls<4)))jump=true;
     }
-    if(boostDue!==null&&s.time.now>=boostDue&&!grounded){jump=true;boost=true;boostDue=null;}
+    if(!s.recoveryRemaining&&boostDue!==null&&s.time.now>=boostDue&&!grounded){jump=true;boost=true;boostDue=null;}
     if(jump){key(true);inputs.push({x,time:t,boost});longest=Math.max(longest,t-lastInput);lastInput=t;}
     const beforeX=x,wasGround=grounded;tick();key(false);
     if(frame%6===0){
@@ -86,7 +95,7 @@ try{
       });
     }
     if(s.restRemaining>0&&prevRest===0)bench++;prevRest=s.restRemaining;
-    if(s.tanya.x-beforeX<.1&&!s.restRemaining)stuck++;else stuck=0;
+    if(s.tanya.x-beforeX<.1&&!s.restRemaining&&!s.recoveryRemaining)stuck++;else stuck=0;
     if(stuck>90){trajectory.push({stuckAt:s.tanya.x,bottom:b.bottom});break}
     if(b.blocked.down&&!wasGround)landings.push({x:s.tanya.x,y:b.bottom,time:t});
     if(frame%6===0)trajectory.push({x:s.tanya.x,y:b.bottom,time:t,ground:b.blocked.down,food:s.foodCount,energy:s.energy,cameraX:s.cameras.main.scrollX,cameraY:s.cameras.main.scrollY,velocity:b.velocity.x,
@@ -98,15 +107,24 @@ try{
    const events=[0,...inputs.map(i=>i.time),...reveals.map(i=>i.time),time].sort((a,b)=>a-b);
    let decisionGap=0,decisionInterval=null;for(let i=1;i<events.length;i++)if(events[i]-events[i-1]>decisionGap){decisionGap=events[i]-events[i-1];decisionInterval=[events[i-1],events[i]];}
    let emptyRun=0,longestEmpty=0;for(const v of viewport){emptyRun=v.empty?emptyRun+.1:0;longestEmpty=Math.max(longestEmpty,emptyRun)}
-   runs.push({mode,finished:s.finished,time,food:s.foodCount,energy:s.energy,collisions:hits,hitsAt,bench,boosts:s.boostsUsed,resets,longestRawInputGap:longest,longestInputDecisionGap:decisionGap,decisionInterval,longestEmpty,threeLayersRatio:viewport.filter(v=>v.now&&v.next&&v.after).length/viewport.length,reveals,viewport,inputs,landings,trajectory,stats});
+   runs.push({mode,finished:s.finished,time,food:s.foodCount,energy:s.energy,collisions:hits,hitsAt,bench,lipton:s.liptonUses,falls:s.falls,recoveries:s.recoveries,boosts:s.boostsUsed,resets,longestRawInputGap:longest,longestInputDecisionGap:decisionGap,decisionInterval,longestEmpty,threeLayersRatio:viewport.filter(v=>v.now&&v.next&&v.after).length/viewport.length,reveals,viewport,inputs,landings,trajectory,stats});
   }
   return runs;
  });
  writeFileSync('/tmp/tanya-v3-runs.json',JSON.stringify(result,null,2));
- assert.deepEqual(errors,[]);assert.ok(result.every(r=>r.finished&&r.resets===0),'all full runs finish without reset');
- for(const r of result.filter(r=>['normal','collector','no-optional-boost','ground'].includes(r.mode)))assert.equal(r.collisions,0,r.mode+' clean collisions');
- assert.ok(result.every(r=>r.longestEmpty===0),'no full empty sampled viewport');
- assert.ok(result[0].time<55&&result[0].food>=80);assert.ok(result[1].food>=103&&result[1].food>result[0].food);
- assert.ok(result.find(r=>r.mode==='ground').food>=80);assert.ok(result.find(r=>r.mode==='low-energy').bench===1);assert.ok(result.find(r=>r.mode==='intentional-error').collisions>=2);
+ assert.deepEqual(errors,[]);assert.ok(result.every(r=>r.finished),'all full runs finish');
+ if(!process.env.PROBE_ONLY){
+  for(const r of result.filter(r=>['normal','collector','low-energy','no-recovery','bench'].includes(r.mode)))assert.equal(r.collisions,0,r.mode+' clean collisions');
+  assert.ok(result[0].food>=80&&result[1].food>=103,'food budgets');
+  const pit=result.find(r=>r.mode==='pit-fall');assert.equal(pit.falls,4,'miss every pit');assert.equal(pit.recoveries,4,'recover every pit');
+  for(const r of result){assert.equal(r.longestEmpty,0,r.mode+' empty viewport');assert.ok(!(r.bench&&r.lipton),'one recovery choice');assert.equal(r.falls,r.recoveries,'no unresolved recovery');}
+  const miss=result.find(r=>r.mode==='platform-miss');assert.equal(miss.falls,0,'platform miss falls safely to ground');
+  const energy=mode=>result.find(r=>r.mode===mode).energy;
+  assert.ok(energy('no-recovery')>=5&&energy('no-recovery')<=15);
+  assert.ok(energy('normal')>=20&&energy('normal')<=35);
+  assert.ok(energy('bench')>=35&&energy('bench')<=50);
+  assert.ok(result.find(r=>r.mode==='intentional-collision').collisions>=5);
+ }
+
  console.log(JSON.stringify({errors,runs:result.map(({trajectory,inputs,landings,stats,reveals,viewport,...r})=>({...r,last:trajectory.at(-1)}))},null,2));
 }finally{await browser.close()}

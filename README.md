@@ -2,7 +2,7 @@ Before making gameplay or level-design changes, read GAME_DESIGN.md.
 
 # Таня и голодный кот
 
-Мобильный auto-runner на Phaser 3 + TypeScript + Vite. **Level V3**: портрет, авторский маршрут с наклонами, разными островами, длинным разрывом и ранним вторым тапом для boost. Чистый прогон — 42,1 с. Дизайн: `GAME_DESIGN.md` §27, референсы: `LEVEL_REFERENCES.md`, измерения и оставшиеся вопросы: `LEVEL_AUDIT.md`.
+Мобильный auto-runner на Phaser 3 + TypeScript + Vite. **Level V3**: портрет, авторский маршрут с наклонами, разными островами, длинным разрывом и ранним вторым тапом для boost. Чистый прогон — 42,1 с. В текущей настройке: 3 бабки, 2 самоката, автоматический возврат из ям и выбор Lipton/лавочка. Дизайн: `GAME_DESIGN.md` §27–28, референсы: `LEVEL_REFERENCES.md`, измерения и оставшиеся вопросы: `LEVEL_AUDIT.md`.
 
 Нужен Node.js 22.12+ (или 20.19+).
 

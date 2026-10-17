@@ -1388,3 +1388,37 @@ SVG/PNG artifacts under /tmp; it is not imported by the production game.
 
 **Stop after the validation report. No further autonomous level iteration before
 manual phone playtesting**. Report unresolved findings explicitly; phone approval is pending.
+
+## 28. V3 local hazard / gap / recovery tuning (2026-10-17)
+
+This authorized local pass preserves §27's silhouette and ten major motifs.
+Three grannies now inhabit high-landing, cascade-landing and final-combination
+contexts. Two scooters inhabit the original roadway and the final high-drop
+approach. Keep two pigeon groups. Do not add empty connectors between them.
+
+Pit widths70/60/40 use standard jump; the270px boost pit remains distinct.
+Every pit has a visible sludge floor and automatic600ms return to the latest
+confirmed safe anchor. Missing optional platforms still lands on the ramp.
+Return preserves food and energy, clears vertical velocity/input buffers,
+synchronizes the collider and camera, and resumes auto-run without a button or
+whole-level restart. Falling itself adds no energy penalty.
+
+Safe anchors:100,240,1220,2660,4110,5880,7320,8140,9240. Keep these on verified
+solid surfaces, outside hazards, with room to resume. Terrain contact uses the
+same analytic surface as drawing on every fixed physics step; visible solid
+ground must catch downward crossings even when a render contains several steps.
+
+Unequal floating widths240/160/200 and gaps60/80 keep the optional line active.
+Normal/tired physics, early boost, coyote and buffer remain unchanged.
+
+Baseline drain2.15/s. One recovery choice: airborne Lipton at6970,y435 gives22;
+ground bench at7200,y545 stops2.5s and restores32. They are physically separated
+and taking one disables the other for this run, including after a pit return.
+Do not place incidental Lipton inside the bench trigger or sitting trajectory.
+Clean finish calibration: no recovery9.34, Lipton31.31, bench41.77 energy.
+
+Food thresholds remain80 /103 after remeasuring routes (normal97, collector105,
+platform fallback90). Display only resource count and feeding requirement.
+Local food cues follow new avoidance jumps and shifted landings, not empty-space
+filler. See LEVEL_AUDIT.md for exact widths, all playthroughs and remaining density
+limitations. Stop for manual phone testing; do not redesign the V3 macro again.

@@ -7,7 +7,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc --noEmit && vite build && node scripts/build-sw.mjs",
     "preview": "vite preview --host 0.0.0.0",
-    "test:level": "node scripts/measure-jumps.mjs && node scripts/audit-v3.mjs && node scripts/validate-collisions.mjs",
+    "test:level": "node scripts/measure-jumps.mjs && node scripts/audit-v3.mjs && node scripts/validate-collisions.mjs && node scripts/validate-recovery.mjs",
     "test:presentation": "node scripts/check-presentation.mjs",
     "level:overview": "node scripts/overview.mjs"
   },
