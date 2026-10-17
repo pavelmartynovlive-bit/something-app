@@ -19,7 +19,7 @@ Horizontal scroll factors: sky .01, atmosphere .04, far-city .09, mid-city .16,
 near-decor .30. All vertical factors are0, so jumping and camera recovery do not
 move the background vertically. Standard camera behavior / zoom remains unchanged.
 Near .30 and mid .16 use the quiet end of the proposed ranges. Layer opacity is
-1 / .6 /1 /.7 /.55: no tint or contrast filter; foreground drawing is untouched.
+1 / .6 /1 /1 /1: no tint or contrast filter; foreground drawing is untouched.
 
 The same source image is progressively revealed as the camera moves right:
 
@@ -101,3 +101,12 @@ Changed: `src/main.ts`, `package.json` (test command only).
 Added: `src/winter-parallax-background.ts`, `scripts/check-winter-background.mjs`,
 five canonical PNGs, this report, validation JSON and preview PNG.
 No gameplay redesign or new mechanics in this pass.
+
+## Opacity correction after phone feedback
+
+The initial .7 mid-city / .55 near-decor opacity exposed distant buildings through
+solid garages, roofs and props. Both architectural/decorative layers now use
+alpha1. Source PNG alpha is preserved for empty areas and soft edges (sampled
+solid interiors are251–253/255); only the extra blanket translucency is removed.
+Atmosphere remains .6. No change to Tanya damage blinking, gameplay, camera,
+parallax factors, layer dimensions or asset pixels.

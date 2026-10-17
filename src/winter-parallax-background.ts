@@ -5,8 +5,8 @@ export const winterLayers = [
   { name: 'sky', factor: .01, alpha: 1, placement: 'cover' },
   { name: 'atmosphere', factor: .04, alpha: .6, placement: 'air' },
   { name: 'far-city', factor: .09, alpha: 1, placement: 'far' },
-  { name: 'mid-city', factor: .16, alpha: .7, placement: 'mid' },
-  { name: 'near-decor', factor: .30, alpha: .55, placement: 'near' },
+  { name: 'mid-city', factor: .16, alpha: 1, placement: 'mid' },
+  { name: 'near-decor', factor: .30, alpha: 1, placement: 'near' },
 ] as const;
 
 export class WinterParallaxBackground {
