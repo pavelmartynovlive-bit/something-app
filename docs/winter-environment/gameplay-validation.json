@@ -1,0 +1,160 @@
+{
+  "baselineCommit": "28b0ab1",
+  "runComparison": "fresh before and after, all values match within 1e-6",
+  "runs": [
+    {
+      "mode": "normal",
+      "time": 42.1,
+      "food": 98,
+      "energy": 15.825,
+      "collisions": 0,
+      "bench": 0,
+      "lipton": 3,
+      "boosts": 3,
+      "falls": 0,
+      "recoveries": 0,
+      "finished": true
+    },
+    {
+      "mode": "collector",
+      "time": 41.23333,
+      "food": 103,
+      "energy": 6.295,
+      "collisions": 0,
+      "bench": 0,
+      "lipton": 2,
+      "boosts": 5,
+      "falls": 0,
+      "recoveries": 0,
+      "finished": true
+    },
+    {
+      "mode": "low-energy",
+      "time": 52.5,
+      "food": 92,
+      "energy": 10.0025,
+      "collisions": 0,
+      "bench": 1,
+      "lipton": 3,
+      "boosts": 3,
+      "falls": 0,
+      "recoveries": 0,
+      "finished": true
+    },
+    {
+      "mode": "intentional-collision",
+      "time": 50.76667,
+      "food": 89,
+      "energy": 0,
+      "collisions": 8,
+      "bench": 0,
+      "lipton": 2,
+      "boosts": 4,
+      "falls": 0,
+      "recoveries": 0,
+      "finished": true
+    },
+    {
+      "mode": "pit-fall",
+      "time": 48.7,
+      "food": 98,
+      "energy": 0,
+      "collisions": 1,
+      "bench": 0,
+      "lipton": 3,
+      "boosts": 3,
+      "falls": 4,
+      "recoveries": 4,
+      "finished": true
+    },
+    {
+      "mode": "platform-miss",
+      "time": 42.11667,
+      "food": 90,
+      "energy": 15.7775,
+      "collisions": 0,
+      "bench": 0,
+      "lipton": 3,
+      "boosts": 3,
+      "falls": 0,
+      "recoveries": 0,
+      "finished": true
+    },
+    {
+      "mode": "bench",
+      "time": 44.51667,
+      "food": 96,
+      "energy": 52.35,
+      "collisions": 0,
+      "bench": 1,
+      "lipton": 3,
+      "boosts": 3,
+      "falls": 0,
+      "recoveries": 0,
+      "finished": true
+    }
+  ],
+  "terrainCollision": [
+    {
+      "start": 1900,
+      "tired": false,
+      "error": 0,
+      "air": 0,
+      "blocked": 0
+    },
+    {
+      "start": 1900,
+      "tired": true,
+      "error": 0,
+      "air": 0,
+      "blocked": 0
+    },
+    {
+      "start": 2520,
+      "tired": false,
+      "error": 0,
+      "air": 0,
+      "blocked": 0
+    },
+    {
+      "start": 2520,
+      "tired": true,
+      "error": 0,
+      "air": 0,
+      "blocked": 0
+    },
+    {
+      "start": 3760,
+      "tired": false,
+      "error": 0,
+      "air": 0,
+      "blocked": 0
+    },
+    {
+      "start": 3760,
+      "tired": true,
+      "error": 0,
+      "air": 0,
+      "blocked": 0
+    },
+    {
+      "start": 9840,
+      "tired": false,
+      "error": 0,
+      "air": 0,
+      "blocked": 0
+    },
+    {
+      "start": 9840,
+      "tired": true,
+      "error": 0,
+      "air": 0,
+      "blocked": 0
+    }
+  ],
+  "recovery": {
+    "anchors": 18,
+    "ground": 40,
+    "drops": 46
+  }
+}

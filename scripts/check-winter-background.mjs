@@ -6,7 +6,7 @@ try {
  const page=await browser.newPage({viewport:{width:390,height:844},hasTouch:true});const errors=[],failed=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400)failed.push(r.url())});
  await page.goto('http://localhost:5173');await page.waitForSelector('canvas');
- await page.evaluate(async()=>{window.game=(await import('/src/main.ts')).game;window.cfg=(await import('/src/settings.ts')).settings});await page.waitForFunction(()=>game.scene.getScene('play')?.tanya?.body);
+ await page.evaluate(async()=>{window.game=(await import(document.querySelector('script[src*="/src/main.ts"]').src)).game;window.cfg=(await import('/src/settings.ts')).settings});await page.waitForFunction(()=>game.scene.getScene('play')?.tanya?.body);
  await page.evaluate(()=>{game.loop.stop();const s=game.scene.getScene('play');s.physics.pause();s.sys.sceneUpdate=()=>{};document.querySelector('#hint').hidden=true});
  const samples=[];
  for(const [width,height] of [[390,844],[375,667],[393,852],[430,932],[375,896],[844,390],[390,844]]){

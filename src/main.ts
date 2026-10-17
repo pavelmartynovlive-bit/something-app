@@ -4,6 +4,7 @@ import { touchesDanger } from './hazard-shapes';
 import { TouchControls } from './controls';
 import { presentation, cameraFrame } from './presentation';
 import { WinterParallaxBackground } from './winter-parallax-background';
+import { WinterEnvironment } from './winter-environment';
 import './style.css';
 import './pwa';
 
@@ -56,9 +57,10 @@ class PlayScene extends Phaser.Scene {
   private wasPortrait = false;
   private framing?: ReturnType<typeof cameraFrame>;
   private winterBackground?: WinterParallaxBackground;
+  private winterEnvironment?: WinterEnvironment;
   constructor() { super('play'); }
 
-  preload() { WinterParallaxBackground.preload(this); }
+  preload() { WinterParallaxBackground.preload(this); WinterEnvironment.preload(this); }
 
   create() {
     this.energy = 100;
@@ -94,25 +96,19 @@ class PlayScene extends Phaser.Scene {
       this.winterBackground?.destroy();
       this.winterBackground = undefined;
     });
+    this.winterEnvironment = new WinterEnvironment(this, 660);
+    this.events.once('shutdown', () => { this.winterEnvironment?.destroy(); this.winterEnvironment = undefined; });
     const ground = this.physics.add.staticGroup();
     const obstacles = this.physics.add.staticGroup();
     const upperRoute = this.physics.add.staticGroup();
     const slab = (x: number, y: number, width: number, height: number, group = ground) => {
-      group.add(this.add.rectangle(x + width / 2, y + height / 2, width, height, 0x788c7b));
-      this.add.rectangle(x + width / 2, y + 4, width, 8, 0x96aa8c);
+      group.add(this.add.rectangle(x + width / 2, y + height / 2, width, height, 0x788c7b).setVisible(false));
     };
     for (const span of s.groundSpans) {
       // Filled to one foundation: the terraces have no playable underside.
       if (span.endY === undefined) slab(span.start, span.y, span.end - span.start, 660 - span.y);
-      else {
-        const shape = this.add.graphics();
-        shape.fillStyle(0x788c7b).fillPoints([
-          new Phaser.Geom.Point(span.start,span.y),new Phaser.Geom.Point(span.end,span.endY),
-          new Phaser.Geom.Point(span.end,660),new Phaser.Geom.Point(span.start,660),
-        ],true);
-        shape.lineStyle(8,0x96aa8c).lineBetween(span.start,span.y+4,span.end,span.endY+4);
-      }
     }
+
     for (const box of s.obstacles) {
       const y = groundYAt(box.x) - box.height;
       const crate = this.add.rectangle(box.x + box.width / 2, y + box.height / 2, box.width, box.height, 0xb99c70);
@@ -122,32 +118,24 @@ class PlayScene extends Phaser.Scene {
       detail.strokeRect(box.x + 1, y + 1, box.width - 2, box.height - 2);
       detail.lineBetween(box.x + 3, y + 3, box.x + box.width - 3, groundYAt(box.x) - 3);
     }
-    const sludge = this.add.graphics();
-    for (const pit of s.interruptions) {
-      const y = groundYAt(pit.start+1);
-      sludge.fillStyle(0x435a50).fillRect(pit.start,y,pit.width,9);
-      sludge.lineStyle(2,0x92a15b).lineBetween(pit.start,y+1,pit.start+pit.width,y+1);
-      for(let x=pit.start+10;x<pit.start+pit.width;x+=24)sludge.fillStyle(0x72804e).fillEllipse(x,y+3,12,3);
-    }
     for (const sign of s.signs) this.sign(sign.x, sign.text);
     // Опоры находятся за игровой дорожкой: они поддерживают навес визуально,
     // но не являются препятствиями в проходе перед ними.
     const supports = this.add.graphics().setDepth(-1);
     for (const platform of s.routePlatforms) {
       const underside = platform.y + s.platformThickness;
-      supports.fillStyle(0x9bb3a3);
-      supports.lineStyle(3, 0x9bb3a3);
+      supports.fillStyle(0xc1ccd6);
+      supports.lineStyle(3, 0xc1ccd6);
       for (const postX of [platform.x + 16, platform.x + platform.width - 23]) {
         supports.fillRect(postX, underside, 7, groundYAt(postX) - underside);
         supports.lineBetween(postX + 3, underside + 25, postX + 24, underside);
       }
       // A light, open awning with a strong top edge communicates a one-way surface.
       const awning = this.add.rectangle(platform.x + platform.width / 2, platform.y + s.platformThickness / 2,
-        platform.width, s.platformThickness, 0x788c7b, .55);
+        platform.width, s.platformThickness, 0x788c7b, .55).setVisible(false);
       upperRoute.add(awning);
-      this.add.rectangle(platform.x + platform.width / 2, platform.y + 2, platform.width, 4, 0x568968);
       for (let x = platform.x + 36; x < platform.x + platform.width; x += 70) {
-        this.add.text(x, platform.y + 12, '↑', { fontSize: '12px', color: '#568968' });
+        this.add.text(x, platform.y + 12, '↑', { fontSize: '12px', color: '#526d94' });
       }
       const body = (upperRoute.getChildren().at(-1) as Phaser.GameObjects.Rectangle).body as Phaser.Physics.Arcade.StaticBody;
       // Односторонняя опора: края и низ никогда не блокируют автобег.
@@ -185,7 +173,7 @@ class PlayScene extends Phaser.Scene {
     this.physics.add.overlap(this.tanya, bottles, (_player, item) => {
       if (this.finished || this.recoveryRemaining > 0) return;
       const bottle = item as Phaser.Physics.Arcade.Sprite;
-      const label = this.add.text(bottle.x, bottle.y - 25, `+${s.liptonEnergy}`, { fontSize: '22px', color: '#326544', fontStyle: 'bold' }).setOrigin(.5);
+      const label = this.add.text(bottle.x, bottle.y - 25, `+${s.liptonEnergy}`, { fontSize: '22px', color: '#326544', fontStyle: 'bold' }).setOrigin(.5).setDepth(20);
       bottle.destroy();
       this.liptonUses++;
       this.changeEnergy(s.liptonEnergy);
@@ -200,11 +188,17 @@ class PlayScene extends Phaser.Scene {
     }
     this.createNewObjects(ground);
     const catX = s.levelWidth - 150;
-    this.add.image(catX, groundYAt(catX) - 22, 'cat');
+    this.add.image(catX, groundYAt(catX) - 22, 'cat').setDepth(8);
     this.add.text(catX, groundYAt(catX) - 75, 'Мяу…', { fontSize: '22px', color: '#29483e' }).setOrigin(.5);
     this.sign(catX - 260, 'Покорми котика');
     if (!controls) controls = new TouchControls(this.game.canvas, hideHint);
     element('#food-goal').textContent = `Котику нужно: ${s.requiredFood}. ${s.bonusFood}+ — кошачий пир!`;
+    this.tanya.setDepth(10);
+    for (const a of [...this.grannies, ...this.scooters, ...this.pigeons]) a.sprite.setDepth(8);
+    for (const body of this.physics.world.staticBodies.entries) {
+      const object = body.gameObject as Phaser.GameObjects.Sprite;
+      if (['food', 'lipton'].includes(object.texture?.key)) object.setDepth(5);
+    }
     this.updateHud();
   }
 
@@ -418,7 +412,7 @@ class PlayScene extends Phaser.Scene {
     this.physics.add.overlap(this.tanya, food, (_player, item) => {
       if (this.finished || this.recoveryRemaining > 0) return;
       const packet = item as Phaser.Physics.Arcade.Sprite;
-      const label = this.add.text(packet.x, packet.y - 25, '+1 корм', { fontSize: '18px', color: '#326544' }).setOrigin(.5);
+      const label = this.add.text(packet.x, packet.y - 25, '+1 корм', { fontSize: '18px', color: '#326544' }).setOrigin(.5).setDepth(20);
       packet.destroy();
       this.foodCount++;
       this.tweens.add({ targets: label, y: label.y - 40, alpha: 0, duration: 750, onComplete: () => label.destroy() });
@@ -441,7 +435,8 @@ class PlayScene extends Phaser.Scene {
       // Rest is activated by the visibly marked seat, not the whole 90px prop.
       this.benchSprites.push(bench);
       bench.setSize(24, 32).setOffset(33, 12);
-      this.add.rectangle(x, groundYAt(x) - 24, 24, 5, 0xe5b83d);
+      this.winterEnvironment!.attachBench(bench);
+      this.add.rectangle(x, groundYAt(x) - 24, 24, 5, 0xe5b83d).setDepth(3);
     }
     this.physics.add.overlap(this.tanya, benches, (_player, item) => {
       const bench = item as Phaser.Physics.Arcade.Sprite;
