@@ -27,17 +27,18 @@ try {
    return {canvas:{width:c.width,height:c.height,zoom:c.zoom},viewport:{width:V,height:H},travel:T,original,after,verticalStable,gameplayMinDepth,poses};
   });
   assert.deepEqual(result.original,result.after);assert.equal(result.verticalStable,true);
-  for(const pose of result.poses){assert.equal(pose.layers.length,5);assert.equal(new Set(pose.layers.map(l=>l.factorX)).size,5);for(const l of pose.layers){assert.equal(l.type,'Image');assert.equal(l.body,false);assert.equal(l.factorY,0);assert.equal(l.scaleX,l.scaleY);assert.ok(l.depth<result.gameplayMinDepth);assert.ok(l.left<=1e-6&&l.right>=result.viewport.width-1e-6,'horizontal coverage '+l.key);}
+  for(const pose of result.poses){assert.equal(pose.layers.length,4);assert.equal(new Set(pose.layers.map(l=>l.factorX)).size,4);for(const l of pose.layers){assert.equal(l.type,'Image');assert.equal(l.body,false);assert.equal(l.factorY,0);assert.equal(l.scaleX,l.scaleY);assert.ok(l.depth<result.gameplayMinDepth);assert.ok(l.left<=1e-6&&l.right>=result.viewport.width-1e-6,'horizontal coverage '+l.key);}
+   assert.deepEqual(pose.layers.map(l=>l.key),['winter:sky','winter:atmosphere','winter:far-city','winter:mid-city']);
    const sky=pose.layers[0];assert.ok(sky.top<=0&&sky.bottom>=result.viewport.height-1e-6,'opaque sky fills viewport');}
   samples.push(result);
  }
  assert.deepEqual(samples[0].poses,samples.at(-1).poses,'same composition after rotate/return');
- // Replaying must keep exactly five backgrounds and avoid destroyed references.
- const replay=await page.evaluate(()=>{game.scene.start('play');let now=performance.now();for(let i=0;i<5;i++)game.headlessStep(now+=1000/60,1000/60);const s=game.scene.getScene('play');s.physics.pause();s.sys.sceneUpdate=()=>{};return s.children.list.filter(o=>o.texture?.key.startsWith('winter:')).length});assert.equal(replay,5);
+ // Replaying must keep exactly four backgrounds and avoid destroyed references.
+ const replay=await page.evaluate(()=>{game.scene.start('play');let now=performance.now();for(let i=0;i<5;i++)game.headlessStep(now+=1000/60,1000/60);const s=game.scene.getScene('play');s.physics.pause();s.sys.sceneUpdate=()=>{};return s.children.list.filter(o=>o.texture?.key.startsWith('winter:')).length});assert.equal(replay,4);
  // Draw actual renderer at representative start/middle/end positions.
  for(const fraction of [0,.25,.5,.75,1]){
   await page.evaluate(fraction=>{const s=game.scene.getScene('play'),c=s.cameras.main;c.scrollX=(cfg.levelWidth-c.width/c.zoom)*fraction;c.scrollY=s.framing.baseY;game.renderer.preRender();game.scene.render(game.renderer);game.renderer.postRender()},fraction);
   await page.screenshot({path:`/tmp/winter-background-${Math.round(fraction*100)}.png`});
  }
- assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);writeFileSync('/tmp/winter-background-check.json',JSON.stringify({samples,errors,failed,replay},null,2));console.log('PASS: five non-physics Images, full horizontal/sky coverage 0–100%, no wrapping, separate factors, fixed vertical parallax, proportional scale, seven resize states and replay');
+ assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);writeFileSync('/tmp/winter-background-check.json',JSON.stringify({samples,errors,failed,replay},null,2));console.log('PASS: four non-physics Images, full horizontal/sky coverage 0–100%, no wrapping, separate factors, fixed vertical parallax, proportional scale, seven resize states and replay');
 }finally{await browser.close()}

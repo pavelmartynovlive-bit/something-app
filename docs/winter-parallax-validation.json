@@ -79,25 +79,6 @@
       "top": -63.37641025641028,
       "bottom": 604.0902564102564,
       "alpha": 1
-    },
-    {
-      "key": "winter:near-decor",
-      "type": "Image",
-      "depth": -96,
-      "body": false,
-      "width": 3457,
-      "height": 1152.3333333333333,
-      "scaleX": 1.5916206261510129,
-      "scaleY": 1.5916206261510129,
-      "sourceWidth": 2172,
-      "sourceHeight": 724,
-      "factorX": 0.3,
-      "factorY": 0,
-      "left": 0,
-      "right": 3457,
-      "top": -416.53846153846143,
-      "bottom": 735.7948717948718,
-      "alpha": 1
     }
   ],
   "devices": [
@@ -242,7 +223,7 @@
       ]
     }
   ],
-  "replayBackgroundCount": 5,
+  "replayBackgroundCount": 4,
   "errors": [],
   "failedRequests": [],
   "gameplayComparison": [
@@ -311,11 +292,6 @@
       "path": "public/assets/backgrounds/winter/mid-city.png",
       "sha256": "feeca0b975716ff9140f152bb7038b8233a517e57e054a9b867457dc324870c2",
       "bytes": 1250080
-    },
-    {
-      "path": "public/assets/backgrounds/winter/near-decor.png",
-      "sha256": "9cebd60ff30398b6444aa8cc458388cf12608c42f7b6e86271ceee0cdea6ca8b",
-      "bytes": 585433
     },
     {
       "path": "public/assets/backgrounds/winter/sky.png",

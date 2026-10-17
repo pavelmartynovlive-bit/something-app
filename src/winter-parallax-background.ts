@@ -6,7 +6,6 @@ export const winterLayers = [
   { name: 'atmosphere', factor: .04, alpha: .6, placement: 'air' },
   { name: 'far-city', factor: .09, alpha: 1, placement: 'far' },
   { name: 'mid-city', factor: .16, alpha: 1, placement: 'mid' },
-  { name: 'near-decor', factor: .30, alpha: 1, placement: 'near' },
 ] as const;
 
 export class WinterParallaxBackground {
@@ -47,9 +46,6 @@ export class WinterParallaxBackground {
       if (spec.placement === 'air') y = height * .08;
       if (spec.placement === 'far') y = groundScreenY + height * .08 - image.displayHeight;
       if (spec.placement === 'mid') y = groundScreenY + height * .12 - image.displayHeight;
-      // Near props live mostly below the traversal silhouette. Their original
-      // transparent margins are retained; the solid gameplay ground masks them.
-      if (spec.placement === 'near') y = height - image.displayHeight;
       image.setPosition(0, y);
     }
   }
