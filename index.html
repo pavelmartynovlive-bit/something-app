@@ -14,6 +14,12 @@
   </head>
   <body>
     <main id="game" aria-label="Игра: Таня и голодный кот"></main>
+    <nav id="presentation-nav" aria-label="Варианты отображения">
+      <span>Вид</span>
+      <a data-view="a" href="?view=a" title="A — исходный горизонтальный вид" aria-label="A — исходный горизонтальный вид">A</a>
+      <a data-view="b" href="?view=b" title="B — горизонтальный вид, масштаб ×1,4" aria-label="B — горизонтальный вид, масштаб ×1,4">B</a>
+      <a data-view="c" href="?view=c" title="C — вертикальный эксперимент" aria-label="C — вертикальный эксперимент">C</a>
+    </nav>
     <div id="hud">
       <div class="energy-card"><span>Энергия <b id="energy-value">100</b></span><div class="energy-track" role="progressbar" aria-label="Энергия Тани" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><div id="energy-fill"></div></div></div>
       <div class="hud-right"><div class="goal food-panel" role="status"><div id="food-count">Корм: 0</div><div id="food-needed">Котику нужно: 128</div></div><button id="install" type="button">Установить</button><div class="goal">Покорми котика <span id="distance">→</span></div></div>

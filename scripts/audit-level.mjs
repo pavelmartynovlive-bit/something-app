@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || (existsSync('/usr/bin/chromium') ? '/usr/bin/chromium' : undefined), headless: true, args: ['--no-sandbox'] });
 try {
-  const page = await browser.newPage({ viewport: { width: Number(process.env.AUDIT_WIDTH || 844), height: 390 } });
+  const page = await browser.newPage({ viewport: { width: Number(process.env.AUDIT_WIDTH || 844), height: Number(process.env.AUDIT_HEIGHT || 390) }, hasTouch: process.env.AUDIT_TOUCH === '1' });
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   await page.goto(process.env.LEVEL_URL || 'http://localhost:5173');
   await page.waitForFunction(() => !!document.querySelector('canvas'));
@@ -45,6 +45,7 @@ try {
     const runs = [];
     for (const mode of ['natural', 'ground', 'collector', 'low-energy', 'mistake', 'locked-zero']) {
       const s = restart(), start = s.time.now; const hits = [], jumps = [], rests = [], bottles = [], decisionEvents = [], trajectory = [], waits = [], collected = [];
+      const framingSamples = [], hazardReadings = [], foodReadings = []; const seenHazards = new Set();
       let resets = 0, prevVy = 0, prevRest = 0, thresholdTime = null, bonusTime = null, attemptedMiss = false, maxCameraStep = 0;
       const usedRewards = new Set(), usedDecisions = new Set(), usedChoices = new Set();
       const baseHit = Object.getPrototypeOf(s).hit; s.hit = function(d) { const accepted = baseHit.call(this, d); if (accepted) hits.push({ x: this.tanya.x, time: (this.time.now - start) / 1000, damage: d }); return accepted; };
@@ -85,6 +86,30 @@ try {
         const energy = s.energy, food = s.foodCount, nh = hits.length, cam = s.cameras.main.scrollY;
         if (jump) key(true); tick(); key(false);
         const time = (s.time.now - start) / 1000;
+        const camera = s.cameras.main, left = camera.scrollX, top = camera.scrollY;
+        const vw = camera.width / camera.zoom, vh = camera.height / camera.zoom;
+        const bounds = sprite => ({ left: sprite.x - sprite.displayWidth / 2, right: sprite.x + sprite.displayWidth / 2, top: sprite.y - sprite.displayHeight / 2, bottom: sprite.y + sprite.displayHeight / 2 });
+        const onScreen = r => r.right > left && r.left < left + vw && r.bottom > top && r.top < top + vh;
+        const hazards = [...s.scooters.map((g,i)=>({sprite:g.sprite,id:`scooter:${i}`})), ...s.pigeons.map((g,i)=>({sprite:g.sprite,id:`pigeon:${i}`})), ...s.grannies.map((g,i)=>({sprite:g.sprite,id:`granny:${i}`}))];
+        for (const h of hazards) {
+          const r = bounds(h.sprite);
+          for (const full of [false,true]) {
+            const id = h.id + (full ? ':full' : ':edge');
+            if (!seenHazards.has(id) && h.sprite.x > s.tanya.x && onScreen(r) && (!full || (r.left >= left && r.right <= left+vw && r.top >= top && r.bottom <= top+vh))) {
+              seenHazards.add(id); hazardReadings.push({id,time,x:s.tanya.x,distance:h.sprite.x-s.tanya.x});
+            }
+          }
+        }
+        const foreground = [s.tanya, ...hazards.map(h=>h.sprite), ...s.physics.world.staticBodies.entries.filter(b=>['food','lipton','bench'].includes(b.gameObject.texture?.key)).map(b=>b.gameObject)].map(bounds).filter(onScreen);
+        if (frame % 20 === 0) {
+          const intervals=foreground.map(r=>[Math.max(left,r.left),Math.min(left+vw,r.right)]).sort((a,b)=>a[0]-b[0]);
+          let occupied=0,end=left;for(const [a,b] of intervals){occupied+=Math.max(0,b-Math.max(a,end));end=Math.max(end,b);}
+          framingSamples.push({time,zoom:camera.zoom,width:camera.width,height:camera.height,worldWidth:vw,worldHeight:vh,lookAhead:left+vw-s.tanya.x,skyFraction:Math.max(0,Math.min(...foreground.map(r=>r.top))-top)/vh,objectFreeColumns:1-occupied/vw,tanyaHeight:56*camera.zoom,tanyaWidth:40*camera.zoom,groundFraction:(terrain.groundYAt(s.tanya.x)-top)/vh});
+        }
+        if (b.velocity.y < 0 && prevVy >= 0) {
+          const food = s.physics.world.staticBodies.entries.filter(b=>b.gameObject.texture?.key==='food').map(b=>bounds(b.gameObject)).filter(r=>r.left>x && r.left<x+300);
+          foodReadings.push({time,x,upcoming:food.length,visible:food.filter(onScreen).length,clippedAbove:food.filter(r=>r.top<top).length});
+        }
         stat.seconds += 1 / 60; stat.food += s.foodCount - food; stat.hits += hits.length - nh; stat.minEnergy = Math.min(stat.minEnergy, s.energy);
         if (ground) stat.groundSeconds += 1 / 60; else if (pi >= 0) stat.upperSeconds += 1 / 60; else stat.airborneSeconds += 1 / 60;
         if (b.velocity.y < 0 && prevVy >= 0) { jumps.push({ x, y: b.bottom, time, section: si }); stat.jumps++; }
@@ -105,14 +130,14 @@ try {
       const inputs = [{ time: 0, x: 100 }, ...jumps, ...rests, { time: duration, x: s.tanya.x }].sort((a,b) => a.time - b.time);
       const meaningful = [...inputs, ...decisionEvents].sort((a,b) => a.time - b.time);
       const gaps = meaningful.slice(1).map((a,i) => ({ seconds: a.time - meaningful[i].time, from: meaningful[i].x, to: a.x }));
-      runs.push({ mode, seconds: duration, food: s.foodCount, energy: s.energy, finished: s.finished, success: s.foodCount >= cfg.requiredFood, thresholdTime, bonusTime, hits, rests, bottles, resets, waits, jumps, decisions: decisionEvents, longestInputGap: Math.max(...inputs.slice(1).map((a,i) => a.time - inputs[i].time)), longestDecisionGap: Math.max(...gaps.map(g => g.seconds)), gaps, excursions, landings, stats, trajectory, collected, maxCameraStep, attemptedMiss });
+      runs.push({ mode, seconds: duration, food: s.foodCount, energy: s.energy, finished: s.finished, success: s.foodCount >= cfg.requiredFood, thresholdTime, bonusTime, hits, rests, bottles, resets, waits, jumps, decisions: decisionEvents, longestInputGap: Math.max(...inputs.slice(1).map((a,i) => a.time - inputs[i].time)), longestDecisionGap: Math.max(...gaps.map(g => g.seconds)), gaps, excursions, landings, stats, trajectory, collected, maxCameraStep, attemptedMiss, framingSamples, hazardReadings, foodReadings });
     }
     const s = restart(), rects = s.physics.world.staticBodies.entries.filter(b => b.gameObject.type === 'Rectangle');
     const mismatches = rects.filter(b => { const r = b.gameObject.getBounds(); return Math.abs(r.x-b.x)>.01 || Math.abs(r.y-b.y)>.01 || Math.abs(r.width-b.width)>.01 || Math.abs(r.height-b.height)>.01; });
     return { metrics, transitions, runs, geometry: { edgeMismatches: mismatches.length, minimumClearance: Math.min(...cfg.routePlatforms.map(p => terrain.groundYAt(p.x)-p.y-cfg.platformThickness)), upperSections: cfg.routePlatforms.map(p => sections.findIndex(s => p.x >= s.start && p.x < s.end) + 1), safePocketDepth: Math.max(...cfg.interruptions.map(g=>g.depth)) }, foodTargets: { minimum: cfg.requiredFood, bonus: cfg.bonusFood }, totalFood: cfg.food.length };
   });
   await writeFile(process.env.AUDIT_OUTPUT || '/tmp/tanya-ground-first-audit.json', JSON.stringify({ ...result, errors }, null, 2));
-  console.log(JSON.stringify({ metrics: result.metrics, geometry: result.geometry, foodTargets: result.foodTargets, transitions: result.transitions.map(({samples,...t})=>({...t,passed:samples.every(s=>s.landed&&!s.blocked)})), runs: result.runs.map(({trajectory,collected,jumps,decisions,gaps,...run})=>run) }, null, 2));
+  console.log(JSON.stringify({ metrics: result.metrics, geometry: result.geometry, foodTargets: result.foodTargets, transitions: result.transitions.map(({samples,...t})=>({...t,passed:samples.every(s=>s.landed&&!s.blocked)})), runs: result.runs.map(({trajectory,collected,jumps,decisions,gaps,framingSamples,hazardReadings,foodReadings,...run})=>run) }, null, 2));
   assert.equal(errors.length, 0); assert.equal(result.geometry.edgeMismatches, 0);
   assert.deepEqual(result.geometry.upperSections, [3,7]);
   for (const tr of result.transitions) assert.ok(tr.samples.every(s => s.landed && !s.blocked), `transition ${tr.x} timing margin`);

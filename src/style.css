@@ -39,3 +39,25 @@ button:focus-visible { outline: 3px solid #e5b83d; outline-offset: 4px; }
 
 .food-panel { display: grid; gap: 2px; }
 #food-needed { font-size: 11px; font-weight: 400; }
+
+#presentation-nav { position: fixed; z-index: 5; left: max(12px, env(safe-area-inset-left)); bottom: max(6px, env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 3px; padding: 4px; border-radius: 10px; background: #ffffffdb; font-size: 12px; }
+#presentation-nav span { padding: 0 5px; }
+#presentation-nav a { display: grid; place-items: center; width: 30px; height: 26px; border-radius: 7px; text-decoration: none; color: #29483e; touch-action: manipulation; }
+#presentation-nav a[aria-current] { color: white; background: #3e7054; }
+#presentation-nav a:focus-visible { outline: 3px solid #e5b83d; }
+
+/* C stays a portrait frame on desktop; a portrait phone uses its whole width. */
+body[data-view="c"] #game { width: min(100%, calc(100dvh * 9 / 16)); margin-inline: auto; }
+body[data-view="c"] #hud { width: calc(min(100vw, 100dvh * 9 / 16) - 24px); left: 50%; right: auto; transform: translateX(-50%); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; }
+body[data-view="c"] .energy-card { width: auto; padding: 9px 10px; }
+body[data-view="c"] .hud-right { display: contents; }
+body[data-view="c"] .food-panel { grid-column: 2; grid-row: 1; }
+body[data-view="c"] .hud-right > .goal:last-child { grid-column: 1; grid-row: 2; padding: 8px; font-size: 11px; }
+body[data-view="c"] #distance { margin-left: 4px; }
+body[data-view="c"] #install { grid-column: 2; grid-row: 2; padding: 8px; }
+body[data-view="c"] #presentation-nav { left: calc(50% - min(100vw, 100dvh * 9 / 16) / 2 + 10px); }
+body[data-view="c"] #hint > div { max-width: calc(min(100vw, 100dvh * 9 / 16) - 24px); font-size: 16px; padding: 16px; }
+body[data-view="c"] .end-card { max-width: calc(min(100vw, 100dvh * 9 / 16) - 24px); padding: 18px; }
+body[data-view="c"] #toast { max-width: calc(min(100vw, 100dvh * 9 / 16) - 24px); width: max-content; font-size: 14px; }
+@media (orientation: portrait) and (pointer: coarse) { body[data-view="c"] #portrait { display: none; } }
+@media (orientation: landscape) and (pointer: coarse) { body[data-view="c"] #portrait { display: flex; } }

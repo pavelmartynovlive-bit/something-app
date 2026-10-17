@@ -1,0 +1,17 @@
+{
+  "id": "./?view=c",
+  "name": "Таня и голодный кот — вид C",
+  "short_name": "Таня · C",
+  "description": "Портретный эксперимент с тем же уровнем.",
+  "lang": "ru",
+  "start_url": "./?view=c",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#c7dfcf",
+  "theme_color": "#c7dfcf",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

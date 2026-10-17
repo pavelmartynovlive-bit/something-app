@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { settings as s, levelSections, groundYAt } from './settings';
 import { touchesDanger } from './hazard-shapes';
 import { TouchControls } from './controls';
+import { presentation, cameraFrame } from './presentation';
 import './style.css';
 import './pwa';
 
@@ -41,6 +42,7 @@ class PlayScene extends Phaser.Scene {
   private pigeons: { sprite: Phaser.Physics.Arcade.Sprite; flying: boolean; lowFlightRemaining: number; perchY: number }[] = [];
   private finished = false;
   private wasPortrait = false;
+  private framing?: ReturnType<typeof cameraFrame>;
   constructor() { super('play'); }
 
   create() {
@@ -61,6 +63,7 @@ class PlayScene extends Phaser.Scene {
     controls?.reset();
     this.makeTextures();
     this.cameras.main.setBackgroundColor('#c7dfcf').setScroll(0, 0);
+    this.framing = undefined;
     this.resize();
     this.scale.on('resize', this.resize, this);
     this.events.once('shutdown', () => this.scale.off('resize', this.resize, this));
@@ -174,7 +177,8 @@ class PlayScene extends Phaser.Scene {
 
   update(_time: number, delta: number) {
     const now = this.time.now;
-    const portrait = window.matchMedia('(pointer: coarse)').matches && window.innerHeight > window.innerWidth;
+    const portrait = window.matchMedia('(pointer: coarse)').matches &&
+      (presentation === 'c' ? window.innerWidth > window.innerHeight : window.innerHeight > window.innerWidth);
     if (portrait || document.hidden || installDialog.open) {
       this.physics.pause();
       controls.reset();
@@ -234,11 +238,12 @@ class PlayScene extends Phaser.Scene {
     if (this.tanya.y > 620) this.respawn();
     if (this.tanya.x < 16) this.tanya.x = 16;
     const camera = this.cameras.main;
+    const framing = this.framing!;
     const viewWidth = camera.width / camera.zoom;
-    const target = Phaser.Math.Clamp(this.tanya.x - viewWidth * .35, 0, Math.max(0, s.levelWidth - viewWidth));
-    camera.scrollX = Phaser.Math.Linear(camera.scrollX, target, 1 - Math.exp(-dt * 5));
+    const target = Phaser.Math.Clamp(this.tanya.x - viewWidth * framing.anchorX, 0, Math.max(0, s.levelWidth - viewWidth));
+    camera.scrollX = Phaser.Math.Linear(camera.scrollX, target, 1 - Math.exp(-dt * framing.followX));
     // Небольшое вертикальное смещение сохраняет нижнюю страховочную дорожку в кадре.
-    const targetY = Phaser.Math.Clamp((this.tanya.y - (s.floorY - 24)) * .22, -40, 0);
+    const targetY = framing.baseY + Phaser.Math.Clamp((this.tanya.y - (s.floorY - 24)) * .22, -40, 0);
     camera.scrollY = Phaser.Math.Linear(camera.scrollY, targetY, 1 - Math.exp(-dt * 2.8));
     element('#distance').textContent = `${Math.min(100, Math.round(this.tanya.x / (s.levelWidth - 150) * 100))}% пути`;
     this.updateHud();
@@ -268,7 +273,7 @@ class PlayScene extends Phaser.Scene {
     this.lastGround = this.bufferedJump = -Infinity;
     controls.reset();
     message('Вернулись на безопасное место', 1500);
-    this.cameras.main.scrollX = Math.max(0, this.checkpoint - this.cameras.main.width / this.cameras.main.zoom * .35);
+    this.cameras.main.scrollX = Math.max(0, this.checkpoint - this.cameras.main.width / this.cameras.main.zoom * this.framing!.anchorX);
   }
   private feedCat() {
     const success = this.foodCount >= s.requiredFood;
@@ -382,9 +387,11 @@ class PlayScene extends Phaser.Scene {
     }
   }
   private resize() {
+    const previousBase = this.framing?.baseY ?? 0;
+    this.framing = cameraFrame(this.scale.width, this.scale.height, s.viewHeight, s.floorY);
     this.cameras.main.setOrigin(0, 0);
-    this.cameras.main.setZoom(this.scale.height / s.viewHeight);
-    this.cameras.main.scrollY = Phaser.Math.Clamp(this.cameras.main.scrollY, -40, 0);
+    this.cameras.main.setZoom(this.framing.zoom);
+    this.cameras.main.scrollY = this.framing.baseY + Phaser.Math.Clamp(this.cameras.main.scrollY - previousBase, -40, 0);
     controls?.reset();
   }
   private sign(x: number, text: string) {
