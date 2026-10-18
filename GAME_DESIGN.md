@@ -1632,3 +1632,11 @@ Source crop(131,80,781,1407). Grounding uses two presentation-only ellipses:
 28×5 foot shadow alpha0.14,18×2 contact shadow alpha0.18. Both follow the
 actual foot anchor and hide when airborne/resting/recovering; no collisions.
 Destroy both on scene shutdown. No level, movement, camera or energy changes.
+
+
+## 40. Approved neck readability correction
+
+Replace the harsh black neck wedge/line with warm peach skin shadow and muted
+rose inside the hoodie collar. Preserve the current character, palette, pose,
+visual size, separate grounded shadows and all physics/gameplay.
+Source1024×1536; updated crop(131,80,781,1408), height70.928px unchanged.
