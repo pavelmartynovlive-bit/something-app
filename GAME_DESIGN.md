@@ -1640,3 +1640,14 @@ Replace the harsh black neck wedge/line with warm peach skin shadow and muted
 rose inside the hoodie collar. Preserve the current character, palette, pose,
 visual size, separate grounded shadows and all physics/gameplay.
 Source1024×1536; updated crop(131,80,781,1408), height70.928px unchanged.
+
+
+## 41. Approved +10% readability scale and silhouette cleanup
+
+Increase Tanya presentation by10% from §40:78.0208px height,43.4148px frame
+width, scale0.3146. Lightly clean hair, leg and boot contours while preserving
+pose, design, softened neck/collar, pink hoodie, olive pants/soles and orange
+mittens/boots. Source1024×1536, crop(132,76,779,1412).
+Existing grounded-only foot/contact shadows scale to30.8×5.5 and19.8×2.2px,
+keeping their opacity, foot anchor and lifecycle. No duplicate/baked shadow.
+Physics body24×50, movement, level geometry, energy and camera unchanged.

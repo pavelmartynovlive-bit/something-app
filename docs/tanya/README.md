@@ -1,12 +1,12 @@
 # Tanya — static character integration
 
-> Latest phone request: soften the neck/collar using warm skin and muted rose
-> shadows instead of the black neck wedge; preserve design, palette and size.
+> Latest phone request: +10% visual scale, lightly simplified hair/leg/boot contours.
+> Preserve soft warm neck/collar, palette, physics and existing ground shadows.
 > Previous approved simplifications: cleaner silhouette, cohesive ponytail, larger head/mittens/boots,
 > no backpack/straps/fur cuffs/tread details. Three dominant clothing colors:
 > hot pink, olive, orange. Mittens match the orange boots, soles match olive trousers;
-> the jacket center seam is removed. Overall size remains **39.468×70.928 world px** (scale0.286).
-> Source crop: x131,y80,w781,h1408. Separate28×5px foot shadow (alpha0.14) and18×2px contact shadow (alpha0.18),
+> the jacket center seam is removed. Overall size remains **43.4148×78.0208 world px** (scale0.3146).
+> Source crop: x132,y76,w779,h1412. Separate30.8×5.5px foot shadow (alpha0.14) and19.8×2.2px contact shadow (alpha0.18),
 > visible only while grounded and not resting/recovering; no physics. Body and
 > foot anchor unchanged. The original integration audit below is historical.
 

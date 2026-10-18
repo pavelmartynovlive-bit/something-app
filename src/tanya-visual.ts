@@ -8,8 +8,8 @@ export type TanyaVisualContext = { resting: boolean; tired: boolean; recovering:
 export const tanyaArt = {
   key: 'tanya:stand', file: 'assets/characters/tanya/tanya-stand.png',
   sourceWidth: 1024, sourceHeight: 1536,
-  frame: { x: 131, y: 80, width: 781, height: 1408 },
-  renderedHeight: 70.928, rasterHeight: 248, rasterWidth: 138,
+  frame: { x: 132, y: 76, width: 779, height: 1412 },
+  renderedHeight: 78.0208, rasterHeight: 248, rasterWidth: 138,
   displayKey: 'tanya:stand-display',
 };
 type TanyaPose = { key: string; frame: string; renderedHeight: number };
@@ -51,9 +51,9 @@ export class TanyaVisual {
       texture.refresh();
     }
     // Contact shadow only: no physics and no floating shadow during jumps/falls.
-    this.footShadow = scene.add.ellipse(0, 0, 28, 5, 0x36465b)
+    this.footShadow = scene.add.ellipse(0, 0, 30.8, 5.5, 0x36465b)
       .setData('tanyaFootShadow', true);
-    this.contactShadow = scene.add.ellipse(0, 0, 18, 2, 0x2c394b)
+    this.contactShadow = scene.add.ellipse(0, 0, 19.8, 2.2, 0x2c394b)
       .setData('tanyaContactShadow', true);
     this.sprite = scene.add.image(0, 0, stand.key, stand.frame)
       .setOrigin(.5, 1).setScale(tanyaArt.renderedHeight / tanyaArt.rasterHeight).setFlipX(false);

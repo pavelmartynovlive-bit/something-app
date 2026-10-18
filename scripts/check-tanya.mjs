@@ -24,7 +24,7 @@ try {
  assert.deepEqual(contract.carrier,{width:40,height:56,scale:1,origin:[.5,.5],visible:false});
  assert.deepEqual(contract.before,contract.after,'visual sync cannot mutate gameplay/camera');
  assert.equal(contract.before.body.width,24);assert.equal(contract.before.body.height,50);assert.deepEqual(contract.before.body.offset,[8,4]);
- assert.ok(Math.abs(contract.visual.width-39.468)<1e-9&&Math.abs(contract.visual.height-70.928)<1e-9&&Math.abs(contract.visual.scale-.286)<1e-9,'simplified visual is 10% taller than the previous size');
+ assert.ok(Math.abs(contract.visual.width-43.4148)<1e-9&&Math.abs(contract.visual.height-78.0208)<1e-9&&Math.abs(contract.visual.scale-.3146)<1e-9,'simplified visual is 10% taller than the previous size');
  assert.deepEqual({...contract.visual,width:0,height:0,scale:0},{width:0,height:0,scale:0,origin:[.5,1],body:false,flipX:false,alpha:1,depth:10});
  const states=await page.evaluate(()=>{
   const samples=[],probe=label=>{const s=game.scene.getScene('play'),v=s.tanyaVisual.sprite,b=s.tanya.body;samples.push({contactVisible:s.tanyaVisual.contactShadow.visible,contactBody:!!s.tanyaVisual.contactShadow.body,contactX:s.tanyaVisual.contactShadow.x-b.center.x,contactY:s.tanyaVisual.contactShadow.y-b.bottom,shadowVisible:s.tanyaVisual.footShadow.visible,shadowBody:!!s.tanyaVisual.footShadow.body,shadowX:s.tanyaVisual.footShadow.x-b.center.x,shadowY:s.tanyaVisual.footShadow.y-b.bottom,label,state:s.tanyaVisual.state,visible:v.visible,anchorError:Math.max(Math.abs(v.x-b.center.x),Math.abs(v.y-b.bottom)),width:b.width,height:b.height,offset:[b.offset.x,b.offset.y],alpha:v.alpha})};
@@ -52,7 +52,7 @@ try {
   await page.setViewportSize({width,height});await page.waitForTimeout(100);
   resize.push(await page.evaluate(()=>{tanyaTick(2);const s=game.scene.getScene('play'),v=s.tanyaVisual.sprite,b=s.tanya.body;return{visual:[v.displayWidth,v.displayHeight],body:[b.width,b.height],anchorError:v.y-b.bottom}}));
  }
- assert.ok(resize.every(r=>Math.abs(r.visual[0]-39.468)<1e-9&&Math.abs(r.visual[1]-70.928)<1e-9&&r.body[0]===24&&r.body[1]===50&&r.anchorError===0));
+ assert.ok(resize.every(r=>Math.abs(r.visual[0]-43.4148)<1e-9&&Math.abs(r.visual[1]-78.0208)<1e-9&&r.body[0]===24&&r.body[1]===50&&r.anchorError===0));
  mkdirSync('docs/tanya',{recursive:true});
  // Real input replay: inspect current art alongside terrain/pickups/hazards.
  const runs=JSON.parse(readFileSync('/tmp/tanya-v3-runs.json','utf8')),run=runs.find(r=>r.mode==='natural');
