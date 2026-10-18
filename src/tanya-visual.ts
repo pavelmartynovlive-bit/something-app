@@ -8,7 +8,7 @@ export type TanyaVisualContext = { resting: boolean; tired: boolean; recovering:
 export const tanyaArt = {
   key: 'tanya:stand', file: 'assets/characters/tanya/tanya-stand.png',
   sourceWidth: 1024, sourceHeight: 1536,
-  frame: { x: 131, y: 76, width: 780, height: 1412 },
+  frame: { x: 131, y: 70, width: 780, height: 1419 },
   renderedHeight: 78.0208, rasterHeight: 248, rasterWidth: 138,
   displayKey: 'tanya:stand-display',
 };

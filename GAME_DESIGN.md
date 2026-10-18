@@ -1659,3 +1659,13 @@ Minimize hoodie/trouser fold detail: retain only essential limb separation and
 restrained broad side shadows, without knee-shaped highlight patches or extra
 crease lines. Preserve design, palette, softened neck,78.0208px visual height,
 existing foot shadows and all physics/gameplay. Crop(131,76,780,1412).
+
+
+## 43. Approved loose hairstyle
+
+Change only Tanya's hairstyle: loose shoulder-length brunette hair, open
+forehead, no bangs/ponytail/hair tie/fine face strands; cohesive clean silhouette
+for small sprite readability. Preserve outfit, palette, proportions,78.0208px
+visual height, soft neck/collar, foot shadows and all physics/gameplay.
+Source1024×1536; crop(131,70,780,1419) keeps the established horizontal
+anchor and includes the full new hair silhouette and boot baseline.
