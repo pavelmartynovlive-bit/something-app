@@ -1587,3 +1587,16 @@ size/visual clearance statement; the physical clearance is unchanged.
 Reduce Tanya visual size by20% from §34: 80.6 × 0.8 = 64.48px tall,
 35.88px wide, prepared-texture scale0.26. This supersedes §34 visual size.
 Keep physics body, foot anchor, level geometry, movement and camera unchanged.
+
+
+## 36. Approved simplified Tanya art
+
+Replace the static heroine artwork with a simplified right-facing production PNG:
+large hot-pink jacket, olive trousers, vivid orange boots, cohesive brown hair,
+simplified face, stronger dark outline, restrained cel shading, slightly larger
+head, hands and boots. No animation or gameplay change.
+Visual height increases 10% from §35 to70.928px; frame width39.468px.
+Source1024×1536, crop(120,27,795,1476), cached138×248, scale0.286.
+Existing24×50 physics body/offset(8,4), bottom anchor, movement, energy,
+level and camera remain unchanged. Other visual states still share this static
+pose; sitting/rest and genuine run/jump/fall/tired animation assets remain missing.

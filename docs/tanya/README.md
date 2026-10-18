@@ -1,9 +1,10 @@
 # Tanya — static character integration
 
-> Latest phone request: visual size reduced by20% from the previous size to35.88×64.48 world px
-> (prepared texture scale0.26). Physics/body, foot anchor, camera and level
-> remain unchanged. The original62px sizing audit below is historical; no
-> geometry adaptation is part of this experiment.
+> Latest phone request: simplified production art with broader pink/olive/orange
+> color masses, heavier outline, simplified face/hair, bigger head/mittens/boots.
+> Display height +10%: **39.468×70.928 world px**, prepared texture scale **0.286**.
+> Source crop: x120,y27,w795,h1476. Bottom anchor and 24×50 body (offset8,4)
+> remain unchanged. The original integration audit below describes the first asset.
 
 This pass changes presentation only. The current level, physics, energy, pickups,
 enemies and camera remain the technical base. No new animation is fabricated.

@@ -3,13 +3,13 @@ import Phaser from 'phaser';
 export type TanyaVisualState = 'run' | 'jump' | 'fall' | 'tired' | 'rest';
 export type TanyaVisualContext = { resting: boolean; tired: boolean; recovering: boolean };
 
-// Static cutout from the approved concept, not a sprite sheet. Frame coordinates
+// Static simplified production sprite, not a sprite sheet. Frame coordinates
 // trim transparent padding and center the two boot soles around the anchor.
 export const tanyaArt = {
   key: 'tanya:stand', file: 'assets/characters/tanya/tanya-stand.png',
   sourceWidth: 1024, sourceHeight: 1536,
-  frame: { x: 150, y: 49, width: 762, height: 1387 },
-  renderedHeight: 64.48, rasterHeight: 248, rasterWidth: 138,
+  frame: { x: 120, y: 27, width: 795, height: 1476 },
+  renderedHeight: 70.928, rasterHeight: 248, rasterWidth: 138,
   displayKey: 'tanya:stand-display',
 };
 type TanyaPose = { key: string; frame: string; renderedHeight: number };

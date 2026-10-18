@@ -24,7 +24,7 @@ try {
  assert.deepEqual(contract.carrier,{width:40,height:56,scale:1,origin:[.5,.5],visible:false});
  assert.deepEqual(contract.before,contract.after,'visual sync cannot mutate gameplay/camera');
  assert.equal(contract.before.body.width,24);assert.equal(contract.before.body.height,50);assert.deepEqual(contract.before.body.offset,[8,4]);
- assert.ok(Math.abs(contract.visual.width-35.88)<1e-9&&Math.abs(contract.visual.height-64.48)<1e-9&&Math.abs(contract.visual.scale-.26)<1e-9,'visual size reduced by 20% from previous 130% size');
+ assert.ok(Math.abs(contract.visual.width-39.468)<1e-9&&Math.abs(contract.visual.height-70.928)<1e-9&&Math.abs(contract.visual.scale-.286)<1e-9,'simplified visual is 10% taller than the previous size');
  assert.deepEqual({...contract.visual,width:0,height:0,scale:0},{width:0,height:0,scale:0,origin:[.5,1],body:false,flipX:false,alpha:1,depth:10});
  const states=await page.evaluate(()=>{
   const samples=[],probe=label=>{const s=game.scene.getScene('play'),v=s.tanyaVisual.sprite,b=s.tanya.body;samples.push({label,state:s.tanyaVisual.state,visible:v.visible,anchorError:Math.max(Math.abs(v.x-b.center.x),Math.abs(v.y-b.bottom)),width:b.width,height:b.height,offset:[b.offset.x,b.offset.y],alpha:v.alpha})};
@@ -51,7 +51,7 @@ try {
   await page.setViewportSize({width,height});await page.waitForTimeout(100);
   resize.push(await page.evaluate(()=>{tanyaTick(2);const s=game.scene.getScene('play'),v=s.tanyaVisual.sprite,b=s.tanya.body;return{visual:[v.displayWidth,v.displayHeight],body:[b.width,b.height],anchorError:v.y-b.bottom}}));
  }
- assert.ok(resize.every(r=>Math.abs(r.visual[0]-35.88)<1e-9&&Math.abs(r.visual[1]-64.48)<1e-9&&r.body[0]===24&&r.body[1]===50&&r.anchorError===0));
+ assert.ok(resize.every(r=>Math.abs(r.visual[0]-39.468)<1e-9&&Math.abs(r.visual[1]-70.928)<1e-9&&r.body[0]===24&&r.body[1]===50&&r.anchorError===0));
  mkdirSync('docs/tanya',{recursive:true});
  // Real input replay: inspect current art alongside terrain/pickups/hazards.
  const runs=JSON.parse(readFileSync('/tmp/tanya-v3-runs.json','utf8')),run=runs.find(r=>r.mode==='natural');

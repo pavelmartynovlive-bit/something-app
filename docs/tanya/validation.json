@@ -6,12 +6,12 @@
       "sourceWidth": 1024,
       "sourceHeight": 1536,
       "frame": {
-        "x": 150,
-        "y": 49,
-        "width": 762,
-        "height": 1387
+        "x": 120,
+        "y": 27,
+        "width": 795,
+        "height": 1476
       },
-      "renderedHeight": 64.48,
+      "renderedHeight": 70.928,
       "rasterHeight": 248,
       "rasterWidth": 138,
       "displayKey": "tanya:stand-display"
@@ -31,9 +31,9 @@
       "visible": false
     },
     "visual": {
-      "width": 35.88,
-      "height": 64.48,
-      "scale": 0.26,
+      "width": 39.467999999999996,
+      "height": 70.928,
+      "scale": 0.286,
       "origin": [
         0.5,
         1
@@ -260,8 +260,8 @@
   "resize": [
     {
       "visual": [
-        35.88,
-        64.48
+        39.467999999999996,
+        70.928
       ],
       "body": [
         24,
@@ -271,8 +271,8 @@
     },
     {
       "visual": [
-        35.88,
-        64.48
+        39.467999999999996,
+        70.928
       ],
       "body": [
         24,
@@ -282,8 +282,8 @@
     },
     {
       "visual": [
-        35.88,
-        64.48
+        39.467999999999996,
+        70.928
       ],
       "body": [
         24,
@@ -293,8 +293,8 @@
     },
     {
       "visual": [
-        35.88,
-        64.48
+        39.467999999999996,
+        70.928
       ],
       "body": [
         24,
