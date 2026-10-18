@@ -11,7 +11,11 @@
     "test:presentation": "node scripts/check-presentation.mjs",
     "level:overview": "node scripts/overview.mjs",
     "test:background": "node scripts/check-winter-background.mjs",
-    "test:environment": "node scripts/check-winter-environment.mjs"
+    "test:environment": "node scripts/check-winter-environment.mjs",
+    "test:fatigue": "node scripts/check-fatigue.mjs",
+    "test:collectible-trust": "node scripts/audit-v3.mjs && node scripts/check-collectible-trust.mjs",
+    "test:character": "node scripts/check-tanya.mjs",
+    "test:character:production": "node scripts/check-tanya-production.mjs"
   },
   "dependencies": {
     "phaser": "3.90.0"

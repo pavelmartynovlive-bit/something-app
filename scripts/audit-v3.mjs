@@ -10,7 +10,7 @@ try{
  const result=await page.evaluate(()=>{
   game.loop.stop();let now=performance.now();const tick=()=>game.headlessStep(now+=1000/60,1000/60);const key=d=>window.dispatchEvent(new KeyboardEvent(d?'keydown':'keyup',{key:' ',code:'Space',keyCode:32,bubbles:true}));
   const runs=[];
-  for(const mode of ['normal','collector','low-energy','intentional-collision','pit-fall','platform-miss','bench']){
+  for(const mode of ['normal','collector','low-energy','intentional-collision','pit-fall','platform-miss','bench','natural','safe']){
    key(false);game.scene.start('play');for(let i=0;i<4;i++)tick();const s=game.scene.getScene('play'),start=s.time.now; s.hit=Object.getPrototypeOf(s).hit; s.respawn=Object.getPrototypeOf(s).respawn;
    if(mode==='low-energy')s.changeEnergy(-100);
    let lastRecovery=0;const missed=new Set();let hits=0,resets=0,bench=0,prevRest=0,lastInput=0,longest=0,lastProgress=0,stuck=0,boostDue=null;const reveals=[],viewport=[],hitsAt=[],inputs=[],trajectory=[],landings=[],used=new Set(),seen=new Set(),stats=sections.map(z=>({name:z.name,seconds:0,food:0,collisions:0,boosts:0}));
@@ -30,14 +30,28 @@ try{
       {id:'longgap',x:tired?4255:4230,boost:true},
       {id:'road',x:tired?4795:4730},
       {id:'cascade',x:tired?5880:6005,boost:tired},
-      {id:'skipbench',x:tired?7170:7100,optional:true},
-      {id:'step1',x:tired?7505:7460}, {id:'step2',x:tired?7825:7810,boost:mode==='collector'||tired},
+      {id:'skipbench',x:tired?7170:7140,optional:true},
+      {id:'step1',x:tired?7505:7460}, {id:'step2',x:tired?7825:7810,boost:tired},
       {id:'step3',x:tired?8355:8320,boost:true},
       {id:'finalgap',x:tired?9450:9530,boost:tired},
       {id:'granny',x:tired?10180:10140},
     ];
     if(grounded&&!s.restRemaining&&!s.recoveryRemaining){
-     for(const z of targets){if(used.has(z.id)||x<z.x)continue;
+     if(mode==='natural'){
+       // First-play approximation: use ONLY presently visible surfaces, food and
+       // actors. No takeoff-coordinate list or knowledge of offscreen rewards.
+       const c=s.cameras.main,right=c.scrollX+c.width/c.zoom;
+       const visibleFood=cfg.food.filter(p=>p.x>x&&p.x<right&&p.y>=c.scrollY&&p.y<=c.scrollY+c.height/c.zoom);
+       const gap=cfg.interruptions.find(g=>g.start>x&&g.start<right);
+       if(gap&&gap.start-x<=(gap.width>200?50:25)&&visibleFood.some(p=>p.x>=gap.start-70&&p.x<=gap.start+gap.width)){jump=true;if(gap.width>200)boostDue=s.time.now+150;}
+       const rise=terrain.terrainTransitions.find(z=>z.x>x&&z.x<right&&z.rise>0&&!cfg.interruptions.some(g=>g.start+g.width===z.x));
+       if(rise&&rise.x-x<=(rise.rise>100?130:80)&&visibleFood.some(p=>p.x>=x&&p.x<=rise.x+100)){jump=true;if(rise.rise>100)boostDue=s.time.now+150;}
+       // Read the bench, then decide. Staying low is the natural recovery line.
+       const benchX=cfg.benches.find(v=>v>x&&v<right-45);
+       if(benchX&&benchX-x<60&&s.energy>=45)jump=true;
+     }
+     for(const z of targets){if(mode==='natural'||used.has(z.id)||x<z.x)continue;
+      if(mode==='safe'&&(z.id.startsWith('platform')||z.id==='upper-exit'||z.id==='skipbench')){used.add(z.id);continue;}
       if(mode==='pit-fall'&&['gap1','longgap','cascade','finalgap'].includes(z.id)&&!missed.has(z.id)){used.add(z.id);missed.add(z.id);continue}
       if(z.optional&&((z.id==='skipbench'&&['bench','low-energy'].includes(mode))||
         (mode==='platform-miss'&&((z.id.startsWith('platform')&&z.id!=='platform1')||z.id==='upper-exit')))){used.add(z.id);continue}
@@ -51,10 +65,11 @@ try{
        jump ||= grannyNear; if(tired&&grannyNear&&boostDue===null)boostDue=s.time.now+150;
        jump ||= s.scooters.some(g=>g.sprite.body.enable&&g.launched&&Math.abs(g.sprite.body.bottom-b.bottom)<5&&g.sprite.x-x>0&&g.sprite.x-x<85);
      }
-     if(s.pigeons.some(p=>Math.abs(p.perchY-b.bottom)<5&&p.sprite.x-x>0&&p.sprite.x-x<(tired?70:85)&&p.sprite.y>p.perchY-100)&&!((mode==='intentional-collision'&&x<3340)||(mode==='pit-fall'&&x>8800&&s.falls<4)))jump=true;
+     const pigeonJump=s.pigeons.some(p=>Math.abs(p.perchY-b.bottom)<5&&p.sprite.x-x>0&&p.sprite.x-x<(tired?180:85)&&p.sprite.y>p.perchY-100)&&!((mode==='intentional-collision'&&x<3340)||(mode==='pit-fall'&&x>8800&&s.falls<4));
+     if(pigeonJump){jump=true;if(tired||(x>9000&&s.lowEnergy))boostDue=s.time.now+150;}
     }
     if(!s.recoveryRemaining&&boostDue!==null&&s.time.now>=boostDue&&!grounded){jump=true;boost=true;boostDue=null;}
-    if(jump){key(true);inputs.push({x,time:t,boost});longest=Math.max(longest,t-lastInput);lastInput=t;}
+    if(jump){key(true);inputs.push({x,time:t,boost,view:{left:s.cameras.main.scrollX,right:s.cameras.main.scrollX+s.cameras.main.width/s.cameras.main.zoom,top:s.cameras.main.scrollY,bottom:s.cameras.main.scrollY+s.cameras.main.height/s.cameras.main.zoom}});longest=Math.max(longest,t-lastInput);lastInput=t;}
     const beforeX=x,wasGround=grounded;tick();key(false);
     if(frame%6===0){
       const c=s.cameras.main,left=c.scrollX,right=left+c.width/c.zoom,top=c.scrollY,bottom=top+c.height/c.zoom;
@@ -104,17 +119,18 @@ try{
    const events=[0,...inputs.map(i=>i.time),...reveals.map(i=>i.time),time].sort((a,b)=>a-b);
    let decisionGap=0,decisionInterval=null;for(let i=1;i<events.length;i++)if(events[i]-events[i-1]>decisionGap){decisionGap=events[i]-events[i-1];decisionInterval=[events[i-1],events[i]];}
    let emptyRun=0,longestEmpty=0;for(const v of viewport){emptyRun=v.empty?emptyRun+.1:0;longestEmpty=Math.max(longestEmpty,emptyRun)}
-   runs.push({mode,finished:s.finished,time,food:s.foodCount,energy:s.energy,collisions:hits,hitsAt,bench,lipton:s.liptonUses,falls:s.falls,recoveries:s.recoveries,boosts:s.boostsUsed,resets,longestRawInputGap:longest,longestInputDecisionGap:decisionGap,decisionInterval,longestEmpty,threeLayersRatio:viewport.filter(v=>v.now&&v.next&&v.after).length/viewport.length,reveals,viewport,inputs,landings,trajectory,stats});
+   runs.push({mode,finished:s.finished,time,food:s.foodCount,energy:s.energy,collisions:hits,hitsAt,bench,lipton:s.liptonUses,falls:s.falls,recoveries:s.recoveries,boosts:s.boostsUsed,resets,longestRawInputGap:longest,longestInputDecisionGap:decisionGap,decisionInterval,longestEmpty,collectedFood:cfg.food.filter(p=>!s.physics.world.staticBodies.entries.some(o=>o.enable&&o.gameObject.texture?.key==='food'&&o.gameObject.x===p.x&&o.gameObject.y===p.y)),threeLayersRatio:viewport.filter(v=>v.now&&v.next&&v.after).length/viewport.length,reveals,viewport,inputs,landings,trajectory,stats});
   }
   return runs;
  });
  writeFileSync('/tmp/tanya-v3-runs.json',JSON.stringify(result,null,2));
  assert.deepEqual(errors,[]);assert.ok(result.every(r=>r.finished),'all full runs finish');
  if(!process.env.PROBE_ONLY){
-  for(const r of result.filter(r=>['normal','collector','low-energy','bench'].includes(r.mode))){assert.equal(r.collisions,0,r.mode+' clean collisions');assert.equal(r.falls,0,r.mode+' clean falls');}
+  for(const r of result.filter(r=>['normal','collector','low-energy','bench','natural','safe'].includes(r.mode))){assert.equal(r.collisions,0,r.mode+' clean collisions');assert.equal(r.falls,0,r.mode+' clean falls');}
   assert.ok(result[0].food>=80&&result[1].food>=103,'food budgets');
   const pit=result.find(r=>r.mode==='pit-fall');assert.equal(pit.falls,4,'miss every pit');assert.equal(pit.recoveries,4,'recover every pit');
   for(const r of result){assert.equal(r.longestEmpty,0,r.mode+' empty viewport');assert.equal(r.falls,r.recoveries,'no unresolved recovery');}
+  for(const r of result.filter(r=>['natural','safe'].includes(r.mode)))assert.ok(r.food>=80,r.mode+' feeding margin');
   const miss=result.find(r=>r.mode==='platform-miss');assert.equal(miss.falls,0,'platform miss falls safely to ground');
   assert.ok(result.find(r=>r.mode==='intentional-collision').collisions>=8);
   const normal=result.find(r=>r.mode==='normal'),low=result.find(r=>r.mode==='low-energy'),rest=result.find(r=>r.mode==='bench');

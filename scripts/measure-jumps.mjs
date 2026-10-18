@@ -19,7 +19,8 @@ try {
    s.tanya.body.reset(100,414);if(tired)s.changeEnergy(-100);for(let i=0;i<3;i++)tick();
    const start=s.time.now,x=s.tanya.x;let min=440,air=false,tapped=false,land=null;
    key(true);tick();key(false);const takeoffTime=s.time.now,takeoffX=s.tanya.x;
-   for(let f=0;f<160;f++){
+   // Exhausted boosted flights now take about four seconds at 85px/s.
+   for(let f=0;f<420;f++){
     if(delay!==null&&!tapped&&f+1>=Math.round(delay/(1000/60))){key(true);tapped=true;}
     tick();key(false);min=Math.min(min,s.tanya.body.bottom);air||=s.tanya.body.bottom<439;
     if(air&&s.tanya.body.blocked.down){land={seconds:(s.time.now-takeoffTime)/1000,distance:s.tanya.x-takeoffX};break;}

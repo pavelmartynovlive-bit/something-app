@@ -5,6 +5,7 @@ import { TouchControls } from './controls';
 import { presentation, cameraFrame } from './presentation';
 import { WinterParallaxBackground } from './winter-parallax-background';
 import { WinterEnvironment } from './winter-environment';
+import { TanyaVisual } from './tanya-visual';
 import './style.css';
 import './pwa';
 
@@ -28,10 +29,13 @@ function message(text: string, duration = 1800) {
 
 class PlayScene extends Phaser.Scene {
   private tanya!: Phaser.Physics.Arcade.Sprite;
+  private tanyaVisual?: TanyaVisual;
   private keys!: Record<string, Phaser.Input.Keyboard.Key>;
   private grannies: { sprite: Phaser.Physics.Arcade.Sprite; left: number; right: number }[] = [];
   private energy = 100;
   private exhausted = false;
+  private lowEnergy = false;
+  private flightGravity = s.gravity;
   private checkpoint = 100;
   private lastGround = -Infinity;
   private bufferedJump = -Infinity;
@@ -60,11 +64,13 @@ class PlayScene extends Phaser.Scene {
   private winterEnvironment?: WinterEnvironment;
   constructor() { super('play'); }
 
-  preload() { WinterParallaxBackground.preload(this); WinterEnvironment.preload(this); }
+  preload() { WinterParallaxBackground.preload(this); WinterEnvironment.preload(this); TanyaVisual.preload(this); }
 
   create() {
     this.energy = 100;
     this.exhausted = false;
+    this.lowEnergy = false;
+    this.flightGravity = s.gravity;
     this.checkpoint = 100;
     this.recoveryRemaining = this.falls = this.recoveries = this.benchUses = this.liptonUses = 0;
     this.benchSprites = [];
@@ -180,7 +186,10 @@ class PlayScene extends Phaser.Scene {
     this.add.text(catX, groundYAt(catX) - 75, 'Мяу…', { fontSize: '22px', color: '#29483e' }).setOrigin(.5);
     if (!controls) controls = new TouchControls(this.game.canvas, hideHint);
     element('#food-goal').textContent = `Котику нужно: ${s.requiredFood}. ${s.bonusFood}+ — кошачий пир!`;
-    this.tanya.setDepth(10);
+    this.tanya.setDepth(10).setVisible(false);
+    this.tanyaVisual = new TanyaVisual(this, this.tanya, () => ({
+      resting: this.restRemaining > 0, tired: this.exhausted, recovering: this.recoveryRemaining > 0,
+    }));
     for (const a of [...this.grannies, ...this.scooters, ...this.pigeons]) a.sprite.setDepth(8);
     for (const body of this.physics.world.staticBodies.entries) {
       const object = body.gameObject as Phaser.GameObjects.Sprite;
@@ -219,8 +228,10 @@ class PlayScene extends Phaser.Scene {
       this.beginFall(); return;
     }
     const grounded = body.blocked.down && body.velocity.y >= 0;
-    const jumpVelocity = this.exhausted ? s.tiredJumpVelocity : s.jumpVelocity;
-    if (grounded) { this.lastGround = now; body.maxVelocity.y = 700; }
+    if (grounded) {
+      this.lastGround = now; body.maxVelocity.y = 700;
+      this.flightGravity = s.gravity; body.setGravityY(0);
+    }
     // Прочитать все запросы, чтобы JustDown не оставался от предыдущего кадра.
     const space = Phaser.Input.Keyboard.JustDown(this.keys.SPACE);
     const up = Phaser.Input.Keyboard.JustDown(this.keys.UP);
@@ -239,12 +250,23 @@ class PlayScene extends Phaser.Scene {
         message('Отдохнули — побежали!', 1200);
       }
     } else {
-      if (grounded) this.airborneSpeed = this.exhausted ? s.tiredSpeed : s.speed;
       this.changeEnergy(-s.energyDrainPerSecond * dt);
-      // Fatigue/recovery changes the next grounded stride, not a jump that was
-      // already committed. This keeps food-guided arcs predictable at energy 0.
+      if (grounded) this.airborneSpeed = this.runSpeed();
+      else {
+        // A fatigue transition slows the entire committed trajectory, rather
+        // than cutting horizontal reach and dropping Tanya into a pit.
+        const cap = this.boostUsed ? this.boostSpeed() : this.runSpeed();
+        if (this.airborneSpeed > cap) {
+          const rate = cap / this.airborneSpeed;
+          body.velocity.y *= rate;
+          this.flightGravity *= rate * rate;
+          body.setGravityY(this.flightGravity - s.gravity);
+          this.airborneSpeed = cap;
+        }
+      }
       this.tanya.setVelocityX(now < this.slowUntil ? Math.min(s.scooterSlowSpeed, this.airborneSpeed) : this.airborneSpeed).setFlipX(false);
     }
+    const jumpVelocity = this.exhausted ? s.tiredJumpVelocity : s.jumpVelocity;
     if (this.restRemaining === 0 && now - this.bufferedJump <= s.jumpBufferMs && now - this.lastGround <= s.coyoteMs) {
       this.tanya.setVelocityY(-jumpVelocity);
       this.jumpStartedAt = now;
@@ -256,12 +278,15 @@ class PlayScene extends Phaser.Scene {
       now - this.jumpStartedAt >= s.boostMinMs && now - this.jumpStartedAt <= s.boostWindowMs && body.velocity.y < 0) {
       // A single early continuation of THIS takeoff, never an arbitrary air jump.
       // Target a fixed apex relative to takeoff so different early tap timings
-      // do not produce radically different heights. Fatigue is committed at takeoff.
-      const height = this.takeoffTired ? s.tiredBoostHeight : s.boostHeight;
+      // do not produce radically different heights. Zero energy also slows the flight.
+      const tired = this.takeoffTired || this.exhausted;
+      const height = tired ? s.tiredBoostHeight : s.boostHeight;
       const rise = this.takeoffFloor - body.bottom;
       body.maxVelocity.y = 900;
-      this.tanya.setVelocityY(-Math.sqrt(Math.max(0, 2 * s.gravity * (height - rise))));
-      this.airborneSpeed = this.takeoffTired ? s.tiredBoostSpeed : s.boostSpeed;
+      this.flightGravity = tired ? s.tiredBoostGravity : s.gravity;
+      body.setGravityY(this.flightGravity - s.gravity);
+      this.tanya.setVelocityY(-Math.sqrt(Math.max(0, 2 * this.flightGravity * (height - rise))));
+      this.airborneSpeed = tired ? s.tiredBoostSpeed : this.boostSpeed();
       this.tanya.setVelocityX(this.airborneSpeed);
       this.boostUsed = true;
       this.boostsUsed++;
@@ -292,7 +317,14 @@ class PlayScene extends Phaser.Scene {
     this.updateHud();
     if (Math.abs(this.tanya.x - (s.levelWidth - 150)) < 80 && grounded) this.feedCat();
   }
+  private runSpeed() {
+    return this.exhausted ? s.tiredSpeed : this.lowEnergy ? s.lowEnergySpeed : s.speed;
+  }
+  private boostSpeed() {
+    return this.exhausted ? s.tiredBoostSpeed : this.lowEnergy ? s.lowEnergyBoostSpeed : s.boostSpeed;
+  }
   private changeEnergy(amount: number) {
+    const wasLow = this.lowEnergy;
     this.energy = Phaser.Math.Clamp(this.energy + amount, 0, 100);
     if (this.energy === 0 && !this.exhausted) {
       this.exhausted = true;
@@ -300,8 +332,10 @@ class PlayScene extends Phaser.Scene {
     }
     if (this.exhausted && this.energy > 0) {
       this.exhausted = false;
-      message('Снова бежим быстро!', 1400);
+      message(this.energy <= s.lowEnergyThreshold ? 'Немного отдохнули — силы ещё на исходе' : 'Снова бежим быстро!', 1400);
     }
+    this.lowEnergy = this.energy > 0 && this.energy <= s.lowEnergyThreshold;
+    if (this.lowEnergy && !wasLow && amount < 0) message('Скоро Таня устанет — нужен отдых', 2500);
   }
   private hit(damage: number) {
     if (this.finished || this.restRemaining > 0 || this.time.now < this.hitUntil) return false;
@@ -353,7 +387,8 @@ class PlayScene extends Phaser.Scene {
     body.updateCenter();
     body.blocked.down=body.touching.down=true;
     body.setMaxVelocity(500,700); body.setVelocity(0,0);
-    this.airborneSpeed=this.exhausted?s.tiredSpeed:s.speed;
+    this.flightGravity=s.gravity; body.setGravityY(0);
+    this.airborneSpeed=this.runSpeed();
     body.setVelocityX(this.airborneSpeed);
     this.slowUntil=0; this.hitUntil=this.time.now+800;
     this.lastGround=this.bufferedJump=this.jumpStartedAt=-Infinity;
@@ -390,7 +425,11 @@ class PlayScene extends Phaser.Scene {
     element('#food-needed').textContent = `Котику нужно: ${s.requiredFood}`;
     hudValue.textContent = `${Math.ceil(this.energy)}`;
     hudFill.style.width = `${this.energy}%`;
-    hudFill.style.background = this.exhausted ? '#bd745b' : '#568968';
+    hudFill.style.background = this.exhausted ? '#bd745b' : this.lowEnergy ? '#d9ac32' : '#568968';
+    const warning = element('#energy-warning');
+    warning.hidden = !this.exhausted && !this.lowEnergy;
+    warning.textContent = this.exhausted ? 'Таня устала' : 'Скоро Таня устанет';
+    energyTrack.setAttribute('aria-valuetext', `${Math.ceil(this.energy)}%${warning.hidden ? '' : ` — ${warning.textContent}`}`);
     energyTrack.setAttribute('aria-valuenow', `${Math.ceil(this.energy)}`);
   }
   private createNewObjects(ground: Phaser.Physics.Arcade.StaticGroup) {
@@ -435,6 +474,7 @@ class PlayScene extends Phaser.Scene {
       body.reset(bench.x, groundYAt(bench.x) - 26);
       this.tanya.setVelocity(0, 0).setTexture('tanya-sitting');
       body.allowGravity = false;
+      this.flightGravity = s.gravity; body.setGravityY(0);
       controls.reset();
       message('Отдыхаем на лавочке', s.benchDurationMs);
     });

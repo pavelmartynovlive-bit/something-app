@@ -1,0 +1,308 @@
+{
+  "contract": {
+    "art": {
+      "key": "tanya:stand",
+      "file": "assets/characters/tanya/tanya-stand.png",
+      "sourceWidth": 1024,
+      "sourceHeight": 1536,
+      "frame": {
+        "x": 150,
+        "y": 49,
+        "width": 762,
+        "height": 1387
+      },
+      "renderedHeight": 62,
+      "rasterHeight": 248,
+      "rasterWidth": 138,
+      "displayKey": "tanya:stand-display"
+    },
+    "bitmap": {
+      "lastOpaqueRow": 247,
+      "bottomGap": 0
+    },
+    "carrier": {
+      "width": 40,
+      "height": 56,
+      "scale": 1,
+      "origin": [
+        0.5,
+        0.5
+      ],
+      "visible": false
+    },
+    "visual": {
+      "width": 34.5,
+      "height": 62,
+      "scale": 0.25,
+      "origin": [
+        0.5,
+        1
+      ],
+      "body": false,
+      "flipX": false,
+      "alpha": 1,
+      "depth": 10
+    },
+    "before": {
+      "body": {
+        "x": 100,
+        "y": 390,
+        "width": 24,
+        "height": 50,
+        "offset": [
+          8,
+          4
+        ],
+        "vx": 240,
+        "vy": 0,
+        "gravity": 0,
+        "enabled": true
+      },
+      "energy": 99.81,
+      "camera": [
+        47.74949278181613,
+        -75.86107452506653
+      ]
+    },
+    "after": {
+      "body": {
+        "x": 100,
+        "y": 390,
+        "width": 24,
+        "height": 50,
+        "offset": [
+          8,
+          4
+        ],
+        "vx": 240,
+        "vy": 0,
+        "gravity": 0,
+        "enabled": true
+      },
+      "energy": 99.81,
+      "camera": [
+        47.74949278181613,
+        -75.86107452506653
+      ]
+    }
+  },
+  "states": {
+    "samples": [
+      {
+        "label": "run",
+        "state": "run",
+        "visible": true,
+        "anchorError": 0,
+        "width": 24,
+        "height": 50,
+        "offset": [
+          8,
+          4
+        ],
+        "alpha": 1
+      },
+      {
+        "label": "jump",
+        "state": "jump",
+        "visible": true,
+        "anchorError": 0,
+        "width": 24,
+        "height": 50,
+        "offset": [
+          8,
+          4
+        ],
+        "alpha": 1
+      },
+      {
+        "label": "fall",
+        "state": "fall",
+        "visible": true,
+        "anchorError": 0,
+        "width": 24,
+        "height": 50,
+        "offset": [
+          8,
+          4
+        ],
+        "alpha": 1
+      },
+      {
+        "label": "land",
+        "state": "run",
+        "visible": true,
+        "anchorError": 0,
+        "width": 24,
+        "height": 50,
+        "offset": [
+          8,
+          4
+        ],
+        "alpha": 1
+      },
+      {
+        "label": "tired",
+        "state": "tired",
+        "visible": true,
+        "anchorError": 0,
+        "width": 24,
+        "height": 50,
+        "offset": [
+          8,
+          4
+        ],
+        "alpha": 1
+      },
+      {
+        "label": "rest",
+        "state": "rest",
+        "visible": false,
+        "anchorError": 0,
+        "width": 24,
+        "height": 50,
+        "offset": [
+          8,
+          4
+        ],
+        "alpha": 1
+      },
+      {
+        "label": "rest-exit",
+        "state": "run",
+        "visible": true,
+        "anchorError": 0,
+        "width": 24,
+        "height": 50,
+        "offset": [
+          8,
+          4
+        ],
+        "alpha": 1
+      },
+      {
+        "label": "pit",
+        "state": "fall",
+        "visible": true,
+        "anchorError": 0,
+        "width": 24,
+        "height": 50,
+        "offset": [
+          8,
+          4
+        ],
+        "alpha": 0.45
+      },
+      {
+        "label": "respawn",
+        "state": "run",
+        "visible": true,
+        "anchorError": 0,
+        "width": 24,
+        "height": 50,
+        "offset": [
+          8,
+          4
+        ],
+        "alpha": 1
+      }
+    ],
+    "recovery": {
+      "energy": 49.81,
+      "expectedEnergy": 49.81,
+      "food": 17,
+      "returns": 1,
+      "bodyBottom": 440,
+      "ground": 440
+    }
+  },
+  "replay": [
+    {
+      "images": 1,
+      "textures": 1,
+      "listeners": 2
+    },
+    {
+      "images": 1,
+      "textures": 1,
+      "listeners": 2
+    },
+    {
+      "images": 1,
+      "textures": 1,
+      "listeners": 2
+    },
+    {
+      "images": 1,
+      "textures": 1,
+      "listeners": 2
+    },
+    {
+      "images": 1,
+      "textures": 1,
+      "listeners": 2
+    },
+    {
+      "images": 1,
+      "textures": 1,
+      "listeners": 2
+    },
+    {
+      "images": 1,
+      "textures": 1,
+      "listeners": 2
+    },
+    {
+      "images": 1,
+      "textures": 1,
+      "listeners": 2
+    }
+  ],
+  "resize": [
+    {
+      "visual": [
+        34.5,
+        62
+      ],
+      "body": [
+        24,
+        50
+      ],
+      "anchorError": 0
+    },
+    {
+      "visual": [
+        34.5,
+        62
+      ],
+      "body": [
+        24,
+        50
+      ],
+      "anchorError": 0
+    },
+    {
+      "visual": [
+        34.5,
+        62
+      ],
+      "body": [
+        24,
+        50
+      ],
+      "anchorError": 0
+    },
+    {
+      "visual": [
+        34.5,
+        62
+      ],
+      "body": [
+        24,
+        50
+      ],
+      "anchorError": 0
+    }
+  ],
+  "errors": [],
+  "failed": []
+}

@@ -1,3 +1,151 @@
+# Current audit — collectible trust and platform purpose (2026-10-18)
+
+> Character presentation updated afterwards: see [Tanya integration](docs/tanya/README.md). Level layout and the following food budgets remain unchanged; current heroine captures are in docs/tanya.
+
+This is a focused refinement of the existing V3, not a new layout. Read the full
+GAME_DESIGN.md, LEVEL_REFERENCES.md, previous audit and scene/data first. Preserve
+all27 ground spans, four pits, ten phrases,10730px length, enemies, portrait
+camera and §31 fatigue/jump/recovery mechanics. Remove only one redundant aerial
+island; reposition only food and the late Lipton by8px vertically. No new system.
+Older numbers below the historical divider are superseded by this report.
+
+## Audit before implementation
+
+| Place | Food promise | Actual outcome / problem | Implemented correction |
+| --- | --- | --- | --- |
+| Opening375–1040 | Gap, granny avoidance, small rise | Main cues work;1050 island is unexplained and cannot catch the ordinary ascent jump | Keep the three authored groups; remove1050 island |
+| High ledge1320–1830 | Early boost, high landing, granny reward | Coherent tested path | Preserve |
+| Downhill2020–2640 | Descend, birds jump, continue collecting | Bird reward flows into an upper takeoff without showing the lower reward first | End in a grounded landing/common breadcrumb, then split |
+| Bonus entrance2680–2950 | One high arc looks like the only continuation | Lower reward begins too late; choosing an upper route is not clearly advertised | Low403px and rising310px branches start at the same2680 coordinate, visible before takeoff |
+| Upper2960–3550 | Zig-zag and high food | Landings and common return are poorly identified | Separate landing sweeps, high skill reward and downward return |
+| Long pit / roadway | Boost crossing, then sparse scooter timing | No conflicting alternate route; tested coherent | Preserve the distinct parabola and timing markers |
+| Cascade5765–6460 | Drop, gap, granny reward | Coherent tested movement, no late route split | Preserve |
+| Bench6880–7390 | Follow an early high arc | Natural collection bypasses rest; rest looks like abandoning the prescribed path | Grounded common approach; low seat markers vs a late, separate optional hop; shared exit |
+| Middle terrace8020–8190 | High bonus food | No clear reward for a perch landing; bottle just out of standing reach | Low scooter timing markers, actual landing reward, Lipton270→278 so standing contact works |
+| Final climb / descent / cat | Rise, hazard timing, final landing | Coherent tested movement, no additional branch needed | Preserve existing varying patterns |
+
+## Every separate aerial platform
+
+| Platform (x / top / width) | Function before | Decision / function now | Verified |
+| --- | --- | --- | --- |
+|1050 /315 /110 | No clear reward; ordinary preceding jump cannot reach it | **Remove**; ground rise remains exactly as before | No remaining collider or island art |
+|2860 /317 /120 | Entry to optional high line | **Keep**: boosted entry landing, explicit landing reward, next short jump | Collector and zero-start land here |
+|3040 /261 /80 | Intermediate short surface | **Keep**: changes altitude and prepares third landing; food marks sweep/landing | Collector and zero-start land here |
+|3190 /205 /100 | Final high surface | **Keep**: skill reward launch and readable descent to common ground | Collector and zero-start land here |
+|8130 /348 /100 | Unclear perch near scooter / bottle | **Keep, give clear reward**: catches scooter jump, rewards landing, reaches Lipton without another tap | Coherent runs plus isolated standing-pickup control |
+
+Widths/heights/positions of all four retained surfaces are unchanged. The upper
+three require more execution than simply remaining on the ramp. Misses still
+fall onto continuous ground. The middle perch rewards an existing hazard jump;
+it does not introduce another compulsory reward jump or another platform chain.
+Each retained surface also has an explicit developer-facing `role` in settings.
+
+## Food / recovery composition after the pass
+
+- Bird landing2550/2580 ends at common2610/2640 breadcrumbs.
+- At2680 the food separates immediately: low ramp2680–2820, rising boost
+  2680–2950. The lower route earns its own compact2940–3020 group.
+- Upper path: first landing2950, second short sweep2995–3105, third high
+  landing3170–3270, skill reward3300–3470, descent3510/3550. That descent
+  returns before the shared granny3690; it does not promise another upper road.
+- Bench: grounded6880/6940/7010 approach;7130/7170 seat approach; optional
+  late-hop7170/7210/7260 group;7350/7390 common exit. No early obligatory arc.
+  At low energy, staying low triggers the existing2.5s/+36 rest. The fast player
+  deliberately hops the seat and earns the separate airborne group. No Lipton
+  is added nearby; earlier and later bottles remain4590 and8190.
+- Middle terrace:8020/8060 low timing markers prepare the existing scooter jump;
+  8080/8140/8190 food rewards its flight/landing instead of an unrelated high arc.
+  Late Lipton stays at8190, lowered270→278. A standing player on348px top now
+  overlaps its bottom304px, rather than missing the former296px bottom by2px.
+- Other food patterns are preserved: opening arc, granny crest, vertical boost,
+  downhill diagonal, long parabola, sparse timing markers, ground cascade,
+  rising staircase and final landing groups. No generic food-arc generator.
+
+## Actual portrait-camera checks
+
+390×844 touch viewport, actual smooth camera records from the full input run.
+No idealized camera positioning is used for these assertions or screenshots.
+
+- Upper entry atx2624: viewport2584.93–2924.93. Four low and four rising food
+  cues are fully visible before the first tap;64.93px of the120px first landing
+  is already visible. The whole later chain is not claimed to be on screen.
+- Bench on common approach atx7012: viewport6973.10–7313.10. Full bench plus
+  at least two packets on EACH alternative are visible before the fast-hop
+  takeoff near7140. Staying low reaches rest naturally.
+- Middle perch: its entire100px landing is visible before the actual scooter
+  jump atx8039.5 (viewport8000.43–8340.43), including the nearby bottle/reward.
+
+Screenshots replay real collector inputs through Phaser without teleporting
+Tanya, terrain or camera: [platform choice](docs/collectible-trust/platform-choice.png),
+[first landing](docs/collectible-trust/first-landing.png),
+[high reward](docs/collectible-trust/high-reward.png),
+[return](docs/collectible-trust/return-to-ground.png),
+[bench reveal](docs/collectible-trust/bench-reveal.png),
+[bench choice](docs/collectible-trust/bench-choice.png),
+[Lipton perch](docs/collectible-trust/lipton-perch.png).
+These verify visible cues, not a human's perception or first-play understanding.
+Manual phone testing is still required, especially the partially revealed first
+platform and the quick upper landings.
+
+## Full runs and food budget
+
+Actual60Hz Phaser physics, ordinary inputs, collisions, energy drain, pickups,
+bench and automatic recovery. Natural is an automated first-play approximation:
+its controller reads only currently visible terrain/food/actors and does not use
+the authored takeoff-coordinate list. Safe/collector/zero-start are explicit
+route policies. None substitutes for a new human player's phone playtest.
+
+| Run | Seconds | Food | Final energy | Hits / falls | Bench | Lipton |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Natural, visible cues |44.12|98|53.49|0 /0|1|3|
+| Safe ground-first |44.52|98|52.35|0 /0|1|3|
+| Collector, upper route |41.92|111|16.35|0 /0|0|3|
+| Zero-start, bench recovery |89.60|93|8.25|0 /0|1|3|
+
+**118 placed; minimum80; bonus103.** Natural98 is83.1% of placed food and18 above
+feeding minimum. Collector111 is13 more than natural and reaches the bonus.
+Natural first reaches80 aroundx8450 /35.8s, so feeding remains relevant late.
+The four coherent routes together collect every one of the118 unique positions;
+there are no never-reached packets in their union. This is NOT a claim that118
+can be collected on one run: the upper and lower branches contain alternatives.
+The UI still shows only `Корм: X` and `Котику нужно:80`; the initial HTML fallback now also says80 rather than the historical128.
+
+The natural/ground route no longer requires refusing an earlier packet to learn
+about a later platform. Upper food is a visibly separate option. The safe route
+has no precision-platform requirement and sufficient margin over the minimum.
+The upper route pays more for entry boost / quick landings / extra execution.
+
+## Validation / reproduce
+
+With Vite running:
+
+```sh
+npm run test:collectible-trust
+node scripts/validate-collisions.mjs
+npm run test:fatigue
+npm run test:environment
+npm run level:overview
+npm run build
+```
+
+Strict full audit also retains intentional-hit, intentional-pit-fall, platform-
+miss and bench policies: nine complete runs in total. Four deliberate pit misses
+still produce four returns; missed optional surfaces fail forward. Required
+normal/tired transitions, boost gaps, coyote/buffer, one-way contacts, hazard
+masks/timing, bench and endings pass. Fatigue transition/speed tests still pass.
+The Lipton perch test has an actual negative control: standing pickup at old270
+fails, at278 succeeds, both with zero boosts. Production/TypeScript/PWA build
+passes; existing large-bundle warning remains.
+
+[Machine-readable current results](docs/collectible-trust/validation.json) ·
+[Current overview](docs/level-v3-overview.svg).
+No new mechanics, neutral connector, hazard or ground-template repetition.
+Stop after this refinement for manual phone testing. No publication is claimed.
+
+---
+
+## Historical V3 audit (superseded exact geometry / budgets below)
+
 # Level V3 — density, distributed energy and scooter fix (2026-10-17)
 
 Base synced to origin/main `a28c29240d974e1258bf734bf4732b01c18654a2`.
@@ -188,3 +336,8 @@ ascending tops317/261/205, tired speed85. See
 [measured report](docs/winter-environment/clearance-and-fatigue.md) and
 [current run results](docs/winter-environment/gameplay-validation.json).
 Older exact platform/gap/tired-speed numbers above are historical.
+
+
+## Latest fatigue feedback — 2026-10-18
+
+Zero-energy boost no longer bypasses85px/s fatigue;1–20 energy gives15% slower running and a yellow persistent warning. Geometry and resource balance unchanged. See [fatigue-feedback.md](docs/winter-environment/fatigue-feedback.md) for current envelopes, seven strict full-run results and regression checks. Earlier330px/s tired-boost numbers are historical. Manual phone playtesting remains pending.

@@ -1,0 +1,467 @@
+{
+  "fatigue": {
+    "states": [
+      {
+        "energy": 100,
+        "speed": 240,
+        "color": "rgb(86, 137, 104)",
+        "warning": "Скоро Таня устанет",
+        "hidden": true
+      },
+      {
+        "energy": 20.1,
+        "speed": 240,
+        "color": "rgb(86, 137, 104)",
+        "warning": "Скоро Таня устанет",
+        "hidden": true
+      },
+      {
+        "energy": 20,
+        "speed": 204,
+        "color": "rgb(217, 172, 50)",
+        "warning": "Скоро Таня устанет",
+        "hidden": false
+      },
+      {
+        "energy": 10,
+        "speed": 204,
+        "color": "rgb(217, 172, 50)",
+        "warning": "Скоро Таня устанет",
+        "hidden": false
+      },
+      {
+        "energy": 0,
+        "speed": 85,
+        "color": "rgb(189, 116, 91)",
+        "warning": "Таня устала",
+        "hidden": false
+      }
+    ],
+    "flights": [
+      {
+        "transition": "zero",
+        "before": 85,
+        "maxSpeed": 85,
+        "landed": true,
+        "landingSpeed": 85,
+        "groundSpeed": 85,
+        "gravity": 0,
+        "boosts": 1
+      },
+      {
+        "transition": "to-low",
+        "before": 350,
+        "maxSpeed": 297.5,
+        "landed": true,
+        "landingSpeed": 204,
+        "groundSpeed": 204,
+        "gravity": 0,
+        "boosts": 1
+      },
+      {
+        "transition": "to-zero",
+        "before": 350,
+        "maxSpeed": 85,
+        "landed": true,
+        "landingSpeed": 85,
+        "groundSpeed": 85,
+        "gravity": 0,
+        "boosts": 1
+      },
+      {
+        "transition": "recovery",
+        "before": 85,
+        "maxSpeed": 85,
+        "landed": true,
+        "landingSpeed": 240,
+        "groundSpeed": 240,
+        "gravity": 0,
+        "boosts": 1
+      }
+    ],
+    "recovered": {
+      "hidden": true,
+      "color": "rgb(86, 137, 104)"
+    },
+    "respawn": {
+      "gravity": 0,
+      "speed": 85
+    },
+    "replay": {
+      "hidden": true,
+      "speed": 240
+    }
+  },
+  "jumps": [
+    {
+      "tired": false,
+      "delay": null,
+      "height": 107.33333333333337,
+      "seconds": 0.7999999999999708,
+      "distance": 192,
+      "boosts": 0
+    },
+    {
+      "tired": false,
+      "delay": 20,
+      "height": 107.33333333333337,
+      "seconds": 0.7999999999999708,
+      "distance": 192,
+      "boosts": 0
+    },
+    {
+      "tired": false,
+      "delay": 50,
+      "height": 213.89897945825402,
+      "seconds": 1.133333333333292,
+      "distance": 391.1666666666661,
+      "boosts": 1
+    },
+    {
+      "tired": false,
+      "delay": 100,
+      "height": 214.2499344700981,
+      "seconds": 1.1499999999999582,
+      "distance": 391.4999999999995,
+      "boosts": 1
+    },
+    {
+      "tired": false,
+      "delay": 150,
+      "height": 214.5537346353413,
+      "seconds": 1.166666666666717,
+      "distance": 391.83333333333275,
+      "boosts": 1
+    },
+    {
+      "tired": false,
+      "delay": 200,
+      "height": 214.8564747658838,
+      "seconds": 1.2000000000000872,
+      "distance": 397.99999999999943,
+      "boosts": 1
+    },
+    {
+      "tired": false,
+      "delay": 250,
+      "height": 215.08568260141448,
+      "seconds": 1.233333333333423,
+      "distance": 404.16666666666606,
+      "boosts": 1
+    },
+    {
+      "tired": false,
+      "delay": 270,
+      "height": 215.13050000125298,
+      "seconds": 1.233333333333423,
+      "distance": 402.3333333333326,
+      "boosts": 1
+    },
+    {
+      "tired": false,
+      "delay": 300,
+      "height": 107.33333333333337,
+      "seconds": 0.8000000000000582,
+      "distance": 192,
+      "boosts": 0
+    },
+    {
+      "tired": false,
+      "delay": 450,
+      "height": 107.33333333333337,
+      "seconds": 0.8000000000000582,
+      "distance": 192,
+      "boosts": 0
+    },
+    {
+      "tired": true,
+      "delay": null,
+      "height": 85.16666666666669,
+      "seconds": 0.7000000000000509,
+      "distance": 59.50000000000007,
+      "boosts": 0
+    },
+    {
+      "tired": true,
+      "delay": 20,
+      "height": 85.16666666666669,
+      "seconds": 0.7000000000000509,
+      "distance": 59.50000000000007,
+      "boosts": 0
+    },
+    {
+      "tired": true,
+      "delay": 50,
+      "height": 198.48987397154,
+      "seconds": 4.066666666666962,
+      "distance": 345.6666666666683,
+      "boosts": 1
+    },
+    {
+      "tired": true,
+      "delay": 100,
+      "height": 198.57412439817148,
+      "seconds": 4.016666666666865,
+      "distance": 341.4166666666682,
+      "boosts": 1
+    },
+    {
+      "tired": true,
+      "delay": 150,
+      "height": 198.64532048748794,
+      "seconds": 3.9666666666660895,
+      "distance": 337.16666666666816,
+      "boosts": 1
+    },
+    {
+      "tired": true,
+      "delay": 200,
+      "height": 198.70654960127294,
+      "seconds": 3.949999999999425,
+      "distance": 335.7500000000015,
+      "boosts": 1
+    },
+    {
+      "tired": true,
+      "delay": 250,
+      "height": 198.74848602480293,
+      "seconds": 3.933333333332761,
+      "distance": 334.3333333333348,
+      "boosts": 1
+    },
+    {
+      "tired": true,
+      "delay": 270,
+      "height": 198.76062810998974,
+      "seconds": 3.933333333332761,
+      "distance": 334.3333333333348,
+      "boosts": 1
+    },
+    {
+      "tired": true,
+      "delay": 300,
+      "height": 85.16666666666669,
+      "seconds": 0.6999999999998981,
+      "distance": 59.50000000000007,
+      "boosts": 0
+    },
+    {
+      "tired": true,
+      "delay": 450,
+      "height": 85.16666666666669,
+      "seconds": 0.6999999999998981,
+      "distance": 59.50000000000007,
+      "boosts": 0
+    }
+  ],
+  "runs": [
+    {
+      "mode": "normal",
+      "finished": true,
+      "time": 41.89999999999869,
+      "food": 102,
+      "energy": 16.39500000000143,
+      "collisions": 0,
+      "hitsAt": [],
+      "bench": 0,
+      "lipton": 3,
+      "falls": 0,
+      "recoveries": 0,
+      "boosts": 4,
+      "resets": 0,
+      "longestRawInputGap": 3.69999999999996,
+      "longestInputDecisionGap": 2.200000000000024,
+      "decisionInterval": [
+        24.900000000000816,
+        27.10000000000084
+      ],
+      "longestEmpty": 0,
+      "threeLayersRatio": 0.43914081145584727
+    },
+    {
+      "mode": "collector",
+      "finished": true,
+      "time": 41.78333333333795,
+      "food": 103,
+      "energy": 4.727500000001366,
+      "collisions": 0,
+      "hitsAt": [],
+      "bench": 0,
+      "lipton": 2,
+      "falls": 0,
+      "recoveries": 0,
+      "boosts": 6,
+      "resets": 0,
+      "longestRawInputGap": 3.7000000000010758,
+      "longestInputDecisionGap": 2.2000000000006423,
+      "decisionInterval": [
+        24.8999999999997,
+        27.100000000000342
+      ],
+      "longestEmpty": 0,
+      "threeLayersRatio": 0.41626794258373206
+    },
+    {
+      "mode": "low-energy",
+      "finished": true,
+      "time": 89.59999999998362,
+      "food": 89,
+      "energy": 8.245000000000424,
+      "collisions": 0,
+      "hitsAt": [],
+      "bench": 1,
+      "lipton": 3,
+      "falls": 0,
+      "recoveries": 0,
+      "boosts": 10,
+      "resets": 0,
+      "longestRawInputGap": 14.449999999991583,
+      "longestInputDecisionGap": 6.299999999996331,
+      "decisionInterval": [
+        63.39999999999888,
+        69.69999999999521
+      ],
+      "longestEmpty": 0,
+      "threeLayersRatio": 0.49441964285714285
+    },
+    {
+      "mode": "intentional-collision",
+      "finished": true,
+      "time": 82.89999999995261,
+      "food": 90,
+      "energy": 0,
+      "collisions": 8,
+      "hitsAt": [
+        {
+          "x": 708,
+          "time": 2.4999999999985447,
+          "damage": 15
+        },
+        {
+          "x": 1779.9999999999964,
+          "time": 6.599999999996158,
+          "damage": 15
+        },
+        {
+          "x": 2439.9999999999964,
+          "time": 9.349999999994557,
+          "damage": 6
+        },
+        {
+          "x": 3651.6666666666706,
+          "time": 14.016666666658509,
+          "damage": 15
+        },
+        {
+          "x": 5257.524999999919,
+          "time": 21.266666666654288,
+          "damage": 12
+        },
+        {
+          "x": 6272.5750000001335,
+          "time": 33.14999999998071,
+          "damage": 15
+        },
+        {
+          "x": 9200.825000000128,
+          "time": 67.59999999996066,
+          "damage": 12
+        },
+        {
+          "x": 10229.324999999688,
+          "time": 79.6999999999536,
+          "damage": 15
+        }
+      ],
+      "bench": 0,
+      "lipton": 2,
+      "falls": 0,
+      "recoveries": 0,
+      "boosts": 7,
+      "resets": 0,
+      "longestRawInputGap": 15.01666666665793,
+      "longestInputDecisionGap": 6.299999999996338,
+      "decisionInterval": [
+        34.09999999998015,
+        40.39999999997649
+      ],
+      "longestEmpty": 0,
+      "threeLayersRatio": 0.413751507840772
+    },
+    {
+      "mode": "pit-fall",
+      "finished": true,
+      "time": 50.58333333339222,
+      "food": 103,
+      "energy": 0,
+      "collisions": 1,
+      "hitsAt": [
+        {
+          "x": 9532.00000000003,
+          "time": 41.8666666667154,
+          "damage": 6
+        }
+      ],
+      "bench": 0,
+      "lipton": 3,
+      "falls": 4,
+      "recoveries": 4,
+      "boosts": 4,
+      "resets": 4,
+      "longestRawInputGap": 4.583333333338672,
+      "longestInputDecisionGap": 2.5833333333363413,
+      "decisionInterval": [
+        48.00000000005588,
+        50.58333333339222
+      ],
+      "longestEmpty": 0,
+      "threeLayersRatio": 0.466403162055336
+    },
+    {
+      "mode": "platform-miss",
+      "finished": true,
+      "time": 41.90000000004878,
+      "food": 89,
+      "energy": 16.39500000000143,
+      "collisions": 0,
+      "hitsAt": [],
+      "bench": 0,
+      "lipton": 3,
+      "falls": 0,
+      "recoveries": 0,
+      "boosts": 4,
+      "resets": 0,
+      "longestRawInputGap": 3.7000000000043087,
+      "longestInputDecisionGap": 2.200000000002561,
+      "decisionInterval": [
+        24.90000000002899,
+        27.10000000003155
+      ],
+      "longestEmpty": 0,
+      "threeLayersRatio": 0.441527446300716
+    },
+    {
+      "mode": "bench",
+      "finished": true,
+      "time": 44.13333333338471,
+      "food": 100,
+      "energy": 53.44250000000126,
+      "collisions": 0,
+      "hitsAt": [],
+      "bench": 1,
+      "lipton": 3,
+      "falls": 0,
+      "recoveries": 0,
+      "boosts": 4,
+      "resets": 0,
+      "longestRawInputGap": 7.616666666675535,
+      "longestInputDecisionGap": 3.900000000004539,
+      "decisionInterval": [
+        27.10000000003155,
+        31.00000000003609
+      ],
+      "longestEmpty": 0,
+      "threeLayersRatio": 0.47058823529411764
+    }
+  ]
+}

@@ -1,0 +1,163 @@
+{
+  "perchInput": {
+    "x": 8039.499999999985,
+    "time": 31.816666666668702,
+    "boost": false,
+    "view": {
+      "left": 8000.433377735475,
+      "right": 8340.433377735475,
+      "top": -77.96346870843743,
+      "bottom": 657.8314030864344
+    }
+  },
+  "minimum": 80,
+  "bonus": 103,
+  "placed": 118,
+  "naturalRatio": 0.8305084745762712,
+  "neverCollected": [],
+  "platformVisibleWidth": 64.93337773548728,
+  "entry": {
+    "x": 2623.9999999999964,
+    "view": {
+      "left": 2584.9333777354873,
+      "right": 2924.9333777354873,
+      "top": -88.1959712436342,
+      "bottom": 647.5989005512376
+    },
+    "branches": {
+      "lower": [
+        {
+          "x": 2680,
+          "y": 403
+        },
+        {
+          "x": 2720,
+          "y": 402
+        },
+        {
+          "x": 2760,
+          "y": 401
+        },
+        {
+          "x": 2820,
+          "y": 399
+        }
+      ],
+      "upper": [
+        {
+          "x": 2680,
+          "y": 310
+        },
+        {
+          "x": 2730,
+          "y": 245
+        },
+        {
+          "x": 2830,
+          "y": 185
+        },
+        {
+          "x": 2890,
+          "y": 215
+        }
+      ]
+    }
+  },
+  "benchReveal": {
+    "x": 7012.166666666649,
+    "view": {
+      "left": 6973.100044402138,
+      "right": 7313.100044402138,
+      "top": -75.80052334834832,
+      "bottom": 659.9943484465235
+    }
+  },
+  "runs": [
+    {
+      "mode": "natural",
+      "time": 44.116666666718025,
+      "food": 98,
+      "energy": 53.49000000000126,
+      "collisions": 0,
+      "bench": 1,
+      "lipton": 3,
+      "boosts": 4,
+      "falls": 0
+    },
+    {
+      "mode": "safe",
+      "time": 44.51666666671849,
+      "food": 98,
+      "energy": 52.3500000000013,
+      "collisions": 0,
+      "bench": 1,
+      "lipton": 3,
+      "boosts": 3,
+      "falls": 0
+    },
+    {
+      "mode": "collector",
+      "time": 41.91666666667164,
+      "food": 111,
+      "energy": 16.347500000001432,
+      "collisions": 0,
+      "bench": 0,
+      "lipton": 3,
+      "boosts": 4,
+      "falls": 0
+    },
+    {
+      "mode": "low-energy",
+      "time": 89.59999999998287,
+      "food": 93,
+      "energy": 8.245000000000424,
+      "collisions": 0,
+      "bench": 1,
+      "lipton": 3,
+      "boosts": 10,
+      "falls": 0
+    }
+  ],
+  "platforms": [
+    {
+      "x": 2860,
+      "y": 317,
+      "width": 120,
+      "label": "Бонус ↑",
+      "role": "Boost entry landing; starts the optional rising route"
+    },
+    {
+      "x": 3040,
+      "y": 261,
+      "width": 80,
+      "label": "",
+      "role": "Short intermediate landing; sets up the next higher jump"
+    },
+    {
+      "x": 3190,
+      "y": 205,
+      "width": 100,
+      "label": "",
+      "role": "High reward launch; descending food rejoins the main ramp"
+    },
+    {
+      "x": 8130,
+      "y": 348,
+      "width": 100,
+      "label": "",
+      "role": "Scooter-jump landing with food and a Lipton approach"
+    }
+  ],
+  "perchContact": [
+    {
+      "bottleY": 270,
+      "lipton": 0,
+      "boosts": 0
+    },
+    {
+      "bottleY": 278,
+      "lipton": 1,
+      "boosts": 0
+    }
+  ]
+}

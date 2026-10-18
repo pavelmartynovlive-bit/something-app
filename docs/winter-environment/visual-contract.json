@@ -9,7 +9,7 @@
       120,
       80
     ],
-    "visualCount": 44,
+    "visualCount": 43,
     "visualsWithBodies": 0,
     "rects": [
       [
@@ -166,12 +166,6 @@
         3190,
         205,
         100,
-        12
-      ],
-      [
-        1050,
-        315,
-        110,
         12
       ],
       [
@@ -336,12 +330,6 @@
         3190,
         205,
         100,
-        12
-      ],
-      [
-        1050,
-        315,
-        110,
         12
       ],
       [
@@ -568,14 +556,6 @@
         "clearance": 173.16129035483868
       },
       {
-        "x": 1050,
-        "y": 315,
-        "width": 110,
-        "height": 35,
-        "body": false,
-        "clearance": 65
-      },
-      {
         "x": 8130,
         "y": 348,
         "width": 100,
@@ -759,22 +739,29 @@
         5,
         5,
         5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
         5
       ]
     },
-    "geometry": "{\"ground\":[{\"start\":0,\"end\":420,\"y\":440},{\"start\":420,\"end\":560,\"y\":505},{\"start\":560,\"end\":990,\"y\":440},{\"start\":990,\"end\":1450,\"y\":415},{\"start\":1450,\"end\":1900,\"y\":280},{\"start\":1900,\"end\":2320,\"y\":280,\"endY\":435},{\"start\":2320,\"end\":2520,\"y\":435},{\"start\":2520,\"end\":3760,\"y\":435,\"endY\":395},{\"start\":3760,\"end\":4280,\"y\":395,\"endY\":425},{\"start\":4280,\"end\":4550,\"y\":565},{\"start\":4550,\"end\":4820,\"y\":425},{\"start\":4820,\"end\":5420,\"y\":401},{\"start\":5420,\"end\":5740,\"y\":465},{\"start\":5740,\"end\":6040,\"y\":505},{\"start\":6040,\"end\":6160,\"y\":568},{\"start\":6160,\"end\":6380,\"y\":483},{\"start\":6380,\"end\":6670,\"y\":525},{\"start\":6670,\"end\":7550,\"y\":545},{\"start\":7550,\"end\":7890,\"y\":505},{\"start\":7890,\"end\":8450,\"y\":445},{\"start\":8450,\"end\":8870,\"y\":310},{\"start\":8870,\"end\":9600,\"y\":470},{\"start\":9600,\"end\":9680,\"y\":535},{\"start\":9680,\"end\":9840,\"y\":470},{\"start\":9840,\"end\":10070,\"y\":470,\"endY\":450},{\"start\":10070,\"end\":10420,\"y\":450},{\"start\":10420,\"end\":10730,\"y\":462}],\"platforms\":[{\"x\":2860,\"y\":317,\"width\":120,\"label\":\"Бонус ↑\"},{\"x\":3040,\"y\":261,\"width\":80,\"label\":\"\"},{\"x\":3190,\"y\":205,\"width\":100,\"label\":\"\"},{\"x\":1050,\"y\":315,\"width\":110,\"label\":\"\"},{\"x\":8130,\"y\":348,\"width\":100,\"label\":\"\"}],\"pits\":[{\"start\":420,\"width\":140,\"depth\":65},{\"start\":4280,\"width\":270,\"depth\":140},{\"start\":6040,\"width\":120,\"depth\":63},{\"start\":9600,\"width\":80,\"depth\":65}],\"anchors\":[100,240,1220,2660,4110,5880,7320,8280,9240]}",
-    "generated": 36,
+    "geometry": "{\"ground\":[{\"start\":0,\"end\":420,\"y\":440},{\"start\":420,\"end\":560,\"y\":505},{\"start\":560,\"end\":990,\"y\":440},{\"start\":990,\"end\":1450,\"y\":415},{\"start\":1450,\"end\":1900,\"y\":280},{\"start\":1900,\"end\":2320,\"y\":280,\"endY\":435},{\"start\":2320,\"end\":2520,\"y\":435},{\"start\":2520,\"end\":3760,\"y\":435,\"endY\":395},{\"start\":3760,\"end\":4280,\"y\":395,\"endY\":425},{\"start\":4280,\"end\":4550,\"y\":565},{\"start\":4550,\"end\":4820,\"y\":425},{\"start\":4820,\"end\":5420,\"y\":401},{\"start\":5420,\"end\":5740,\"y\":465},{\"start\":5740,\"end\":6040,\"y\":505},{\"start\":6040,\"end\":6160,\"y\":568},{\"start\":6160,\"end\":6380,\"y\":483},{\"start\":6380,\"end\":6670,\"y\":525},{\"start\":6670,\"end\":7550,\"y\":545},{\"start\":7550,\"end\":7890,\"y\":505},{\"start\":7890,\"end\":8450,\"y\":445},{\"start\":8450,\"end\":8870,\"y\":310},{\"start\":8870,\"end\":9600,\"y\":470},{\"start\":9600,\"end\":9680,\"y\":535},{\"start\":9680,\"end\":9840,\"y\":470},{\"start\":9840,\"end\":10070,\"y\":470,\"endY\":450},{\"start\":10070,\"end\":10420,\"y\":450},{\"start\":10420,\"end\":10730,\"y\":462}],\"platforms\":[{\"x\":2860,\"y\":317,\"width\":120,\"label\":\"Бонус ↑\",\"role\":\"Boost entry landing; starts the optional rising route\"},{\"x\":3040,\"y\":261,\"width\":80,\"label\":\"\",\"role\":\"Short intermediate landing; sets up the next higher jump\"},{\"x\":3190,\"y\":205,\"width\":100,\"label\":\"\",\"role\":\"High reward launch; descending food rejoins the main ramp\"},{\"x\":8130,\"y\":348,\"width\":100,\"label\":\"\",\"role\":\"Scooter-jump landing with food and a Lipton approach\"}],\"pits\":[{\"start\":420,\"width\":140,\"depth\":65},{\"start\":4280,\"width\":270,\"depth\":140},{\"start\":6040,\"width\":120,\"depth\":63},{\"start\":9600,\"width\":80,\"depth\":65}],\"anchors\":[100,240,1220,2660,4110,5880,7320,8280,9240]}",
+    "generated": 35,
     "textures": [
       "environment:platform_short.png",
-      "environment:platform_floating_small.png",
       "environment:ground_snow_basic.png",
-      "environment:cliff_tall.png",
+      "environment:platform_floating_small.png",
       "environment:slope_snow.png",
+      "environment:cliff_tall.png",
+      "environment:bench_winter.png",
       "environment:pit_edge.png",
-      "environment:garage_winter.png",
-      "environment:railing_winter.png",
       "environment:pit_rubbish_winter.png",
-      "environment:bench_winter.png"
+      "environment:garage_winter.png",
+      "environment:railing_winter.png"
     ]
   },
   "speedProbe": {
@@ -783,8 +770,8 @@
   },
   "resizeStates": 5,
   "replay": {
-    "images": 44,
-    "generated": 36
+    "images": 43,
+    "generated": 35
   },
   "errors": [],
   "failed": []

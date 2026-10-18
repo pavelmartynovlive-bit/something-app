@@ -61,3 +61,5 @@ body[data-view="c"] .end-card { max-width: calc(min(100vw, 100dvh * 9 / 16) - 24
 body[data-view="c"] #toast { max-width: calc(min(100vw, 100dvh * 9 / 16) - 24px); width: max-content; font-size: 14px; }
 @media (orientation: portrait) and (pointer: coarse) { body[data-view="c"] #portrait { display: none; } }
 @media (orientation: landscape) and (pointer: coarse) { body[data-view="c"] #portrait { display: flex; } }
+
+#energy-warning { margin-top: 5px; font-size: 10px; line-height: 1.2; color: #7a570e; }

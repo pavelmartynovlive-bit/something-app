@@ -1492,3 +1492,81 @@ energy preserved. Zero-start run62.58s; normal41.72s, collector41.37s. The slowe
 fatigue run is intentional; do not stretch or redesign the normal route to hit
 an arbitrary target. See docs/winter-environment/clearance-and-fatigue.md for
 measured clearances and validation. Stop for manual phone playtesting.
+
+
+## 31. Phone feedback: consistent fatigue and a low-energy warning (2026-10-18)
+
+This targeted change supersedes §30's330px/s exhausted boost. Keep all geometry,
+food, hazards, energy drain and recovery amounts unchanged.
+
+Above20 energy: running240px/s and boosted flight350px/s, unchanged.
+At1–20: running204px/s (-15%), boosted flight297.5px/s, yellow meter and persistent
+“Скоро Таня устанет” warning. At0: both running and boosted forward movement85px/s.
+Second tapping must never bypass exhaustion or increase forward speed at0.
+
+A tired boost uses slower local vertical physics (gravity92.8834px/s²), retaining
+its200px target apex and the reach needed for the existing270px pit. At150ms
+second tap, measured198.65px height /337.17px reach /3.967s flight. This is an
+intentionally sleepy, longer flight, not a faster traversal. Standard tired jump
+is unchanged:85.17px height /59.5px reach /0.7s. Normal jumps are unchanged.
+The early40–280ms window, one boost, coyote130ms and buffer150ms remain.
+
+If energy falls through20 or0 mid-flight, scale forward speed, vertical velocity
+and local gravity together to preserve the remaining spatial trajectory while
+slowing time. Recovery does not accelerate a committed jump; normal physics
+returns on landing, bench entry, respawn and replay. Other actors keep existing
+gravity/speeds. Above20 the warning clears; recovering only to12 remains yellow.
+
+Regression instructions/results: docs/winter-environment/fatigue-feedback.md.
+Stop for manual phone testing; no level redesign is authorized by this change.
+
+
+## 32. Collectible trust / platform-purpose refinement (2026-10-18)
+
+Preserve the V3 terrain, length, hazards, camera and §31 physics/energy values.
+Food before the three-platform bonus must finish the bird landing, then expose
+both low and rising branches BEFORE the entry boost. A shared continuous arc
+must not hide a different route choice. Landing groups and a descending trail
+connect the upper route back to the ramp before the common granny encounter.
+
+Remove the redundant1050,y315 island: it has no reward/transition function and
+cannot catch the ordinary lower-ground ascent jump. Retain2860/3040/3190 as
+entry/intermediate/high-reward landings. Retain8130 as a scooter-jump landing
+with food and Lipton; no extra tap is required merely to justify the platform.
+The late bottle moves only8px down,270→278, so a standing landing can collect it
+instead of needing a pixel-grazing airborne contact. Recovery amount stays12.
+Each remaining platform has an explicit role in settings.ts.
+
+The bench approach is grounded shared food, followed by two visible alternatives:
+stay low for the existing automatic rest OR make a later seat-clearing hop for
+food/tempo. No separate early arc may carry an unaware player past the bench.
+Three bottles remain far from the bench; no additional recovery or mechanic.
+
+Food remains a resource, not X/total completion. Current placement118, coherent
+natural/main98 (~83% of placed), collector111; minimum80 and bonus103 retained.
+Alternative-route packets are mutually exclusive. Both branches must be visible
+in actual portrait-camera records before commitment. See LEVEL_AUDIT.md and
+scripts/check-collectible-trust.mjs for the current audit and reproducible checks.
+Stop for manual phone testing after validation, without further redesign.
+
+
+## 33. Tanya character integration — presentation only (2026-10-18)
+
+Approved brunette/pink-jacket/orange-boots concept now supplies one transparent
+static stand PNG. Keep the40×56 physics carrier,24×50 body, offset8,4 and centered
+carrier origin exactly unchanged. Hide that carrier; a separate visual image
+at body center.x/body.bottom uses bottom-center origin and34.5×62px rendered
+frame (cached138×248 texture at.25 scale). No PNG-derived collider or camera change.
+
+Visual states run/jump/fall/tired use the same static pose for now. Rest is an
+explicit missing tanya-rest asset: hide the standing image during the existing
+bench stop, without stretching art or changing bench mechanics. Future poses
+belong to the visual layer, never the movement/collision system. No fake sprite
+sheet, new tint, glow, fatigue opacity, animation-driven impulse or geometry edit.
+The existing65px underpass still clears62px art by3px; do not move platforms to
+recalculate an old art-height clearance ratio during character integration.
+
+Nine regression policies preserve pre-integration food/hazard/recovery outcomes;
+foot anchors, zero-energy behavior, platforms, pits, bench and offline asset load
+are tested. See docs/tanya/README.md for dimensions, missing production poses,
+mobile captures and limitations. Stop for manual phone testing.

@@ -1,4 +1,5 @@
 // V3 regression probes: actual Arcade contacts, controls and visible hazard masks.
+// Seven-second probe budgets include the deliberately slow exhausted boost.
 import {chromium} from 'playwright';import assert from 'node:assert/strict';import {writeFileSync} from 'node:fs';
 const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});
 try{
@@ -12,7 +13,7 @@ try{
    const boosted=tr.rise>100;const lead=(boosted?(tired?110:130):(tired?(tr.rise>45?42:35):80))+offset*(tired&&!boosted?.5:1);
    const s=restart();place(s,tr.x-lead-(tired?6:8),tr.fromY);if(tired)s.changeEnergy(-100);tick(2);
    const launch=s.tanya.x,start=s.time.now;key(true);tick();key(false);let sent=false,landing=null,blocked=0;
-   for(let i=0;i<100;i++){
+   for(let i=0;i<420;i++){
     if(boosted&&!sent&&s.time.now-start>=150){key(true);sent=true;}tick();key(false);blocked+=Number(s.tanya.body.blocked.right);
     if(s.tanya.body.blocked.down&&s.tanya.x>tr.x+12&&Math.abs(s.tanya.body.bottom-tr.toY)<1){landing=s.tanya.x;break}
    }
@@ -23,14 +24,14 @@ try{
    const leads=tired?{420:90,6040:160,9600:150}:{420:25,6040:35,9600:70};
    const lead=leads[gap.start]+offset,from=terrain.groundYAt(gap.start-1),target=terrain.groundYAt(gap.start+gap.width+1);
    const s=restart();place(s,gap.start-lead-(tired?6:8),from);if(tired)s.changeEnergy(-100);tick(2);const takeoff=s.time.now;key(true);tick();key(false);let sent=false,land=null,blocked=0,deepest=from;
-   for(let i=0;i<100;i++){if(tired&&!sent&&s.time.now-takeoff>=150){key(true);sent=true;}tick();key(false);blocked+=Number(s.tanya.body.blocked.right);deepest=Math.max(deepest,s.tanya.body.bottom);if(s.tanya.body.blocked.down&&s.tanya.x>gap.start+gap.width+12&&Math.abs(s.tanya.body.bottom-target)<2){land=s.tanya.x;break}}
+   for(let i=0;i<420;i++){if(tired&&!sent&&s.time.now-takeoff>=150){key(true);sent=true;}tick();key(false);blocked+=Number(s.tanya.body.blocked.right);deepest=Math.max(deepest,s.tanya.body.bottom);if(s.tanya.body.blocked.down&&s.tanya.x>gap.start+gap.width+12&&Math.abs(s.tanya.body.bottom-target)<2){land=s.tanya.x;break}}
    shortGaps.push({start:gap.start,tired,offset,land,blocked,deepest,footMargin:land===null?null:land-gap.start-gap.width-12});
   }
   const longGap=[];
   for(const tired of [false,true])for(const delay of [null,100,150,220]){
    const s=restart(),lead=tired?25:50;place(s,4280-lead-(tired?6:8),425);if(tired)s.changeEnergy(-100);tick(2);const start=s.time.now;
    key(true);tick();key(false);let sent=false,land=null,deepest=0;
-   for(let i=0;i<100;i++){
+   for(let i=0;i<420;i++){
     if(delay!==null&&!sent&&s.time.now-start>=delay){key(true);sent=true;}tick();key(false);deepest=Math.max(deepest,s.tanya.body.bottom);
     if(s.tanya.body.blocked.down&&s.tanya.x>4562&&Math.abs(s.tanya.body.bottom-425)<1){land=s.tanya.x;break}
    }
@@ -66,7 +67,7 @@ try{
     delay:(s.time.now-start)/1000,x:s.tanya.x,anchor:s.checkpoint,foot:s.tanya.body.bottom,ground:terrain.groundYAt(s.checkpoint),vy:s.tanya.body.velocity.y});
   }
   const oneWay=[];
-  for(const p of cfg.routePlatforms){const s=restart();place(s,p.x+p.width/2,terrain.groundYAt(p.x+p.width/2));const update=s.update;s.sys.sceneUpdate=function(t,d){update.call(this,t,d);this.tanya.setVelocityX(0)};s.tanya.setVelocityX(0);key(true);tick();key(false);let hitHead=false,landed=false;for(let i=0;i<100;i++){if(i===9)key(true);tick();key(false);hitHead||=s.tanya.body.blocked.up;landed||=s.tanya.body.blocked.down&&Math.abs(s.tanya.body.bottom-p.y)<1}oneWay.push({x:p.x,hitHead,landed})}
+  for(const p of cfg.routePlatforms){const s=restart();place(s,p.x+p.width/2,terrain.groundYAt(p.x+p.width/2));const update=s.update;s.sys.sceneUpdate=function(t,d){update.call(this,t,d);this.tanya.setVelocityX(0)};s.tanya.setVelocityX(0);key(true);tick();key(false);let hitHead=false,landed=false;for(let i=0;i<420;i++){if(i===9)key(true);tick();key(false);hitHead||=s.tanya.body.blocked.up;landed||=s.tanya.body.blocked.down&&Math.abs(s.tanya.body.bottom-p.y)<1}oneWay.push({x:p.x,hitHead,landed})}
   const coyote=[];for(const frames of [4,12]){const s=restart(),p=cfg.routePlatforms[0];place(s,p.x+p.width-20,p.y);let i=0;while(s.tanya.body.blocked.down&&i++<30)tick();tick(frames-1);key(true);tick();key(false);coyote.push({frames,vy:s.tanya.body.velocity.y})}
   const buffer=(()=>{const s=restart();place(s,100,330);while(s.tanya.body.bottom<410)tick();key(true);tick();key(false);let fired=false;for(let i=0;i<12;i++){tick();fired||=s.tanya.body.velocity.y<0}return fired})();
   const scooters=[];
