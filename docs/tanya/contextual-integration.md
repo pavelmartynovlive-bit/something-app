@@ -142,3 +142,11 @@ Checks: new `scripts/check-tanya-context.mjs`, updated `scripts/check-tanya.mjs`
 `scripts/check-tanya-production.mjs`, `scripts/validate-recovery.mjs` and
 `scripts/audit-v3.mjs` (preserves hazard kind when recording actual hits).
 Updated audit/design docs and portrait evidence; other art is unchanged.
+
+## Pigeon reaction and viewport clipping fix
+
+Pigeon damage now reuses `tanya-hit-granny` through the same accepted-hit path and existing shared cooldown. Damage, physics, layout and sprite size are unchanged.
+
+The portrait camera's original 5% anchor left only 17 world pixels behind the character. Opaque run/fall/recoil frames extend up to 53.12 pixels left of the foot anchor. Follow lag hid this at full speed but exposed clipping when speed fell after a scooter hit or exhaustion. The camera now reserves the maximum measured left extent across both atlases plus 8 world pixels (61.12 total), retains smooth tracking, and prevents stale camera scroll from overtaking the safe frame after slowing. Checkpoint framing uses the same inset. The 8px margin also accommodates the current camera shake.
+
+`npm run test:character:framing` checks actual pigeon contact, shared cooldown, normal/scooter-slowed/zero-energy framing and immediate checkpoint framing at 320×568, 390×844 and 430×932. Existing contextual interaction checks remain applicable. No new art or gameplay rules were introduced.

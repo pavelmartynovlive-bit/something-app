@@ -16,7 +16,8 @@
     "test:collectible-trust": "node scripts/audit-v3.mjs && node scripts/check-collectible-trust.mjs",
     "test:character:context": "node scripts/check-tanya-context.mjs",
     "test:character": "node scripts/check-tanya.mjs",
-    "test:character:production": "node scripts/check-tanya-production.mjs"
+    "test:character:production": "node scripts/check-tanya-production.mjs",
+    "test:character:framing": "node scripts/check-tanya-framing.mjs"
   },
   "dependencies": {
     "phaser": "3.90.0"

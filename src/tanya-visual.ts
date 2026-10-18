@@ -59,6 +59,8 @@ export class TanyaVisual {
   }
 
   readonly sprite: Phaser.GameObjects.Sprite;
+  /** Opaque art extent, not the padded frame/collider. Includes all reactions. */
+  readonly cameraLeftInset: number;
   readonly footShadow: Phaser.GameObjects.Ellipse;
   readonly contactShadow: Phaser.GameObjects.Ellipse;
   state: TanyaVisualState = 'idle';
@@ -77,6 +79,9 @@ export class TanyaVisual {
 
   constructor(private scene: Phaser.Scene, private carrier: Phaser.Physics.Arcade.Sprite, private context: TanyaVisualContext) {
     TanyaVisual.prepare(scene);
+    const scale = tanyaArt.renderedHeight / tanyaArt.referenceHeight;
+    this.cameraLeftInset = Math.max(...[tanyaArt, tanyaContextArt].flatMap(art =>
+      (scene.cache.json.get(art.dataKey) as AnimationData).frames.map(f => f.rootX * f.normalize * scale))) + 8;
     this.pitMaskShape = scene.add.graphics().setVisible(false);
     this.pitMask = this.pitMaskShape.createGeometryMask();
     this.footShadow = scene.add.ellipse(0, 0, 30.8, 5.5, 0x36465b).setData('tanyaFootShadow', true);

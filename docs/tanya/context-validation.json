@@ -543,7 +543,7 @@
       "food": 24,
       "foodStart": 24,
       "energyPreserved": true,
-      "waitMs": 233.33333333333758,
+      "waitMs": 233.33333333332484,
       "x": 240,
       "anchor": 240,
       "vy": 0,
@@ -3459,7 +3459,7 @@
       "food": 23,
       "foodStart": 23,
       "energyPreserved": true,
-      "waitMs": 233.33333333332484,
+      "waitMs": 233.33333333334485,
       "x": 9240,
       "anchor": 9240,
       "vy": 0,
@@ -4510,7 +4510,7 @@
           ]
         }
       ],
-      "seconds": 2.500000000000033,
+      "seconds": 2.499999999999909,
       "energyGain": 35.905000000000015,
       "uses": 1,
       "anchor": [

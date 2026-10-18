@@ -335,10 +335,14 @@ class PlayScene extends Phaser.Scene {
     const camera = this.cameras.main;
     const framing = this.framing!;
     const viewWidth = camera.width / camera.zoom;
-    // Frame the occupied bench fully during rest; normal autorun framing is unchanged.
-    const anchorX = this.restRemaining > 0 ? Math.max(framing.anchorX, .25) : framing.anchorX;
+    // Keep opaque art (including recoil/hair) inside the frame at every speed.
+    // The old 5% portrait anchor clipped Tanya when follow lag shrank on slowing.
+    const safeInset = this.tanyaVisual?.cameraLeftInset ?? 0;
+    const anchorX = Math.max(framing.anchorX, safeInset / viewWidth, this.restRemaining > 0 ? .25 : 0);
     const target = Phaser.Math.Clamp(this.tanya.x - viewWidth * anchorX, 0, Math.max(0, s.levelWidth - viewWidth));
     camera.scrollX = Phaser.Math.Linear(camera.scrollX, target, 1 - Math.exp(-dt * framing.followX));
+    // A sudden slowdown/resize must not leave the camera ahead of the sprite.
+    camera.scrollX = Math.min(camera.scrollX, Math.max(0, body.center.x - safeInset));
     // Небольшое вертикальное смещение сохраняет нижнюю страховочную дорожку в кадре.
     const targetY = framing.baseY + Phaser.Math.Clamp((this.tanya.y - (s.floorY - 24)) * .22, -40, 0);
     camera.scrollY = Phaser.Math.Linear(camera.scrollY, targetY, 1 - Math.exp(-dt * 2.8));
@@ -457,7 +461,8 @@ class PlayScene extends Phaser.Scene {
     this.tanya.setTexture('tanya').setAlpha(1);
     this.recoveries++; controls.reset();
     const camera=this.cameras.main,f=this.framing!;
-    camera.scrollX=Phaser.Math.Clamp(this.checkpoint-camera.width/camera.zoom*f.anchorX,0,s.levelWidth-camera.width/camera.zoom);
+    const inset=Math.max(camera.width/camera.zoom*f.anchorX,this.tanyaVisual?.cameraLeftInset ?? 0);
+    camera.scrollX=Phaser.Math.Clamp(this.checkpoint-inset,0,s.levelWidth-camera.width/camera.zoom);
     camera.scrollY=f.baseY+Phaser.Math.Clamp((this.tanya.y-(s.floorY-24))*.22,-40,0);
     message('Снова бежим!',900);
   }
@@ -581,7 +586,7 @@ class PlayScene extends Phaser.Scene {
     for (const flock of this.pigeons) {
       // Visible birds remain dangerous while flying. No invisible rectangular
       // flock and no timer that silently turns still-visible birds harmless.
-      if (touchesDanger(player, flock.sprite, 'pigeons') && this.hit(s.pigeonDamage)) {
+      if (touchesDanger(player, flock.sprite, 'pigeons') && this.hit(s.pigeonDamage, 'granny')) {
         this.cameras.main.shake(160, .004);
       }
     }
