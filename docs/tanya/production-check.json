@@ -5,13 +5,21 @@
     "width": 1536,
     "height": 1024,
     "frames": 20,
-    "animations": 6
+    "animations": 6,
+    "context": {
+      "width": 1536,
+      "height": 1024,
+      "frames": 20,
+      "animations": 6
+    }
   },
   "offline": {
     "ok": true,
     "width": 1536,
     "height": 1024,
-    "frames": 20
+    "frames": 20,
+    "contextFrames": 20,
+    "contextWidth": 1536
   },
   "errors": [],
   "failed": []

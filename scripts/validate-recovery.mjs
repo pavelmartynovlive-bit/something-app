@@ -10,7 +10,7 @@ const result=await page.evaluate(()=>{
  const anchors=[];
  for(const x of cfg.recoveryAnchors)for(const tired of [false,true]){
   const s=restart();if(tired)s.changeEnergy(-100);s.checkpoint=x;s.foodCount=23;
-  const energy=s.energy;s.beginFall();let frames=0;while(!s.recoveries&&frames++<50)tick();
+  const energy=s.energy;s.beginFall();let frames=0;while(!s.recoveries&&frames++<120)tick();
   const b=s.tanya.body,c=s.cameras.main,expected=Math.max(0,Math.min(cfg.levelWidth-c.width/c.zoom,x-c.width/c.zoom*s.framing.anchorX));
   const danger=[...s.grannies.map(g=>[g.sprite,'granny']),...s.scooters.map(g=>[g.sprite,'scooter']),...s.pigeons.map(g=>[g.sprite,'pigeons'])].some(([sprite,kind])=>haz.touchesDanger(b,sprite,kind));
   const cameraErrorAtRestore=Math.abs(c.scrollX-expected),vyAtRestore=b.velocity.y,foodAtRestore=s.foodCount,footErrorAtRestore=Math.abs(b.bottom-terrain.groundYAt(x));

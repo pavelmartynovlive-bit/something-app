@@ -1,0 +1,110 @@
+[
+  {
+    "mode": "normal",
+    "time": 41.89999999999819,
+    "food": 111,
+    "energy": 16.39500000000143,
+    "collisions": 0,
+    "bench": 0,
+    "lipton": 3,
+    "falls": 0,
+    "recoveries": 0,
+    "boosts": 4
+  },
+  {
+    "mode": "collector",
+    "time": 41.90000000000623,
+    "food": 111,
+    "energy": 16.39500000000143,
+    "collisions": 0,
+    "bench": 0,
+    "lipton": 3,
+    "falls": 0,
+    "recoveries": 0,
+    "boosts": 4
+  },
+  {
+    "mode": "low-energy",
+    "time": 89.59999999998035,
+    "food": 93,
+    "energy": 8.005000000000557,
+    "collisions": 0,
+    "bench": 1,
+    "lipton": 3,
+    "falls": 0,
+    "recoveries": 0,
+    "boosts": 10
+  },
+  {
+    "mode": "intentional-collision",
+    "time": 82.89999999995916,
+    "food": 91,
+    "energy": 0,
+    "collisions": 8,
+    "bench": 0,
+    "lipton": 2,
+    "falls": 0,
+    "recoveries": 0,
+    "boosts": 7
+  },
+  {
+    "mode": "pit-fall",
+    "time": 51.01666666672606,
+    "food": 112,
+    "energy": 0,
+    "collisions": 1,
+    "bench": 0,
+    "lipton": 3,
+    "falls": 4,
+    "recoveries": 4,
+    "boosts": 4
+  },
+  {
+    "mode": "platform-miss",
+    "time": 41.90000000004878,
+    "food": 100,
+    "energy": 16.39500000000143,
+    "collisions": 0,
+    "bench": 0,
+    "lipton": 3,
+    "falls": 0,
+    "recoveries": 0,
+    "boosts": 4
+  },
+  {
+    "mode": "bench",
+    "time": 44.116666666718025,
+    "food": 108,
+    "energy": 53.25000000000129,
+    "collisions": 0,
+    "bench": 1,
+    "lipton": 3,
+    "falls": 0,
+    "recoveries": 0,
+    "boosts": 4
+  },
+  {
+    "mode": "natural",
+    "time": 44.10000000005134,
+    "food": 98,
+    "energy": 53.29750000000129,
+    "collisions": 0,
+    "bench": 1,
+    "lipton": 3,
+    "falls": 0,
+    "recoveries": 0,
+    "boosts": 4
+  },
+  {
+    "mode": "safe",
+    "time": 44.500000000051806,
+    "food": 98,
+    "energy": 52.15750000000128,
+    "collisions": 0,
+    "bench": 1,
+    "lipton": 3,
+    "falls": 0,
+    "recoveries": 0,
+    "boosts": 3
+  }
+]

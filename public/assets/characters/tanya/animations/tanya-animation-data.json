@@ -4,9 +4,9 @@
     "height": 1024,
     "sha256": "3baa439705cd945b75ad25f379fa6dc5835ea2cfb1460995b962383da7f0e711"
   },
-  "frameSize": 192,
-  "footX": 96,
-  "footY": 172,
+  "frameSize": 256,
+  "footX": 128,
+  "footY": 224,
   "referenceHeight": 133,
   "referenceFaceHeight": 37,
   "frames": [

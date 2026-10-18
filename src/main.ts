@@ -5,7 +5,8 @@ import { TouchControls } from './controls';
 import { presentation, cameraFrame } from './presentation';
 import { WinterParallaxBackground } from './winter-parallax-background';
 import { WinterEnvironment } from './winter-environment';
-import { TanyaVisual } from './tanya-visual';
+import { TanyaVisual, tanyaArt } from './tanya-visual';
+import { tanyaInteractions as interaction, type BenchPhase, type PitFallZone, type TanyaHit } from './tanya-interactions';
 import './style.css';
 import './pwa';
 
@@ -48,6 +49,16 @@ class PlayScene extends Phaser.Scene {
   private boostUsed = false;
   private boostsUsed = 0;
   private restRemaining = 0;
+  private benchAnchorX = 0;
+  private benchFloorY = 0;
+  private pitFalling = false;
+  private fallZone: PitFallZone | null = null;
+  private get benchPhase(): BenchPhase {
+    if (this.restRemaining <= 0) return 'none';
+    const elapsed = s.benchDurationMs - this.restRemaining;
+    return elapsed < interaction.benchSitMs - 1e-6 ? 'sit'
+      : this.restRemaining <= interaction.benchStandMs + 1e-6 ? 'stand' : 'seated';
+  }
   private foodCount = 0;
   private scooters: { sprite: Phaser.Physics.Arcade.Sprite; spawnX: number; launchAt: number; left: number; right: number; launched: boolean }[] = [];
   private pigeons: { sprite: Phaser.Physics.Arcade.Sprite; flying: boolean; lowFlightRemaining: number; perchY: number }[] = [];
@@ -82,6 +93,7 @@ class PlayScene extends Phaser.Scene {
     this.takeoffTired = this.boostUsed = false;
     this.boostsUsed = 0;
     this.restRemaining = this.foodCount = 0;
+    this.pitFalling = false; this.fallZone = null;
     this.scooters = [];
     this.pigeons = [];
     this.finished = this.wasPortrait = false;
@@ -139,7 +151,8 @@ class PlayScene extends Phaser.Scene {
     }
     this.tanya = this.physics.add.sprite(100, s.floorY - 25, 'tanya');
     this.tanya.setSize(24, 50).setOffset(8, 4).setMaxVelocity(500, 700);
-    this.physics.add.collider(this.tanya, ground);
+    this.physics.add.collider(this.tanya, ground, undefined, () =>
+      !this.pitFalling && !this.enteredPit(this.tanya.body as Phaser.Physics.Arcade.Body));
     // Resolve the same drawn top after EVERY fixed physics substep, not once
     // per render frame. This also catches high-speed top crossings at joins.
     const physicsWorld = this.physics.world;
@@ -148,7 +161,7 @@ class PlayScene extends Phaser.Scene {
     this.physics.add.collider(this.tanya, upperRoute, undefined, (_player, block) => {
       const body = this.tanya.body as Phaser.Physics.Arcade.Body;
       const platform = (block as Phaser.GameObjects.Rectangle).body as Phaser.Physics.Arcade.StaticBody;
-      return body.velocity.y >= 0 && body.prev.y + body.height <= platform.top + 4;
+      return !this.pitFalling && body.velocity.y >= 0 && body.prev.y + body.height <= platform.top + 4;
     });
     // Crates are genuinely solid. A missed jump contacts the visible face;
     // a jump from that face remains possible even at zero energy.
@@ -165,7 +178,7 @@ class PlayScene extends Phaser.Scene {
       bottle.setSize(42, 52);
     });
     this.physics.add.overlap(this.tanya, bottles, (_player, item) => {
-      if (this.finished || this.recoveryRemaining > 0) return;
+      if (this.finished || this.pitFalling || this.recoveryRemaining > 0) return;
       const bottle = item as Phaser.Physics.Arcade.Sprite;
       const label = this.add.text(bottle.x, bottle.y - 25, `+${s.liptonEnergy}`, { fontSize: '22px', color: '#326544', fontStyle: 'bold' }).setOrigin(.5).setDepth(20);
       bottle.destroy();
@@ -190,6 +203,9 @@ class PlayScene extends Phaser.Scene {
     const owner = this;
     this.tanyaVisual = new TanyaVisual(this, this.tanya, {
       get resting() { return owner.restRemaining > 0; },
+      get benchPhase() { return owner.benchPhase; },
+      get pitFalling() { return owner.pitFalling; },
+      get pitZone() { return owner.fallZone; },
       get recovering() { return owner.recoveryRemaining > 0; },
       get energy() { return owner.energy; },
     });
@@ -226,9 +242,10 @@ class PlayScene extends Phaser.Scene {
       if (this.recoveryRemaining === 0) this.respawn();
       return;
     }
-    const pit = s.interruptions.find(p => body.center.x >= p.start && body.center.x < p.start+p.width);
-    if ((pit && body.bottom > groundYAt(pit.start-1)+3) || body.bottom > 650) {
-      this.beginFall(); return;
+    if (this.pitFalling) { this.updatePitFall(); return; }
+    const pit = this.enteredPit(body);
+    if (pit || body.bottom > 650) {
+      this.beginFall(pit); this.updatePitFall(); return;
     }
     const grounded = body.blocked.down && body.velocity.y >= 0;
     if (grounded) {
@@ -242,14 +259,21 @@ class PlayScene extends Phaser.Scene {
     const jumpRequested = space || up || touch;
     if (jumpRequested) this.bufferedJump = now;
     if (this.restRemaining > 0) {
+      const before = s.benchDurationMs - this.restRemaining;
       this.restRemaining = Math.max(0, this.restRemaining - delta);
-      this.tanya.setVelocity(0, 0);
+      const after = s.benchDurationMs - this.restRemaining;
+      const seatedMs = s.benchDurationMs - interaction.benchSitMs - interaction.benchStandMs;
+      const seatedDelta = Phaser.Math.Clamp(after - interaction.benchSitMs, 0, seatedMs)
+        - Phaser.Math.Clamp(before - interaction.benchSitMs, 0, seatedMs);
+      // Same original total recovery in the same total stop time, only while seated.
+      if (seatedDelta > 0) this.changeEnergy(s.benchEnergyPerSecond * s.benchDurationMs / 1000 * seatedDelta / seatedMs);
+      this.holdBench();
       this.bufferedJump = -Infinity;
-      this.changeEnergy(s.benchEnergyPerSecond * dt);
       if (this.restRemaining === 0) {
-        this.tanya.setTexture('tanya');
         body.allowGravity = true;
-        body.reset(this.tanya.x, groundYAt(this.tanya.x) - 26);
+        this.airborneSpeed = this.runSpeed();
+        body.setVelocityX(this.airborneSpeed);
+        this.lastGround = now;
         message('Отдохнули — побежали!', 1200);
       }
     } else {
@@ -295,7 +319,7 @@ class PlayScene extends Phaser.Scene {
       this.boostsUsed++;
       this.bufferedJump = -Infinity;
     }
-    this.tanya.setAlpha(now < this.hitUntil ? (Math.floor(now / 100) % 2 ? .45 : 1) : 1);
+    this.tanya.setAlpha(1); // Invulnerability is gameplay-only; reactions replace blinking.
     // Keep the trolley silhouette stable when the patrol reverses: flipping
     // it would instantly move the head hitbox across a jump already in progress.
     for (const granny of this.grannies) {
@@ -311,7 +335,9 @@ class PlayScene extends Phaser.Scene {
     const camera = this.cameras.main;
     const framing = this.framing!;
     const viewWidth = camera.width / camera.zoom;
-    const target = Phaser.Math.Clamp(this.tanya.x - viewWidth * framing.anchorX, 0, Math.max(0, s.levelWidth - viewWidth));
+    // Frame the occupied bench fully during rest; normal autorun framing is unchanged.
+    const anchorX = this.restRemaining > 0 ? Math.max(framing.anchorX, .25) : framing.anchorX;
+    const target = Phaser.Math.Clamp(this.tanya.x - viewWidth * anchorX, 0, Math.max(0, s.levelWidth - viewWidth));
     camera.scrollX = Phaser.Math.Linear(camera.scrollX, target, 1 - Math.exp(-dt * framing.followX));
     // Небольшое вертикальное смещение сохраняет нижнюю страховочную дорожку в кадре.
     const targetY = framing.baseY + Phaser.Math.Clamp((this.tanya.y - (s.floorY - 24)) * .22, -40, 0);
@@ -340,10 +366,11 @@ class PlayScene extends Phaser.Scene {
     this.lowEnergy = this.energy > 0 && this.energy <= s.lowEnergyThreshold;
     if (this.lowEnergy && !wasLow && amount < 0) message('Скоро Таня устанет — нужен отдых', 2500);
   }
-  private hit(damage: number) {
-    if (this.finished || this.restRemaining > 0 || this.time.now < this.hitUntil) return false;
+  private hit(damage: number, kind?: TanyaHit) {
+    if (this.finished || this.restRemaining > 0 || this.pitFalling || this.recoveryRemaining > 0 || this.time.now < this.hitUntil) return false;
     this.hitUntil = this.time.now + s.hitCooldownMs;
     this.changeEnergy(-damage);
+    if (kind) this.tanyaVisual?.react(kind);
     if (!this.exhausted) message(`Ой! −${damage} энергии`, 1000);
     return true;
   }
@@ -353,6 +380,7 @@ class PlayScene extends Phaser.Scene {
     for(const actor of actors) {
       const body=actor.body as Phaser.Physics.Arcade.Body;
       if(!body.enable || !body.allowGravity || body.velocity.y<0)continue;
+      if(actor===this.tanya && (this.pitFalling || this.enteredPit(body)))continue;
       const x=body.center.x, previousX=body.prev.x+body.halfWidth;
       const span=s.groundSpans.find(g=>x>=g.start&&x<g.end);
       if(!span)continue;
@@ -368,17 +396,47 @@ class PlayScene extends Phaser.Scene {
       }
     }
   }
-  private beginFall() {
-    if(this.finished || this.recoveryRemaining>0)return;
-    this.falls++;
-    this.recoveryRemaining=s.recoveryDelayMs;
-    const body=this.tanya.body as Phaser.Physics.Arcade.Body;
-    body.setVelocity(0,0); body.enable=false; this.tanya.setAlpha(.45);
-    this.lastGround=this.bufferedJump=this.jumpStartedAt=-Infinity;
-    controls.reset(); message('Ой, яма! Возвращаемся…',s.recoveryDelayMs);
+  private enteredPit(body: Phaser.Physics.Arcade.Body) {
+    if (body.velocity.y < 0) return undefined;
+    return s.interruptions.find(p => body.center.x >= p.start && body.center.x < p.start + p.width
+      && body.bottom > groundYAt(p.start - 1) + 3);
+  }
+  private beginFall(pit?: typeof s.interruptions[number]) {
+    if (this.finished || this.pitFalling || this.recoveryRemaining > 0) return;
+    this.falls++; this.pitFalling = true;
+    const body = this.tanya.body as Phaser.Physics.Arcade.Body;
+    const maskBottom = pit ? groundYAt(pit.start) - interaction.pitMaskInset : 660;
+    this.fallZone = {start: pit?.start ?? body.center.x - 128, width: pit?.width ?? 256,
+      maskBottom, killY: maskBottom + tanyaArt.footY * tanyaArt.renderedHeight / tanyaArt.referenceHeight + 2};
+    body.enable = true; body.allowGravity = true;
+    body.setGravityY(0); body.setMaxVelocity(500, 900);
+    body.setVelocityY(Math.max(1, body.velocity.y)); // Preserve downward momentum.
+    body.setVelocityX(Math.min(interaction.pitDriftSpeed, Math.max(0, body.velocity.x)));
+    this.tanya.setAlpha(1);
+    this.lastGround = this.bufferedJump = this.jumpStartedAt = -Infinity;
+    controls.reset();
+  }
+  private updatePitFall() {
+    const body = this.tanya.body as Phaser.Physics.Arcade.Body, zone = this.fallZone!;
+    controls.reset(); Phaser.Input.Keyboard.JustDown(this.keys.SPACE); Phaser.Input.Keyboard.JustDown(this.keys.UP);
+    body.setVelocityX(Math.min(interaction.pitDriftSpeed, Math.max(0, (zone.start + zone.width - 16 - body.center.x) * 10)));
+    if (body.top < zone.killY - body.height) return;
+    // Only now is every sprite pixel below the pit's occlusion boundary.
+    body.stop(); body.enable = false;
+    this.recoveryRemaining = s.recoveryDelayMs;
+    message('Ой, яма! Возвращаемся…', s.recoveryDelayMs);
+  }
+  private holdBench() {
+    const body = this.tanya.body as Phaser.Physics.Arcade.Body;
+    this.tanya.setPosition(this.benchAnchorX, this.benchFloorY - 26).setVelocity(0, 0);
+    body.allowGravity = false;
+    body.position.set(this.benchAnchorX - body.halfWidth, this.benchFloorY - body.height);
+    body.prev.copy(body.position); body.prevFrame.copy(body.position); body.updateCenter();
+    body.blocked.down = body.touching.down = true;
   }
   private respawn() {
     const body=this.tanya.body as Phaser.Physics.Arcade.Body;
+    this.pitFalling = false; this.fallZone = null;
     body.enable=true; body.allowGravity=true;
     this.tanya.setTexture('tanya').setAlpha(1);
     const floor=groundYAt(this.checkpoint);
@@ -439,7 +497,7 @@ class PlayScene extends Phaser.Scene {
     const food = this.physics.add.staticGroup();
     for (const point of s.food) food.create(point.x, point.y, 'food');
     this.physics.add.overlap(this.tanya, food, (_player, item) => {
-      if (this.finished || this.recoveryRemaining > 0) return;
+      if (this.finished || this.pitFalling || this.recoveryRemaining > 0) return;
       const packet = item as Phaser.Physics.Arcade.Sprite;
       const label = this.add.text(packet.x, packet.y - 25, '+1 корм', { fontSize: '18px', color: '#326544' }).setOrigin(.5).setDepth(20);
       packet.destroy();
@@ -470,13 +528,12 @@ class PlayScene extends Phaser.Scene {
     this.physics.add.overlap(this.tanya, benches, (_player, item) => {
       const bench = item as Phaser.Physics.Arcade.Sprite;
       const body = this.tanya.body as Phaser.Physics.Arcade.Body;
-      if (this.finished || this.recoveryRemaining > 0 || this.restRemaining > 0 || bench.getData('used') || this.energy >= s.benchEnergyThreshold || body.velocity.y < 0 || !(body.blocked.down && Math.abs(body.bottom - groundYAt(this.tanya.x)) < 3)) return;
+      if (this.finished || this.pitFalling || this.recoveryRemaining > 0 || this.restRemaining > 0 || bench.getData('used') || this.energy >= s.benchEnergyThreshold || body.velocity.y < 0 || !(body.blocked.down && Math.abs(body.bottom - groundYAt(this.tanya.x)) < 3)) return;
       bench.setData('used', true);
       this.benchUses++;
       this.restRemaining = s.benchDurationMs;
-      body.reset(bench.x, groundYAt(bench.x) - 26);
-      this.tanya.setVelocity(0, 0).setTexture('tanya-sitting');
-      body.allowGravity = false;
+      this.benchAnchorX = bench.x; this.benchFloorY = groundYAt(bench.x);
+      this.holdBench();
       this.flightGravity = s.gravity; body.setGravityY(0);
       controls.reset();
       message('Отдыхаем на лавочке', s.benchDurationMs);
@@ -513,10 +570,10 @@ class PlayScene extends Phaser.Scene {
     }
     const player = this.tanya.body as Phaser.Physics.Arcade.Body;
     for (const granny of this.grannies) {
-      if (touchesDanger(player, granny.sprite, 'granny')) this.hit(s.grannyDamage);
+      if (touchesDanger(player, granny.sprite, 'granny')) this.hit(s.grannyDamage, 'granny');
     }
     for (const scooter of this.scooters) {
-      if (scooter.sprite.body!.enable && touchesDanger(player, scooter.sprite, 'scooter') && this.hit(s.scooterDamage)) {
+      if (scooter.sprite.body!.enable && touchesDanger(player, scooter.sprite, 'scooter') && this.hit(s.scooterDamage, 'scooter')) {
         this.slowUntil = this.time.now + s.scooterSlowMs;
         this.cameras.main.shake(90, .002);
       }

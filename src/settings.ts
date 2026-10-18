@@ -46,7 +46,7 @@ export const settings = {
   pigeons: [{x:2500,y:435},{x:9590,y:470}] as Point[],
   benches: [7200] as number[],
   grannies: [{left:1820,right:1840},{left:6300,right:6320},{left:10230,right:10250},{left:740,right:760},{left:3690,right:3710}] as {left:number;right:number}[],
-  recoveryDelayMs: 600,
+  recoveryDelayMs: 220,
   recoveryAnchors: [100,240,1220,2660,4110,5880,7320,8280,9240],
   signs: levelSections.map(section => ({ x: section.start === 100 ? 260 : section.start === 1100 ? 1470 : section.start === 3940 ? 3990 : section.start === 8870 ? 9130 : section.start - 160, text: section.start === 1100 ? 'Тап → тап: выше' : section.start === 3940 ? 'Тап → тап: дальше' : section.start === 8870 ? 'Самокат → птицы → кот' : section.name })),
 };

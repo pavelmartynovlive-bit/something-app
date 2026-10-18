@@ -7,9 +7,9 @@
       "dataFile": "assets/characters/tanya/animations/tanya-animation-data.json",
       "sourceWidth": 1536,
       "sourceHeight": 1024,
-      "frameSize": 192,
-      "footX": 96,
-      "footY": 172,
+      "frameSize": 256,
+      "footX": 128,
+      "footY": 224,
       "renderedHeight": 78.0208,
       "referenceHeight": 133,
       "displayKey": "tanya:animated-display"
@@ -17,220 +17,220 @@
     "frames": [
       {
         "name": "idle-01",
-        "width": 192,
-        "height": 192,
+        "width": 256,
+        "height": 256,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "bottomError": 0,
         "opaqueHeight": 78.0208
       },
       {
         "name": "idle-02",
-        "width": 192,
-        "height": 192,
+        "width": 256,
+        "height": 256,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "bottomError": 0,
         "opaqueHeight": 78.0208
       },
       {
         "name": "idle-03",
-        "width": 192,
-        "height": 192,
+        "width": 256,
+        "height": 256,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "bottomError": 0,
         "opaqueHeight": 78.0208
       },
       {
         "name": "idle-04",
-        "width": 192,
-        "height": 192,
+        "width": 256,
+        "height": 256,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "bottomError": 0,
         "opaqueHeight": 76.26093233082706
       },
       {
         "name": "run-01",
-        "width": 192,
-        "height": 192,
+        "width": 256,
+        "height": 256,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "bottomError": 0,
         "opaqueHeight": 78.0208
       },
       {
         "name": "run-02",
-        "width": 192,
-        "height": 192,
+        "width": 256,
+        "height": 256,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "bottomError": 0,
         "opaqueHeight": 79.19404511278195
       },
       {
         "name": "run-03",
-        "width": 192,
-        "height": 192,
+        "width": 256,
+        "height": 256,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "bottomError": 0,
         "opaqueHeight": 79.19404511278195
       },
       {
         "name": "run-04",
-        "width": 192,
-        "height": 192,
+        "width": 256,
+        "height": 256,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "bottomError": 0,
         "opaqueHeight": 82.12715789473684
       },
       {
         "name": "run-05",
-        "width": 192,
-        "height": 192,
+        "width": 256,
+        "height": 256,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "bottomError": 0,
         "opaqueHeight": 83.88702556390976
       },
       {
         "name": "run-06",
-        "width": 192,
-        "height": 192,
+        "width": 256,
+        "height": 256,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "bottomError": 0,
         "opaqueHeight": 79.78066766917293
       },
       {
         "name": "run-07",
-        "width": 192,
-        "height": 192,
+        "width": 256,
+        "height": 256,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "bottomError": 0,
         "opaqueHeight": 82.12715789473684
       },
       {
         "name": "run-08",
-        "width": 192,
-        "height": 192,
+        "width": 256,
+        "height": 256,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "bottomError": 0,
         "opaqueHeight": 77.43417744360902
       },
       {
         "name": "jump-start-01",
-        "width": 192,
-        "height": 192,
+        "width": 256,
+        "height": 256,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "bottomError": 0,
         "opaqueHeight": 71.56795187969924
       },
       {
         "name": "jump-start-02",
-        "width": 192,
-        "height": 192,
+        "width": 256,
+        "height": 256,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "bottomError": 0,
         "opaqueHeight": 75.0876872180451
       },
       {
         "name": "jump-01",
-        "width": 192,
-        "height": 192,
+        "width": 256,
+        "height": 256,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "bottomError": 0,
         "opaqueHeight": 81.54053533834586
       },
       {
         "name": "jump-02",
-        "width": 192,
-        "height": 192,
+        "width": 256,
+        "height": 256,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "bottomError": 0,
         "opaqueHeight": 71.56795187969924
       },
       {
         "name": "fall-01",
-        "width": 192,
-        "height": 192,
+        "width": 256,
+        "height": 256,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "bottomError": 0,
         "opaqueHeight": 77.43417744360902
       },
       {
         "name": "fall-02",
-        "width": 192,
-        "height": 192,
+        "width": 256,
+        "height": 256,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "bottomError": 0,
         "opaqueHeight": 80.3672902255639
       },
       {
         "name": "landing-01",
-        "width": 192,
-        "height": 192,
+        "width": 256,
+        "height": 256,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "bottomError": 0,
         "opaqueHeight": 69.22146165413533
       },
       {
         "name": "landing-02",
-        "width": 192,
-        "height": 192,
+        "width": 256,
+        "height": 256,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "bottomError": 0,
         "opaqueHeight": 79.19404511278195
@@ -256,12 +256,12 @@
       "visible": false
     },
     "visual": {
-      "width": 112.63153082706765,
-      "height": 112.63153082706765,
+      "width": 150.1753744360902,
+      "height": 150.1753744360902,
       "scale": 0.5866225563909774,
       "origin": [
         0.5,
-        0.8958333333333334
+        0.875
       ],
       "body": false,
       "flipX": false,
@@ -322,11 +322,11 @@
         "visible": true,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "size": [
-          192,
-          192
+          256,
+          256
         ],
         "anchorError": 0,
         "body": [
@@ -348,11 +348,11 @@
         "visible": true,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "size": [
-          192,
-          192
+          256,
+          256
         ],
         "anchorError": 0,
         "body": [
@@ -374,11 +374,11 @@
         "visible": true,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "size": [
-          192,
-          192
+          256,
+          256
         ],
         "anchorError": 0,
         "body": [
@@ -400,11 +400,11 @@
         "visible": true,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "size": [
-          192,
-          192
+          256,
+          256
         ],
         "anchorError": 0,
         "body": [
@@ -426,11 +426,11 @@
         "visible": true,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "size": [
-          192,
-          192
+          256,
+          256
         ],
         "anchorError": 0,
         "body": [
@@ -452,11 +452,11 @@
         "visible": true,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "size": [
-          192,
-          192
+          256,
+          256
         ],
         "anchorError": 0,
         "body": [
@@ -478,11 +478,11 @@
         "visible": true,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "size": [
-          192,
-          192
+          256,
+          256
         ],
         "anchorError": 0,
         "body": [
@@ -497,18 +497,18 @@
       },
       {
         "label": "bench",
-        "state": "idle",
-        "anim": "tanya-idle",
-        "frame": "idle-01",
+        "state": "bench-idle",
+        "anim": "tanya-bench-idle",
+        "frame": "bench-idle-01",
         "timeScale": 1,
         "visible": true,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "size": [
-          192,
-          192
+          256,
+          256
         ],
         "anchorError": 0,
         "body": [
@@ -518,23 +518,23 @@
           4
         ],
         "alpha": 1,
-        "shadowVisible": false,
-        "contactVisible": false
+        "shadowVisible": true,
+        "contactVisible": true
       },
       {
         "label": "bench-exit",
         "state": "run",
         "anim": "tanya-run",
-        "frame": "run-01",
+        "frame": "run-02",
         "timeScale": 1,
         "visible": true,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "size": [
-          192,
-          192
+          256,
+          256
         ],
         "anchorError": 0,
         "body": [
@@ -549,18 +549,18 @@
       },
       {
         "label": "pit",
-        "state": "fall",
-        "anim": "tanya-fall",
-        "frame": "fall-01",
+        "state": "pit-fall",
+        "anim": "tanya-pit-fall",
+        "frame": "pit-fall-01",
         "timeScale": 1,
         "visible": true,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "size": [
-          192,
-          192
+          256,
+          256
         ],
         "anchorError": 0,
         "body": [
@@ -569,7 +569,7 @@
           8,
           4
         ],
-        "alpha": 0.45,
+        "alpha": 1,
         "shadowVisible": false,
         "contactVisible": false
       },
@@ -582,11 +582,11 @@
         "visible": true,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "size": [
-          192,
-          192
+          256,
+          256
         ],
         "anchorError": 0,
         "body": [
@@ -608,11 +608,11 @@
         "visible": true,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "size": [
-          192,
-          192
+          256,
+          256
         ],
         "anchorError": 0,
         "body": [
@@ -634,11 +634,11 @@
         "visible": true,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "size": [
-          192,
-          192
+          256,
+          256
         ],
         "anchorError": 0,
         "body": [
@@ -660,11 +660,11 @@
         "visible": true,
         "origin": [
           0.5,
-          0.8958333333333334
+          0.875
         ],
         "size": [
-          192,
-          192
+          256,
+          256
         ],
         "anchorError": 0,
         "body": [
@@ -693,9 +693,9 @@
     },
     "bench": {
       "uses": 1,
-      "rest": 2483.3333333333335,
-      "energyBefore": 0.24,
-      "energyAfter": 35.85999999999995
+      "rest": 2300.000000000002,
+      "energyBefore": 0,
+      "energyAfter": 35.62000000000008
     },
     "recovery": {
       "energy": 49.81,
@@ -779,8 +779,8 @@
   "resize": [
     {
       "visual": [
-        192,
-        192,
+        256,
+        256,
         0.5866225563909774
       ],
       "body": [
@@ -791,8 +791,8 @@
     },
     {
       "visual": [
-        192,
-        192,
+        256,
+        256,
         0.5866225563909774
       ],
       "body": [
@@ -803,8 +803,8 @@
     },
     {
       "visual": [
-        192,
-        192,
+        256,
+        256,
         0.5866225563909774
       ],
       "body": [
@@ -815,8 +815,8 @@
     },
     {
       "visual": [
-        192,
-        192,
+        256,
+        256,
         0.5866225563909774
       ],
       "body": [
@@ -827,8 +827,8 @@
     },
     {
       "visual": [
-        192,
-        192,
+        256,
+        256,
         0.5866225563909774
       ],
       "body": [

@@ -1,15 +1,19 @@
 import Phaser from 'phaser';
 import { settings } from './settings';
+import { tanyaInteractions as interaction, type BenchPhase, type PitFallZone, type TanyaHit } from './tanya-interactions';
 
-export type TanyaVisualState = 'idle' | 'run' | 'jump-start' | 'jump' | 'fall' | 'land';
+export type TanyaVisualState = 'idle' | 'run' | 'jump-start' | 'jump' | 'fall' | 'land' | 'bench-sit' | 'bench-idle' | 'bench-stand' | 'pit-fall' | 'hit-granny' | 'hit-scooter';
 export type TanyaVisualContext = {
   readonly resting: boolean;
   readonly recovering: boolean;
+  readonly benchPhase: BenchPhase;
+  readonly pitFalling: boolean;
+  readonly pitZone: PitFallZone | null;
   readonly energy: number;
 };
 type AnimationData = {
   frameSize: number; footX: number; footY: number; referenceHeight: number;
-  frames: { name: string; rect: {x: number; y: number; w: number; h: number}; normalize: number; rootX: number; footY: number }[];
+  frames: { name: string; rect: {x: number; y: number; w: number; h: number}; normalize: number; rootX: number; footY: number; seat?: boolean }[];
   animations: { key: string; frames: string[]; frameRate: number; repeat: number }[];
 };
 
@@ -17,37 +21,40 @@ type AnimationData = {
 export const tanyaArt = {
   key: 'tanya:animation-source', file: 'assets/characters/tanya/animations/tanya-animation-sheet.png',
   dataKey: 'tanya:animation-data', dataFile: 'assets/characters/tanya/animations/tanya-animation-data.json',
-  sourceWidth: 1536, sourceHeight: 1024, frameSize: 192, footX: 96, footY: 172,
+  sourceWidth: 1536, sourceHeight: 1024, frameSize: 256, footX: 128, footY: 224,
   renderedHeight: 78.0208, referenceHeight: 133, displayKey: 'tanya:animated-display',
+};
+
+export const tanyaContextArt = {
+  ...tanyaArt, key: 'tanya:context-source', file: 'assets/characters/tanya/animations/tanya-context-sheet.png',
+  dataKey: 'tanya:context-data', dataFile: 'assets/characters/tanya/animations/tanya-context-data.json', displayKey: 'tanya:context-display',
 };
 
 export class TanyaVisual {
   static preload(scene: Phaser.Scene) {
-    if (!scene.textures.exists(tanyaArt.key)) scene.load.image(tanyaArt.key, `${import.meta.env.BASE_URL}${tanyaArt.file}`);
-    if (!scene.cache.json.exists(tanyaArt.dataKey)) scene.load.json(tanyaArt.dataKey, `${import.meta.env.BASE_URL}${tanyaArt.dataFile}`);
-  }
-
-  private static prepare(scene: Phaser.Scene) {
-    const data = scene.cache.json.get(tanyaArt.dataKey) as AnimationData;
-    if (!scene.textures.exists(tanyaArt.displayKey)) {
-      const source = scene.textures.get(tanyaArt.key).getSourceImage() as HTMLImageElement;
-      // One cached atlas for the entire game. Uniform resampling only: no new
-      // drawing, procedural hair, frame-dependent display scale or collider.
-      const texture = scene.textures.createCanvas(tanyaArt.displayKey, data.frameSize * 4, data.frameSize * 5)!;
-      const ctx = texture.getContext();
-      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
-      data.frames.forEach((f, i) => {
-        const x = i % 4 * data.frameSize, y = Math.floor(i / 4) * data.frameSize, r = f.rect;
-        ctx.drawImage(source, r.x, r.y, r.w, r.h,
-          x + data.footX - f.rootX * f.normalize, y + data.footY - f.footY * f.normalize,
-          r.w * f.normalize, r.h * f.normalize);
-        texture.add(f.name, 0, x, y, data.frameSize, data.frameSize);
-      });
-      texture.refresh();
+    for (const art of [tanyaArt, tanyaContextArt]) {
+      if (!scene.textures.exists(art.key)) scene.load.image(art.key, `${import.meta.env.BASE_URL}${art.file}`);
+      if (!scene.cache.json.exists(art.dataKey)) scene.load.json(art.dataKey, `${import.meta.env.BASE_URL}${art.dataFile}`);
     }
-    for (const a of data.animations) {
-      if (!scene.anims.exists(a.key)) scene.anims.create({ key: a.key,
-        frames: a.frames.map(frame => ({key: tanyaArt.displayKey, frame})), frameRate: a.frameRate, repeat: a.repeat });
+  }
+  private static prepare(scene: Phaser.Scene) {
+    for (const art of [tanyaArt, tanyaContextArt]) {
+      const data = scene.cache.json.get(art.dataKey) as AnimationData;
+      if (!scene.textures.exists(art.displayKey)) {
+        const source = scene.textures.get(art.key).getSourceImage() as HTMLImageElement;
+        const texture = scene.textures.createCanvas(art.displayKey, data.frameSize * 4, data.frameSize * 5)!;
+        const ctx = texture.getContext();ctx.imageSmoothingEnabled = true;ctx.imageSmoothingQuality = 'high';
+        data.frames.forEach((f, i) => {
+          const x = i % 4 * data.frameSize, y = Math.floor(i / 4) * data.frameSize, r = f.rect;
+          const seatOffset = f.seat ? interaction.benchSeatHeight / (tanyaArt.renderedHeight / tanyaArt.referenceHeight) : 0;
+          ctx.drawImage(source, r.x, r.y, r.w, r.h,
+            x + data.footX - f.rootX * f.normalize, y + data.footY - seatOffset - f.footY * f.normalize,
+            r.w * f.normalize, r.h * f.normalize);
+          texture.add(f.name, 0, x, y, data.frameSize, data.frameSize);
+        });texture.refresh();
+      }
+      for (const a of data.animations) if (!scene.anims.exists(a.key)) scene.anims.create({key: a.key,
+        frames: a.frames.map(frame => ({key: art.displayKey, frame})), frameRate: a.frameRate, repeat: a.repeat});
     }
   }
 
@@ -56,6 +63,10 @@ export class TanyaVisual {
   readonly contactShadow: Phaser.GameObjects.Ellipse;
   state: TanyaVisualState = 'idle';
   private initialized = false;
+  private hitReaction: TanyaHit | null = null;
+  private pitMaskShape: Phaser.GameObjects.Graphics;
+  private pitMask: Phaser.Display.Masks.GeometryMask;
+  private lastPitZone: PitFallZone | null = null;
   private wasGrounded = false;
   private wasRecovering = false;
   private lastVelocityY = 0;
@@ -66,6 +77,8 @@ export class TanyaVisual {
 
   constructor(private scene: Phaser.Scene, private carrier: Phaser.Physics.Arcade.Sprite, private context: TanyaVisualContext) {
     TanyaVisual.prepare(scene);
+    this.pitMaskShape = scene.add.graphics().setVisible(false);
+    this.pitMask = this.pitMaskShape.createGeometryMask();
     this.footShadow = scene.add.ellipse(0, 0, 30.8, 5.5, 0x36465b).setData('tanyaFootShadow', true);
     this.contactShadow = scene.add.ellipse(0, 0, 19.8, 2.2, 0x2c394b).setData('tanyaContactShadow', true);
     this.sprite = scene.add.sprite(0, 0, tanyaArt.displayKey, 'idle-01')
@@ -86,10 +99,13 @@ export class TanyaVisual {
     const body = this.carrier.body as Phaser.Physics.Arcade.Body | null;
     if (!body) return;
     const grounded = body.blocked.down && body.velocity.y >= 0;
-    const recovering = this.context.recovering;
+    const recovering = this.context.recovering || this.context.pitFalling;
     let next: TanyaVisualState;
-    if (recovering) next = 'fall';
-    else if (this.context.resting) next = 'idle';
+    if (recovering) { next = 'pit-fall'; this.hitReaction = null; }
+    else if (this.context.benchPhase !== 'none') {
+      next = this.context.benchPhase === 'sit' ? 'bench-sit' : this.context.benchPhase === 'stand' ? 'bench-stand' : 'bench-idle';
+      this.hitReaction = null;
+    } else if (this.hitReaction && this.sprite.anims.isPlaying) next = this.hitReaction === 'granny' ? 'hit-granny' : 'hit-scooter';
     else if (!grounded) {
       if (body.velocity.y < 0) {
         const takeoff = this.initialized && (this.wasGrounded || this.lastVelocityY >= 0) && !this.wasRecovering;
@@ -98,6 +114,7 @@ export class TanyaVisual {
     } else if (this.initialized && !this.wasGrounded && !this.wasRecovering) next = 'land';
     else if (this.state === 'land' && this.sprite.anims.isPlaying) next = 'land';
     else next = Math.abs(body.velocity.x) > 1 ? 'run' : 'idle';
+    if (next !== 'hit-granny' && next !== 'hit-scooter') this.hitReaction = null;
     if (next !== this.state) {
       this.state = next;
       this.sprite.play(`tanya-${next}`);
@@ -115,17 +132,32 @@ export class TanyaVisual {
     this.sync();
   }
 
+  react(kind: TanyaHit) {
+    if (this.context.pitFalling || this.context.recovering || this.context.resting) return;
+    this.hitReaction = kind;
+    this.state = kind === 'granny' ? 'hit-granny' : 'hit-scooter';
+    this.sprite.play(`tanya-${this.state}`);
+  }
+
   private sync() {
     if (!this.carrier.body) return;
     const body = this.carrier.body as Phaser.Physics.Arcade.Body;
     const grounded = body.blocked.down && body.velocity.y >= 0;
     this.footShadow.setPosition(body.center.x, body.bottom - .5)
       .setDepth(this.carrier.depth - .1).setAlpha(.14 * this.carrier.alpha)
-      .setVisible(this.carrier.active && grounded && !this.context.recovering);
+      .setVisible(this.carrier.active && grounded && !this.context.recovering && !this.context.pitFalling);
     this.contactShadow.setPosition(body.center.x, body.bottom - .2)
       .setDepth(this.carrier.depth - .05).setAlpha(.18 * this.carrier.alpha).setVisible(this.footShadow.visible);
     this.sprite.setPosition(body.center.x, body.bottom).setDepth(this.carrier.depth)
-      .setAlpha(this.carrier.alpha).setVisible(this.carrier.active);
+      .setAlpha(1).setVisible(this.carrier.active && !this.context.recovering);
+    const zone = this.context.pitZone;
+    if (zone !== this.lastPitZone) {
+      if (zone) {
+        this.pitMaskShape.clear().fillStyle(0xffffff).fillRect(zone.start, -1024, zone.width, zone.maskBottom + 1024);
+        this.sprite.setMask(this.pitMask);
+      } else this.sprite.clearMask(false);
+      this.lastPitZone = zone;
+    }
     if (this.debugEnabled) this.drawDebug(body, grounded);
   }
 
@@ -154,6 +186,7 @@ export class TanyaVisual {
     this.scene.events.off(Phaser.Scenes.Events.PRE_RENDER, this.sync, this);
     this.scene.input.keyboard?.off('keydown-F3', this.toggleDebug, this);
     this.sprite.destroy(); this.footShadow.destroy(); this.contactShadow.destroy();
+    this.pitMask.destroy(); this.pitMaskShape.destroy();
     this.debugText?.destroy(); this.debugBody?.destroy();
   }
 }

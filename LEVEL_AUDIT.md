@@ -357,3 +357,22 @@ floating-point rounding. Natural44.12s/98food, collector41.90s/111food,
 zero-start89.60s/93food, pit-fall4/4 recoveries. All20 sole baselines measure0px
 error against the foot anchor; repeated jump can interrupt landing immediately.
 No level refinement is part of this change. Manual phone testing remains pending.
+
+
+## Contextual interactions pass
+
+No terrain/layout, hazards, pickups, jump/boost, run speed or food/energy tuning
+was redesigned. Three interactions changed: bench has sit/seated/stand with
+fixed body/seat anchors; pit falls physically descend before an invisible220ms
+respawn pause; granny/scooter reactions replace alpha blinking with the existing
+shared1400ms invulnerability. Seated-only recovery integrates the original36
+energy over the same2.5s stop, removing previous frame-overshoot rounding.
+Bench-only framing now keeps the prop/heroine fully in portrait view.
+Normal and collector runs remain41.90s/111food/16.395energy with no hits/falls.
+Natural44.10s/98food; zero-start89.60s/93food. Deliberate pit run51.02s,
+4falls/4returns; added time is actual descent rather than frozen-air feedback.
+Source scene geometry and ordinary24×50 player body are unchanged.
+Validation:6actual small/large/narrow-pit falls at both energies, bench at
+30/60/120fps, actual danger-shape contacts with both enemies, cross-hazard
+cooldown, jump during hit,18safe-anchor scenarios,40ramp cases and46solid drops.
+See docs/tanya/contextual-integration.md and context-validation.json.

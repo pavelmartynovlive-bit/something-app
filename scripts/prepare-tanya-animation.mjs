@@ -33,9 +33,9 @@ try{
   });
  },{url:'data:image/png;base64,'+png.toString('base64'),frames:atlas.frames});
  assert.equal(frames.length,20);
- for(const f of frames){assert.ok(f.normalize>.8&&f.normalize<1.2);assert.ok(f.rootX>=0&&f.rootX<=f.rect.w);const left=96-f.rootX*f.normalize,right=left+f.rect.w*f.normalize,top=172-f.footY*f.normalize;assert.ok(left>=0&&right<=192&&top>=0&&top+f.rect.h*f.normalize<=192,f.name+' fits common frame')}
+ for(const f of frames){assert.ok(f.normalize>.8&&f.normalize<1.2);assert.ok(f.rootX>=0&&f.rootX<=f.rect.w);const left=128-f.rootX*f.normalize,right=left+f.rect.w*f.normalize,top=224-f.footY*f.normalize;assert.ok(left>=0&&right<=256&&top>=0&&top+f.rect.h*f.normalize<=256,f.name+' fits common frame')}
  const animations=states.map(s=>({...s,key:'tanya-'+(s.key==='landing'?'land':s.key),frameRate:s.key==='idle'?5:['jump-start','landing'].includes(s.key)?24:s.frameRate}));
- const data={source:{width:1536,height:1024,sha256:createHash('sha256').update(png).digest('hex')},frameSize:192,footX:96,footY:172,referenceHeight:133,referenceFaceHeight:37,frames,animations};
+ const data={source:{width:1536,height:1024,sha256:createHash('sha256').update(png).digest('hex')},frameSize:256,footX:128,footY:224,referenceHeight:133,referenceFaceHeight:37,frames,animations};
  writeFileSync('public/assets/characters/tanya/animations/tanya-animation-data.json',JSON.stringify(data,null,2)+'\n');
- console.log('PASS: 20 approved frame crops fit uniform192×192 cells; common foot anchor; reference idle133px, face37px');
+ console.log('PASS: 20 approved frame crops fit uniform256×256 cells; common foot anchor; reference idle133px, face37px');
 }finally{await browser.close()}

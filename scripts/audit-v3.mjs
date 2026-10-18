@@ -14,7 +14,7 @@ try{
    key(false);game.scene.start('play');for(let i=0;i<4;i++)tick();const s=game.scene.getScene('play'),start=s.time.now; s.hit=Object.getPrototypeOf(s).hit; s.respawn=Object.getPrototypeOf(s).respawn;
    if(mode==='low-energy')s.changeEnergy(-100);
    let lastRecovery=0;const missed=new Set();let hits=0,resets=0,bench=0,prevRest=0,lastInput=0,longest=0,lastProgress=0,stuck=0,boostDue=null;const reveals=[],viewport=[],hitsAt=[],inputs=[],trajectory=[],landings=[],used=new Set(),seen=new Set(),stats=sections.map(z=>({name:z.name,seconds:0,food:0,collisions:0,boosts:0}));
-   const origHit=s.hit;s.hit=function(d){const ok=origHit.call(this,d);if(ok){hits++;hitsAt.push({x:this.tanya.x,time:(this.time.now-start)/1000,damage:d});stats[Math.max(0,sections.findLastIndex(z=>this.tanya.x>=z.start))].collisions++}return ok};const origReset=s.respawn;s.respawn=function(){resets++;origReset.call(this)};
+   const origHit=s.hit;s.hit=function(d,kind){const ok=origHit.call(this,d,kind);if(ok){hits++;hitsAt.push({x:this.tanya.x,time:(this.time.now-start)/1000,damage:d});stats[Math.max(0,sections.findLastIndex(z=>this.tanya.x>=z.start))].collisions++}return ok};const origReset=s.respawn;s.respawn=function(){resets++;origReset.call(this)};
    for(let frame=0;frame<60*160&&!s.finished;frame++){
     if(s.recoveries!==lastRecovery){lastRecovery=s.recoveries;used.clear();boostDue=null;}
     const b=s.tanya.body,x=s.tanya.x,tired=s.exhausted,t=(s.time.now-start)/1000,grounded=b.blocked.down&&b.velocity.y>=0;

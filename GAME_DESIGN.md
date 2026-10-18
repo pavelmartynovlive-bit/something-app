@@ -1685,3 +1685,26 @@ Bench rest uses idle, not a fabricated sitting pose. No separate tired/rest shee
 exists. Retain grounded foot shadows; no procedural hair. Debug opt-in only via
 F3 or debugCharacter=1. Nine before/after full policies preserve every gameplay
 outcome; see docs/tanya/README.md. Manual phone animation review follows testing.
+
+
+## 45. Approved contextual animation interactions
+
+Preserve existing basic20-frame Tanya art and movement/level design. Add matching
+20 contextual frames: bench-sit2@10fps, bench-idle4@4fps, bench-stand2@10fps,
+pit-fall4@10fps, hit-granny3@16fps, hit-scooter5@18fps. All visual frames share
+256×256 canvas and foot anchor(128,224), same scale0.5866225564; this padding
+change does not change visible heroine size or24×50 body/offset8,4.
+Bench keeps total2.5s and36energy:200ms sit,2100ms seated-only recovery,200ms
+stand; body is pinned to bench anchor, seated hip aligns22px above ground.
+Rest-only camera anchor0.25 prevents bench/hair cropping; normal camera unchanged.
+Pit commitment now keeps physics active and downward momentum, normal fall gravity,
+limited80px/s horizontal drift inside the existing pit. Only committed pit falls
+bypass terrain collision. A mask hides the figure below existing sludge/walls.
+Once the entire visual is below that boundary, disable body and wait220ms, show
+return message and restore the last existing safe point. No resource reset or
+extra fall penalty. No manual return UI. Retain800ms respawn protection.
+Existing1400ms shared hit cooldown, granny15energy loss, scooter12loss/650ms slow
+remain. Hit reactions latch visually, never move the body or lock jump input.
+Remove repeated alpha blinking entirely. Priority: pit, protected bench phases,
+latched hit, real airborne/landing, run/idle. No new VFX or other asset changes.
+See docs/tanya/contextual-integration.md for mobile checks and limitations.

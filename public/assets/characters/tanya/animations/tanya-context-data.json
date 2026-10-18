@@ -1,0 +1,357 @@
+{
+  "source": {
+    "width": 1536,
+    "height": 1024,
+    "sha256": "68df3908edb511d834915a8fe11bdd5a3461581ff8534b2c2e40c0ab09134fcd"
+  },
+  "frameSize": 256,
+  "footX": 128,
+  "footY": 224,
+  "referenceHeight": 133,
+  "frames": [
+    {
+      "name": "bench-sit-01",
+      "rect": {
+        "x": 142,
+        "y": 45,
+        "w": 139,
+        "h": 161
+      },
+      "normalize": 0.8809523809523809,
+      "rootX": 84,
+      "footY": 159,
+      "seat": false,
+      "measuredFaceHeight": 42
+    },
+    {
+      "name": "bench-sit-02",
+      "rect": {
+        "x": 505,
+        "y": 51,
+        "w": 150,
+        "h": 155
+      },
+      "normalize": 0.7872340425531915,
+      "rootX": 64.25,
+      "footY": 125,
+      "seat": true,
+      "measuredFaceHeight": 47
+    },
+    {
+      "name": "bench-idle-01",
+      "rect": {
+        "x": 883,
+        "y": 51,
+        "w": 149,
+        "h": 154
+      },
+      "normalize": 0.8043478260869565,
+      "rootX": 64.125,
+      "footY": 125,
+      "seat": true,
+      "measuredFaceHeight": 46
+    },
+    {
+      "name": "bench-idle-02",
+      "rect": {
+        "x": 1260,
+        "y": 46,
+        "w": 150,
+        "h": 160
+      },
+      "normalize": 0.7872340425531915,
+      "rootX": 65.125,
+      "footY": 130,
+      "seat": true,
+      "measuredFaceHeight": 47
+    },
+    {
+      "name": "bench-idle-03",
+      "rect": {
+        "x": 143,
+        "y": 239,
+        "w": 146,
+        "h": 158
+      },
+      "normalize": 0.7708333333333334,
+      "rootX": 60.625,
+      "footY": 127,
+      "seat": true,
+      "measuredFaceHeight": 48
+    },
+    {
+      "name": "bench-idle-04",
+      "rect": {
+        "x": 507,
+        "y": 238,
+        "w": 151,
+        "h": 159
+      },
+      "normalize": 0.8222222222222222,
+      "rootX": 64.375,
+      "footY": 128,
+      "seat": true,
+      "measuredFaceHeight": 45
+    },
+    {
+      "name": "bench-stand-01",
+      "rect": {
+        "x": 895,
+        "y": 237,
+        "w": 135,
+        "h": 163
+      },
+      "normalize": 0.8222222222222222,
+      "rootX": 72,
+      "footY": 161,
+      "seat": false,
+      "measuredFaceHeight": 45
+    },
+    {
+      "name": "bench-stand-02",
+      "rect": {
+        "x": 1277,
+        "y": 227,
+        "w": 126,
+        "h": 173
+      },
+      "normalize": 0.7872340425531915,
+      "rootX": 81,
+      "footY": 171,
+      "seat": false,
+      "measuredFaceHeight": 47
+    },
+    {
+      "name": "pit-fall-01",
+      "rect": {
+        "x": 136,
+        "y": 427,
+        "w": 170,
+        "h": 158
+      },
+      "normalize": 0.74,
+      "rootX": 70,
+      "footY": 156,
+      "seat": false,
+      "measuredFaceHeight": 50
+    },
+    {
+      "name": "pit-fall-02",
+      "rect": {
+        "x": 523,
+        "y": 427,
+        "w": 171,
+        "h": 166
+      },
+      "normalize": 0.8222222222222222,
+      "rootX": 58,
+      "footY": 164,
+      "seat": false,
+      "measuredFaceHeight": 45
+    },
+    {
+      "name": "pit-fall-03",
+      "rect": {
+        "x": 883,
+        "y": 425,
+        "w": 186,
+        "h": 166
+      },
+      "normalize": 0.8604651162790697,
+      "rootX": 62,
+      "footY": 164,
+      "seat": false,
+      "measuredFaceHeight": 43
+    },
+    {
+      "name": "pit-fall-04",
+      "rect": {
+        "x": 1271,
+        "y": 424,
+        "w": 198,
+        "h": 173
+      },
+      "normalize": 0.8043478260869565,
+      "rootX": 71,
+      "footY": 171,
+      "seat": false,
+      "measuredFaceHeight": 46
+    },
+    {
+      "name": "hit-granny-01",
+      "rect": {
+        "x": 129,
+        "y": 618,
+        "w": 159,
+        "h": 165
+      },
+      "normalize": 0.7708333333333334,
+      "rootX": 70,
+      "footY": 163,
+      "seat": false,
+      "measuredFaceHeight": 48
+    },
+    {
+      "name": "hit-granny-02",
+      "rect": {
+        "x": 506,
+        "y": 614,
+        "w": 194,
+        "h": 173
+      },
+      "normalize": 0.74,
+      "rootX": 72,
+      "footY": 171,
+      "seat": false,
+      "measuredFaceHeight": 50
+    },
+    {
+      "name": "hit-granny-03",
+      "rect": {
+        "x": 876,
+        "y": 620,
+        "w": 147,
+        "h": 163
+      },
+      "normalize": 0.8222222222222222,
+      "rootX": 103,
+      "footY": 161,
+      "seat": false,
+      "measuredFaceHeight": 45
+    },
+    {
+      "name": "hit-scooter-01",
+      "rect": {
+        "x": 1274,
+        "y": 615,
+        "w": 179,
+        "h": 163
+      },
+      "normalize": 0.7872340425531915,
+      "rootX": 71,
+      "footY": 161,
+      "seat": false,
+      "measuredFaceHeight": 47
+    },
+    {
+      "name": "hit-scooter-02",
+      "rect": {
+        "x": 132,
+        "y": 810,
+        "w": 173,
+        "h": 172
+      },
+      "normalize": 0.7551020408163265,
+      "rootX": 65,
+      "footY": 170,
+      "seat": false,
+      "measuredFaceHeight": 49
+    },
+    {
+      "name": "hit-scooter-03",
+      "rect": {
+        "x": 515,
+        "y": 807,
+        "w": 150,
+        "h": 182
+      },
+      "normalize": 0.7872340425531915,
+      "rootX": 104,
+      "footY": 180,
+      "seat": false,
+      "measuredFaceHeight": 47
+    },
+    {
+      "name": "hit-scooter-04",
+      "rect": {
+        "x": 890,
+        "y": 808,
+        "w": 152,
+        "h": 181
+      },
+      "normalize": 0.7551020408163265,
+      "rootX": 76,
+      "footY": 179,
+      "seat": false,
+      "measuredFaceHeight": 49
+    },
+    {
+      "name": "hit-scooter-05",
+      "rect": {
+        "x": 1278,
+        "y": 806,
+        "w": 153,
+        "h": 180
+      },
+      "normalize": 0.7872340425531915,
+      "rootX": 85,
+      "footY": 178,
+      "seat": false,
+      "measuredFaceHeight": 47
+    }
+  ],
+  "animations": [
+    {
+      "key": "tanya-bench-sit",
+      "frames": [
+        "bench-sit-01",
+        "bench-sit-02"
+      ],
+      "frameRate": 10,
+      "repeat": 0
+    },
+    {
+      "key": "tanya-bench-idle",
+      "frames": [
+        "bench-idle-01",
+        "bench-idle-02",
+        "bench-idle-03",
+        "bench-idle-04"
+      ],
+      "frameRate": 4,
+      "repeat": -1
+    },
+    {
+      "key": "tanya-bench-stand",
+      "frames": [
+        "bench-stand-01",
+        "bench-stand-02"
+      ],
+      "frameRate": 10,
+      "repeat": 0
+    },
+    {
+      "key": "tanya-pit-fall",
+      "frames": [
+        "pit-fall-01",
+        "pit-fall-02",
+        "pit-fall-03",
+        "pit-fall-04"
+      ],
+      "frameRate": 10,
+      "repeat": 0
+    },
+    {
+      "key": "tanya-hit-granny",
+      "frames": [
+        "hit-granny-01",
+        "hit-granny-02",
+        "hit-granny-03"
+      ],
+      "frameRate": 16,
+      "repeat": 0
+    },
+    {
+      "key": "tanya-hit-scooter",
+      "frames": [
+        "hit-scooter-01",
+        "hit-scooter-02",
+        "hit-scooter-03",
+        "hit-scooter-04",
+        "hit-scooter-05"
+      ],
+      "frameRate": 18,
+      "repeat": 0
+    }
+  ]
+}

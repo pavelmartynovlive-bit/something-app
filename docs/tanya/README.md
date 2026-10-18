@@ -1,3 +1,9 @@
+> Contextual interactions are now integrated. See [contextual-integration.md](contextual-integration.md)
+> for bench sitting, continuous pit falls and hit reactions. Current shared virtual
+> frame is256×256 with foot anchor(128,224); apparent idle height remains78.0208px.
+> The original basic-animation audit below is retained as history; bench now has
+> seated phases, hits no longer blink, and pits recover only after physical descent.
+
 # Tanya animated character integration
 
 The approved [20-frame PNG](../../public/assets/characters/tanya/animations/tanya-animation-sheet.png)
