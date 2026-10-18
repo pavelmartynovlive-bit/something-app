@@ -1,5 +1,10 @@
 # Tanya — static character integration
 
+> Latest phone request: visual size increased by30% to44.85×80.6 world px
+> (prepared texture scale0.325). Physics/body, foot anchor, camera and level
+> remain unchanged. The original62px sizing audit below is historical; no
+> geometry adaptation is part of this experiment.
+
 This pass changes presentation only. The current level, physics, energy, pickups,
 enemies and camera remain the technical base. No new animation is fabricated.
 

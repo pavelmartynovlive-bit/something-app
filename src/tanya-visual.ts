@@ -9,7 +9,7 @@ export const tanyaArt = {
   key: 'tanya:stand', file: 'assets/characters/tanya/tanya-stand.png',
   sourceWidth: 1024, sourceHeight: 1536,
   frame: { x: 150, y: 49, width: 762, height: 1387 },
-  renderedHeight: 62, rasterHeight: 248, rasterWidth: 138,
+  renderedHeight: 80.6, rasterHeight: 248, rasterWidth: 138,
   displayKey: 'tanya:stand-display',
 };
 type TanyaPose = { key: string; frame: string; renderedHeight: number };

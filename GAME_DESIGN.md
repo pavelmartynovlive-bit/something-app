@@ -1570,3 +1570,13 @@ Nine regression policies preserve pre-integration food/hazard/recovery outcomes;
 foot anchors, zero-energy behavior, platforms, pits, bench and offline asset load
 are tested. See docs/tanya/README.md for dimensions, missing production poses,
 mobile captures and limitations. Stop for manual phone testing.
+
+
+## 34. Approved visual-only +30% scale experiment
+
+The latest phone request increases only the heroine art from34.5×62 to
+44.85×80.6 world px; cached138×248 texture stays, scale0.25→0.325.
+Keep bottom-center anchoring,24×50 body/offset8,4, carrier dimensions, physics,
+level geometry, objects, camera and energy unchanged. Do not adapt platforms
+or passages to the larger artwork in this pass. This overrides §33's rendered
+size/visual clearance statement; the physical clearance is unchanged.
