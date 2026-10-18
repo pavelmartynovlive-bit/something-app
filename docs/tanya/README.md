@@ -1,7 +1,7 @@
 # Tanya — static character integration
 
-> Latest phone request: visual size increased by30% to44.85×80.6 world px
-> (prepared texture scale0.325). Physics/body, foot anchor, camera and level
+> Latest phone request: visual size reduced by20% from the previous size to35.88×64.48 world px
+> (prepared texture scale0.26). Physics/body, foot anchor, camera and level
 > remain unchanged. The original62px sizing audit below is historical; no
 > geometry adaptation is part of this experiment.
 

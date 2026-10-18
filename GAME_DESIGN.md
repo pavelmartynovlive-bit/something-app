@@ -1580,3 +1580,10 @@ Keep bottom-center anchoring,24×50 body/offset8,4, carrier dimensions, physics,
 level geometry, objects, camera and energy unchanged. Do not adapt platforms
 or passages to the larger artwork in this pass. This overrides §33's rendered
 size/visual clearance statement; the physical clearance is unchanged.
+
+
+## 35. Approved character scale correction
+
+Reduce Tanya visual size by20% from §34: 80.6 × 0.8 = 64.48px tall,
+35.88px wide, prepared-texture scale0.26. This supersedes §34 visual size.
+Keep physics body, foot anchor, level geometry, movement and camera unchanged.
