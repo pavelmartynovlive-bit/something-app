@@ -8,7 +8,7 @@ export type TanyaVisualContext = { resting: boolean; tired: boolean; recovering:
 export const tanyaArt = {
   key: 'tanya:stand', file: 'assets/characters/tanya/tanya-stand.png',
   sourceWidth: 1024, sourceHeight: 1536,
-  frame: { x: 130, y: 84, width: 779, height: 1401 },
+  frame: { x: 130, y: 83, width: 781, height: 1403 },
   renderedHeight: 70.928, rasterHeight: 248, rasterWidth: 138,
   displayKey: 'tanya:stand-display',
 };
@@ -39,14 +39,14 @@ export class TanyaVisual {
   ) {
     if (!scene.textures.exists(tanyaArt.displayKey)) {
       const source = scene.textures.get(tanyaArt.key).getSourceImage() as HTMLImageElement;
-      const f = tanyaArt.frame, rate = tanyaArt.rasterHeight / f.height;
+      const f = tanyaArt.frame, rate = Math.min(tanyaArt.rasterHeight / f.height, tanyaArt.rasterWidth / f.width);
       const texture = scene.textures.createCanvas(tanyaArt.displayKey, tanyaArt.rasterWidth, tanyaArt.rasterHeight)!;
       const ctx = texture.getContext();
       ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
       // Uniform resampling, with symmetric transparent padding. Source art is
       // unchanged; small sprites avoid noisy direct 22:1 GPU minification.
       ctx.drawImage(source, f.x, f.y, f.width, f.height,
-        (tanyaArt.rasterWidth - f.width * rate) / 2, 0, f.width * rate, tanyaArt.rasterHeight);
+        (tanyaArt.rasterWidth - f.width * rate) / 2, tanyaArt.rasterHeight - f.height * rate, f.width * rate, f.height * rate);
       texture.refresh();
     }
     // Contact shadow only: no physics and no floating shadow during jumps/falls.

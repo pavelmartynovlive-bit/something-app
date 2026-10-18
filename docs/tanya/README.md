@@ -2,8 +2,9 @@
 
 > Latest phone request: cleaner silhouette, cohesive ponytail, larger head/mittens/boots,
 > no backpack/straps/fur cuffs/tread details. Three dominant clothing colors:
-> hot pink, olive, orange. Overall size remains **39.468×70.928 world px** (scale0.286).
-> Source crop: x130,y84,w779,h1401. Separate28×5px contact shadow, alpha0.22,
+> hot pink, olive, orange. Mittens match the orange boots, soles match olive trousers;
+> the jacket center seam is removed. Overall size remains **39.468×70.928 world px** (scale0.286).
+> Source crop: x130,y83,w781,h1403. Separate28×5px contact shadow, alpha0.22,
 > visible only while grounded and not resting/recovering; no physics. Body and
 > foot anchor unchanged. The original integration audit below is historical.
 

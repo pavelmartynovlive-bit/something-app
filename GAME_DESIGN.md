@@ -1612,3 +1612,12 @@ Add a separate28×5px blue-grey contact ellipse at body.bottom−0.5, alpha0.22.
 It has no physics, follows the real foot anchor, is behind Tanya, and is hidden
 while airborne, recovering or resting. Destroy it on scene shutdown.
 No movement, camera, energy, collision or level changes.
+
+
+## 38. Approved Tanya palette cleanup
+
+Mittens use the boot-orange palette; boot soles use the trouser-olive palette.
+Remove the vertical center line from the pink jacket. Preserve silhouette,
+overall70.928px visual height, foot contact shadow and all gameplay/physics.
+Updated PNG1024×1536, crop(130,83,781,1403); uniform resampling fits both
+texture dimensions and stays bottom-aligned to the existing foot anchor.
