@@ -6,10 +6,10 @@
       "sourceWidth": 1024,
       "sourceHeight": 1536,
       "frame": {
-        "x": 130,
-        "y": 83,
+        "x": 131,
+        "y": 80,
         "width": 781,
-        "height": 1403
+        "height": 1407
       },
       "renderedHeight": 70.928,
       "rasterHeight": 248,
@@ -89,6 +89,10 @@
   "states": {
     "samples": [
       {
+        "contactVisible": true,
+        "contactBody": false,
+        "contactX": 0,
+        "contactY": -0.19999999999998863,
         "shadowVisible": true,
         "shadowBody": false,
         "shadowX": 0,
@@ -106,6 +110,10 @@
         "alpha": 1
       },
       {
+        "contactVisible": false,
+        "contactBody": false,
+        "contactX": 0,
+        "contactY": -0.19999999999998863,
         "shadowVisible": false,
         "shadowBody": false,
         "shadowX": 0,
@@ -123,6 +131,10 @@
         "alpha": 1
       },
       {
+        "contactVisible": false,
+        "contactBody": false,
+        "contactX": 0,
+        "contactY": -0.19999999999998863,
         "shadowVisible": false,
         "shadowBody": false,
         "shadowX": 0,
@@ -140,6 +152,10 @@
         "alpha": 1
       },
       {
+        "contactVisible": true,
+        "contactBody": false,
+        "contactX": 0,
+        "contactY": -0.19999999999998863,
         "shadowVisible": true,
         "shadowBody": false,
         "shadowX": 0,
@@ -157,6 +173,10 @@
         "alpha": 1
       },
       {
+        "contactVisible": true,
+        "contactBody": false,
+        "contactX": 0,
+        "contactY": -0.19999999999998863,
         "shadowVisible": true,
         "shadowBody": false,
         "shadowX": 0,
@@ -174,6 +194,10 @@
         "alpha": 1
       },
       {
+        "contactVisible": false,
+        "contactBody": false,
+        "contactX": 0,
+        "contactY": -0.20000000000004547,
         "shadowVisible": false,
         "shadowBody": false,
         "shadowX": 0,
@@ -191,6 +215,10 @@
         "alpha": 1
       },
       {
+        "contactVisible": true,
+        "contactBody": false,
+        "contactX": 0,
+        "contactY": -0.20000000000004547,
         "shadowVisible": true,
         "shadowBody": false,
         "shadowX": 0,
@@ -208,6 +236,10 @@
         "alpha": 1
       },
       {
+        "contactVisible": false,
+        "contactBody": false,
+        "contactX": 0,
+        "contactY": -0.19999999999998863,
         "shadowVisible": false,
         "shadowBody": false,
         "shadowX": 0,
@@ -225,6 +257,10 @@
         "alpha": 0.45
       },
       {
+        "contactVisible": true,
+        "contactBody": false,
+        "contactX": 0,
+        "contactY": -0.19999999999998863,
         "shadowVisible": true,
         "shadowBody": false,
         "shadowX": 0,
@@ -253,48 +289,56 @@
   },
   "replay": [
     {
+      "contacts": 1,
       "shadows": 1,
       "images": 1,
       "textures": 1,
       "listeners": 2
     },
     {
+      "contacts": 1,
       "shadows": 1,
       "images": 1,
       "textures": 1,
       "listeners": 2
     },
     {
+      "contacts": 1,
       "shadows": 1,
       "images": 1,
       "textures": 1,
       "listeners": 2
     },
     {
+      "contacts": 1,
       "shadows": 1,
       "images": 1,
       "textures": 1,
       "listeners": 2
     },
     {
+      "contacts": 1,
       "shadows": 1,
       "images": 1,
       "textures": 1,
       "listeners": 2
     },
     {
+      "contacts": 1,
       "shadows": 1,
       "images": 1,
       "textures": 1,
       "listeners": 2
     },
     {
+      "contacts": 1,
       "shadows": 1,
       "images": 1,
       "textures": 1,
       "listeners": 2
     },
     {
+      "contacts": 1,
       "shadows": 1,
       "images": 1,
       "textures": 1,

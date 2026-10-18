@@ -1621,3 +1621,14 @@ Remove the vertical center line from the pink jacket. Preserve silhouette,
 overall70.928px visual height, foot contact shadow and all gameplay/physics.
 Updated PNG1024×1536, crop(130,83,781,1403); uniform resampling fits both
 texture dimensions and stays bottom-aligned to the existing foot anchor.
+
+
+## 39. Approved readability refinement
+
+Preserve the current heroine design, palette, seam-free pink jacket, olive pants
+and soles, orange gloves/boots. Clean major form boundaries and silhouette
+without new costume details. Overall visual height70.928px and physics unchanged.
+Source crop(131,80,781,1407). Grounding uses two presentation-only ellipses:
+28×5 foot shadow alpha0.14,18×2 contact shadow alpha0.18. Both follow the
+actual foot anchor and hide when airborne/resting/recovering; no collisions.
+Destroy both on scene shutdown. No level, movement, camera or energy changes.
