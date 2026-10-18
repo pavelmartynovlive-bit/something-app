@@ -27,7 +27,7 @@ try {
  assert.ok(Math.abs(contract.visual.width-39.468)<1e-9&&Math.abs(contract.visual.height-70.928)<1e-9&&Math.abs(contract.visual.scale-.286)<1e-9,'simplified visual is 10% taller than the previous size');
  assert.deepEqual({...contract.visual,width:0,height:0,scale:0},{width:0,height:0,scale:0,origin:[.5,1],body:false,flipX:false,alpha:1,depth:10});
  const states=await page.evaluate(()=>{
-  const samples=[],probe=label=>{const s=game.scene.getScene('play'),v=s.tanyaVisual.sprite,b=s.tanya.body;samples.push({label,state:s.tanyaVisual.state,visible:v.visible,anchorError:Math.max(Math.abs(v.x-b.center.x),Math.abs(v.y-b.bottom)),width:b.width,height:b.height,offset:[b.offset.x,b.offset.y],alpha:v.alpha})};
+  const samples=[],probe=label=>{const s=game.scene.getScene('play'),v=s.tanyaVisual.sprite,b=s.tanya.body;samples.push({shadowVisible:s.tanyaVisual.footShadow.visible,shadowBody:!!s.tanyaVisual.footShadow.body,shadowX:s.tanyaVisual.footShadow.x-b.center.x,shadowY:s.tanyaVisual.footShadow.y-b.bottom,label,state:s.tanyaVisual.state,visible:v.visible,anchorError:Math.max(Math.abs(v.x-b.center.x),Math.abs(v.y-b.bottom)),width:b.width,height:b.height,offset:[b.offset.x,b.offset.y],alpha:v.alpha})};
   let s=tanyaRestart();probe('run');tanyaKey(true);tanyaTick();tanyaKey(false);probe('jump');
   let i=0;while(s.tanya.body.velocity.y<=0&&i++<80)tanyaTick();probe('fall');
   while(!s.tanya.body.blocked.down&&i++<120)tanyaTick();probe('land');
@@ -40,12 +40,13 @@ try {
   return {samples,recovery:{energy:s.energy,expectedEnergy:energy,food:s.foodCount,returns:s.recoveries,bodyBottom:s.tanya.body.bottom,ground:440}};
  });
  for(const p of states.samples){assert.equal(p.anchorError,0,p.label+' foot alignment');assert.equal(p.width,24);assert.equal(p.height,50);assert.deepEqual(p.offset,[8,4]);}
+ for(const p of states.samples){assert.equal(p.shadowBody,false);assert.equal(p.shadowX,0);assert.equal(p.shadowY,-.5);assert.equal(p.shadowVisible,['run','tired'].includes(p.state),p.label+' contact shadow');}
  assert.deepEqual(states.samples.map(s=>s.state),['run','jump','fall','run','tired','rest','run','fall','run']);
  assert.ok(!states.samples.find(s=>s.label==='rest').visible);assert.ok(states.samples.find(s=>s.label==='rest-exit').visible);
  assert.equal(states.samples.find(s=>s.label==='tired').alpha,1,'no fatigue opacity/filter');
  assert.equal(states.recovery.food,17);assert.equal(states.recovery.energy,states.recovery.expectedEnergy);assert.equal(states.recovery.returns,1);assert.equal(states.recovery.bodyBottom,440);
- const replay=await page.evaluate(()=>{const rows=[];for(let i=0;i<8;i++){const s=tanyaRestart();rows.push({images:s.children.list.filter(o=>o.getData('tanyaVisual')).length,textures:s.textures.getTextureKeys().filter(k=>k==='tanya:stand-display').length,listeners:s.events.listenerCount('postupdate')})}return rows});
- assert.ok(replay.every(r=>r.images===1&&r.textures===1&&r.listeners===replay[0].listeners),'no replay image/event/texture leaks');
+ const replay=await page.evaluate(()=>{const rows=[];for(let i=0;i<8;i++){const s=tanyaRestart();rows.push({shadows:s.children.list.filter(o=>o.getData('tanyaFootShadow')).length,images:s.children.list.filter(o=>o.getData('tanyaVisual')).length,textures:s.textures.getTextureKeys().filter(k=>k==='tanya:stand-display').length,listeners:s.events.listenerCount('postupdate')})}return rows});
+ assert.ok(replay.every(r=>r.images===1&&r.shadows===1&&r.textures===1&&r.listeners===replay[0].listeners),'no replay image/event/texture leaks');
  const resize=[];
  for(const [width,height] of [[375,667],[430,932],[844,390],[390,844]]){
   await page.setViewportSize({width,height});await page.waitForTimeout(100);

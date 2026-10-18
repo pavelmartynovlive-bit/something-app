@@ -6,10 +6,10 @@
       "sourceWidth": 1024,
       "sourceHeight": 1536,
       "frame": {
-        "x": 120,
-        "y": 27,
-        "width": 795,
-        "height": 1476
+        "x": 130,
+        "y": 84,
+        "width": 779,
+        "height": 1401
       },
       "renderedHeight": 70.928,
       "rasterHeight": 248,
@@ -89,6 +89,10 @@
   "states": {
     "samples": [
       {
+        "shadowVisible": true,
+        "shadowBody": false,
+        "shadowX": 0,
+        "shadowY": -0.5,
         "label": "run",
         "state": "run",
         "visible": true,
@@ -102,6 +106,10 @@
         "alpha": 1
       },
       {
+        "shadowVisible": false,
+        "shadowBody": false,
+        "shadowX": 0,
+        "shadowY": -0.5,
         "label": "jump",
         "state": "jump",
         "visible": true,
@@ -115,6 +123,10 @@
         "alpha": 1
       },
       {
+        "shadowVisible": false,
+        "shadowBody": false,
+        "shadowX": 0,
+        "shadowY": -0.5,
         "label": "fall",
         "state": "fall",
         "visible": true,
@@ -128,6 +140,10 @@
         "alpha": 1
       },
       {
+        "shadowVisible": true,
+        "shadowBody": false,
+        "shadowX": 0,
+        "shadowY": -0.5,
         "label": "land",
         "state": "run",
         "visible": true,
@@ -141,6 +157,10 @@
         "alpha": 1
       },
       {
+        "shadowVisible": true,
+        "shadowBody": false,
+        "shadowX": 0,
+        "shadowY": -0.5,
         "label": "tired",
         "state": "tired",
         "visible": true,
@@ -154,6 +174,10 @@
         "alpha": 1
       },
       {
+        "shadowVisible": false,
+        "shadowBody": false,
+        "shadowX": 0,
+        "shadowY": -0.5,
         "label": "rest",
         "state": "rest",
         "visible": false,
@@ -167,6 +191,10 @@
         "alpha": 1
       },
       {
+        "shadowVisible": true,
+        "shadowBody": false,
+        "shadowX": 0,
+        "shadowY": -0.5,
         "label": "rest-exit",
         "state": "run",
         "visible": true,
@@ -180,6 +208,10 @@
         "alpha": 1
       },
       {
+        "shadowVisible": false,
+        "shadowBody": false,
+        "shadowX": 0,
+        "shadowY": -0.5,
         "label": "pit",
         "state": "fall",
         "visible": true,
@@ -193,6 +225,10 @@
         "alpha": 0.45
       },
       {
+        "shadowVisible": true,
+        "shadowBody": false,
+        "shadowX": 0,
+        "shadowY": -0.5,
         "label": "respawn",
         "state": "run",
         "visible": true,
@@ -217,41 +253,49 @@
   },
   "replay": [
     {
+      "shadows": 1,
       "images": 1,
       "textures": 1,
       "listeners": 2
     },
     {
+      "shadows": 1,
       "images": 1,
       "textures": 1,
       "listeners": 2
     },
     {
+      "shadows": 1,
       "images": 1,
       "textures": 1,
       "listeners": 2
     },
     {
+      "shadows": 1,
       "images": 1,
       "textures": 1,
       "listeners": 2
     },
     {
+      "shadows": 1,
       "images": 1,
       "textures": 1,
       "listeners": 2
     },
     {
+      "shadows": 1,
       "images": 1,
       "textures": 1,
       "listeners": 2
     },
     {
+      "shadows": 1,
       "images": 1,
       "textures": 1,
       "listeners": 2
     },
     {
+      "shadows": 1,
       "images": 1,
       "textures": 1,
       "listeners": 2

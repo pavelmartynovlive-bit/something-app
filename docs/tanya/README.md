@@ -1,10 +1,11 @@
 # Tanya — static character integration
 
-> Latest phone request: simplified production art with broader pink/olive/orange
-> color masses, heavier outline, simplified face/hair, bigger head/mittens/boots.
-> Display height +10%: **39.468×70.928 world px**, prepared texture scale **0.286**.
-> Source crop: x120,y27,w795,h1476. Bottom anchor and 24×50 body (offset8,4)
-> remain unchanged. The original integration audit below describes the first asset.
+> Latest phone request: cleaner silhouette, cohesive ponytail, larger head/mittens/boots,
+> no backpack/straps/fur cuffs/tread details. Three dominant clothing colors:
+> hot pink, olive, orange. Overall size remains **39.468×70.928 world px** (scale0.286).
+> Source crop: x130,y84,w779,h1401. Separate28×5px contact shadow, alpha0.22,
+> visible only while grounded and not resting/recovering; no physics. Body and
+> foot anchor unchanged. The original integration audit below is historical.
 
 This pass changes presentation only. The current level, physics, energy, pickups,
 enemies and camera remain the technical base. No new animation is fabricated.

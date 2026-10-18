@@ -8,7 +8,7 @@ export type TanyaVisualContext = { resting: boolean; tired: boolean; recovering:
 export const tanyaArt = {
   key: 'tanya:stand', file: 'assets/characters/tanya/tanya-stand.png',
   sourceWidth: 1024, sourceHeight: 1536,
-  frame: { x: 120, y: 27, width: 795, height: 1476 },
+  frame: { x: 130, y: 84, width: 779, height: 1401 },
   renderedHeight: 70.928, rasterHeight: 248, rasterWidth: 138,
   displayKey: 'tanya:stand-display',
 };
@@ -29,6 +29,7 @@ export class TanyaVisual {
   }
 
   readonly sprite: Phaser.GameObjects.Image;
+  readonly footShadow: Phaser.GameObjects.Ellipse;
   state: TanyaVisualState = 'run';
 
   constructor(
@@ -48,6 +49,9 @@ export class TanyaVisual {
         (tanyaArt.rasterWidth - f.width * rate) / 2, 0, f.width * rate, tanyaArt.rasterHeight);
       texture.refresh();
     }
+    // Contact shadow only: no physics and no floating shadow during jumps/falls.
+    this.footShadow = scene.add.ellipse(0, 0, 28, 5, 0x36465b)
+      .setData('tanyaFootShadow', true);
     this.sprite = scene.add.image(0, 0, stand.key, stand.frame)
       .setOrigin(.5, 1).setScale(tanyaArt.renderedHeight / tanyaArt.rasterHeight).setFlipX(false);
     this.sprite.setData('tanyaVisual', true);
@@ -71,6 +75,9 @@ export class TanyaVisual {
     if (art && (this.sprite.texture.key !== art.key || this.sprite.frame.name !== art.frame)) {
       this.sprite.setTexture(art.key, art.frame).setScale(art.renderedHeight / this.sprite.height);
     }
+    this.footShadow.setPosition(body.center.x, body.bottom - .5)
+      .setDepth(this.carrier.depth - .1).setAlpha(.22 * this.carrier.alpha)
+      .setVisible(this.carrier.active && grounded && !c.recovering && art !== null);
     this.sprite.setPosition(body.center.x, body.bottom)
       .setDepth(this.carrier.depth).setAlpha(this.carrier.alpha)
       .setVisible(this.carrier.active && art !== null);
@@ -81,5 +88,6 @@ export class TanyaVisual {
     this.scene.events.off(Phaser.Scenes.Events.PRE_RENDER, this.sync, this);
     this.scene.events.off(Phaser.Scenes.Events.SHUTDOWN, this.destroy, this);
     this.sprite.destroy();
+    this.footShadow.destroy();
   }
 }

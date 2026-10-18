@@ -1600,3 +1600,15 @@ Source1024×1536, crop(120,27,795,1476), cached138×248, scale0.286.
 Existing24×50 physics body/offset(8,4), bottom anchor, movement, energy,
 level and camera remain unchanged. Other visual states still share this static
 pose; sitting/rest and genuine run/jump/fall/tired animation assets remain missing.
+
+
+## 37. Approved cleaner silhouette and foot contact shadow
+
+Further simplify the static Tanya sprite: cohesive ponytail, larger head/mittens/boots,
+remove backpack, straps, fur cuffs and tread details; preserve three dominant
+clothing colors (hot pink / olive / orange). Keep overall70.928px height,
+39.468px frame width; source crop(130,84,779,1401), source1024×1536.
+Add a separate28×5px blue-grey contact ellipse at body.bottom−0.5, alpha0.22.
+It has no physics, follows the real foot anchor, is behind Tanya, and is hidden
+while airborne, recovering or resting. Destroy it on scene shutdown.
+No movement, camera, energy, collision or level changes.
