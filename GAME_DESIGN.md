@@ -1651,3 +1651,11 @@ mittens/boots. Source1024×1536, crop(132,76,779,1412).
 Existing grounded-only foot/contact shadows scale to30.8×5.5 and19.8×2.2px,
 keeping their opacity, foot anchor and lifecycle. No duplicate/baked shadow.
 Physics body24×50, movement, level geometry, energy and camera unchanged.
+
+
+## 42. Approved minimal clothing folds
+
+Minimize hoodie/trouser fold detail: retain only essential limb separation and
+restrained broad side shadows, without knee-shaped highlight patches or extra
+crease lines. Preserve design, palette, softened neck,78.0208px visual height,
+existing foot shadows and all physics/gameplay. Crop(131,76,780,1412).
