@@ -5,7 +5,7 @@ const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['-
 try {
  const page=await browser.newPage({viewport:{width:390,height:844},hasTouch:true}),errors=[],failed=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400)failed.push(r.url())});
- await page.goto('http://localhost:5173');await page.waitForSelector('canvas');
+ await page.goto(process.env.LEVEL_URL||'http://localhost:5173');await page.waitForSelector('canvas');
  await page.evaluate(async()=>{window.game=(await import(document.querySelector('script[src*="/src/main.ts"]').src)).game;window.cfg=(await import('/src/settings.ts')).settings;window.art=(await import('/src/tanya-visual.ts')).tanyaArt});
  await page.waitForFunction(()=>game.scene.getScene('play')?.tanyaVisual?.sprite);
  const contract=await page.evaluate(()=>{
@@ -15,44 +15,64 @@ try {
   const s=tanyaRestart(),b=s.tanya.body,v=s.tanyaVisual.sprite;
   const snap=()=>({body:{x:b.x,y:b.y,width:b.width,height:b.height,offset:[b.offset.x,b.offset.y],vx:b.velocity.x,vy:b.velocity.y,gravity:b.gravity.y,enabled:b.enable},energy:s.energy,camera:[s.cameras.main.scrollX,s.cameras.main.scrollY]});
   const before=snap();for(let i=0;i<100;i++)s.tanyaVisual.sync();const after=snap();
-  const texture=s.textures.get(art.displayKey),pixels=texture.getContext().getImageData(0,0,art.rasterWidth,art.rasterHeight).data;
-  let lastOpaqueRow=-1;for(let y=0;y<art.rasterHeight;y++)for(let x=0;x<art.rasterWidth;x++)if(pixels[(y*art.rasterWidth+x)*4+3]>=128)lastOpaqueRow=Math.max(lastOpaqueRow,y);
-  const bitmap={lastOpaqueRow,bottomGap:(art.rasterHeight-1-lastOpaqueRow)*v.scaleY};
-  return {art,bitmap,carrier:{width:s.tanya.width,height:s.tanya.height,scale:s.tanya.scale,origin:[s.tanya.originX,s.tanya.originY],visible:s.tanya.visible},visual:{width:v.displayWidth,height:v.displayHeight,scale:v.scale,origin:[v.originX,v.originY],body:!!v.body,flipX:v.flipX,alpha:v.alpha,depth:v.depth},before,after};
+  const tex=s.textures.get(art.displayKey),ctx=tex.getContext(),frames=[];
+  for(const name of tex.getFrameNames()){
+   const f=tex.get(name),pixels=ctx.getImageData(f.cutX,f.cutY,192,192).data;
+   let bottom=-1,top=192;for(let y=0;y<192;y++)for(let x=0;x<192;x++)if(pixels[(y*192+x)*4+3]>=128){bottom=Math.max(bottom,y+1);top=Math.min(top,y)}
+   v.setFrame(name);frames.push({name,width:v.width,height:v.height,origin:[v.originX,v.originY],bottomError:(bottom-art.footY)*v.scaleY,opaqueHeight:(bottom-top)*v.scaleY});
+  }
+  v.setFrame('run-01');
+  return {art,frames,debug:s.tanyaVisual.debugEnabled,animations:s.anims.getAnimsFromTexture(art.displayKey),carrier:{width:s.tanya.width,height:s.tanya.height,scale:s.tanya.scale,origin:[s.tanya.originX,s.tanya.originY],visible:s.tanya.visible},visual:{width:v.displayWidth,height:v.displayHeight,scale:v.scale,origin:[v.originX,v.originY],body:!!v.body,flipX:v.flipX,alpha:v.alpha,depth:v.depth},before,after};
  });
- assert.ok(contract.bitmap.bottomGap<=.25,'opaque boot sole reaches the physical foot baseline');
  assert.deepEqual(contract.carrier,{width:40,height:56,scale:1,origin:[.5,.5],visible:false});
  assert.deepEqual(contract.before,contract.after,'visual sync cannot mutate gameplay/camera');
  assert.equal(contract.before.body.width,24);assert.equal(contract.before.body.height,50);assert.deepEqual(contract.before.body.offset,[8,4]);
- assert.ok(Math.abs(contract.visual.width-43.4148)<1e-9&&Math.abs(contract.visual.height-78.0208)<1e-9&&Math.abs(contract.visual.scale-.3146)<1e-9,'simplified visual is 10% taller than the previous size');
- assert.deepEqual({...contract.visual,width:0,height:0,scale:0},{width:0,height:0,scale:0,origin:[.5,1],body:false,flipX:false,alpha:1,depth:10});
+ assert.equal(contract.frames.length,20);assert.equal(contract.animations.length,6);assert.equal(contract.debug,false);
+ assert.ok(Math.abs(contract.visual.scale-78.0208/133)<1e-9);assert.equal(contract.visual.body,false);
+ for(const f of contract.frames){assert.equal(f.width,192);assert.equal(f.height,192);assert.deepEqual(f.origin,[.5,172/192]);assert.ok(Math.abs(f.bottomError)<.7,f.name+' foot baseline')}
+ assert.ok(Math.abs(contract.frames.find(f=>f.name==='idle-01').opaqueHeight-78.0208)<.7,'preserve current apparent height');
  const states=await page.evaluate(()=>{
-  const samples=[],probe=label=>{const s=game.scene.getScene('play'),v=s.tanyaVisual.sprite,b=s.tanya.body;samples.push({contactVisible:s.tanyaVisual.contactShadow.visible,contactBody:!!s.tanyaVisual.contactShadow.body,contactX:s.tanyaVisual.contactShadow.x-b.center.x,contactY:s.tanyaVisual.contactShadow.y-b.bottom,shadowVisible:s.tanyaVisual.footShadow.visible,shadowBody:!!s.tanyaVisual.footShadow.body,shadowX:s.tanyaVisual.footShadow.x-b.center.x,shadowY:s.tanyaVisual.footShadow.y-b.bottom,label,state:s.tanyaVisual.state,visible:v.visible,anchorError:Math.max(Math.abs(v.x-b.center.x),Math.abs(v.y-b.bottom)),width:b.width,height:b.height,offset:[b.offset.x,b.offset.y],alpha:v.alpha})};
-  let s=tanyaRestart();probe('run');tanyaKey(true);tanyaTick();tanyaKey(false);probe('jump');
-  let i=0;while(s.tanya.body.velocity.y<=0&&i++<80)tanyaTick();probe('fall');
-  while(!s.tanya.body.blocked.down&&i++<120)tanyaTick();probe('land');
+  const samples=[],probe=label=>{const s=game.scene.getScene('play'),v=s.tanyaVisual.sprite,b=s.tanya.body;samples.push({label,state:s.tanyaVisual.state,anim:v.anims.currentAnim.key,frame:v.frame.name,timeScale:v.anims.timeScale,visible:v.visible,origin:[v.originX,v.originY],size:[v.width,v.height],anchorError:Math.max(Math.abs(v.x-b.center.x),Math.abs(v.y-b.bottom)),body:[b.width,b.height,b.offset.x,b.offset.y],alpha:v.alpha,shadowVisible:s.tanyaVisual.footShadow.visible,contactVisible:s.tanyaVisual.contactShadow.visible})};
+  let s=tanyaRestart();probe('run');let starts=0;const seen=new Set();s.tanyaVisual.sprite.on('animationstart',()=>starts++);
+  for(let i=0;i<50;i++){tanyaTick();seen.add(s.tanyaVisual.sprite.frame.name)}
+  const run={starts,frames:[...seen]};
+  s=tanyaRestart();tanyaKey(true);tanyaTick();tanyaKey(false);probe('takeoff');tanyaTick(8);probe('rise');
+  let i=0;while(s.tanya.body.velocity.y<=0&&i++<100)tanyaTick();probe('fall');
+  while(!s.tanya.body.blocked.down&&i++<180)tanyaTick();probe('land');
+  tanyaKey(true);tanyaTick();tanyaKey(false);probe('jump-immediately-after-land');
   s=tanyaRestart();s.changeEnergy(-100);tanyaTick();probe('tired');
-  // Isolated bench fixture; full routes test ordinary approach separately.
-  s.checkpoint=7000;s.respawn();let frames=0;while(s.restRemaining===0&&frames++<250)tanyaTick();probe('rest');
-  while(s.restRemaining>0&&frames++<500)tanyaTick();tanyaTick(3);probe('rest-exit');
+  // The real bench trigger, not a synthetic animation context.
+  s.checkpoint=7000;s.respawn();let frames=0;while(s.restRemaining===0&&frames++<300)tanyaTick();probe('bench');
+  const bench={uses:s.benchUses,rest:s.restRemaining,energyBefore:s.energy};
+  while(s.restRemaining>0&&frames++<600)tanyaTick();tanyaTick(8);probe('bench-exit');bench.energyAfter=s.energy;
   s=tanyaRestart();s.foodCount=17;s.changeEnergy(-50);const energy=s.energy;s.beginFall();tanyaTick();probe('pit');
   while(s.recoveries===0)tanyaTick();probe('respawn');
-  return {samples,recovery:{energy:s.energy,expectedEnergy:energy,food:s.foodCount,returns:s.recoveries,bodyBottom:s.tanya.body.bottom,ground:440}};
+  const recovery={energy:s.energy,expectedEnergy:energy,food:s.foodCount,returns:s.recoveries,bodyBottom:s.tanya.body.bottom};
+  // Walk off the actual high one-way platform: no fake takeoff animation.
+  s=tanyaRestart();const b=s.tanya.body;b.reset(3285,179);b.position.set(3285-b.halfWidth,205-b.height);b.prev.copy(b.position);b.prevFrame.copy(b.position);b.updateCenter();b.blocked.down=true;b.velocity.set(240,0);s.tanyaVisual.initialized=false;tanyaTick(8);probe('high-platform-drop');
+  // Ordinary frame-driven landing animation returns to autorun, never locks input.
+  i=0;while(!b.blocked.down&&i++<180)tanyaTick();probe('platform-fall-land');tanyaTick(7);probe('land-exit');
+  return {samples,run,bench,recovery};
  });
- for(const p of states.samples){assert.equal(p.anchorError,0,p.label+' foot alignment');assert.equal(p.width,24);assert.equal(p.height,50);assert.deepEqual(p.offset,[8,4]);}
- for(const p of states.samples){assert.equal(p.contactBody,false);assert.equal(p.contactVisible,p.shadowVisible);assert.equal(p.contactX,0);assert.ok(Math.abs(p.contactY+.2)<1e-9);assert.equal(p.shadowBody,false);assert.equal(p.shadowX,0);assert.equal(p.shadowY,-.5);assert.equal(p.shadowVisible,['run','tired'].includes(p.state),p.label+' contact shadow');}
- assert.deepEqual(states.samples.map(s=>s.state),['run','jump','fall','run','tired','rest','run','fall','run']);
- assert.ok(!states.samples.find(s=>s.label==='rest').visible);assert.ok(states.samples.find(s=>s.label==='rest-exit').visible);
- assert.equal(states.samples.find(s=>s.label==='tired').alpha,1,'no fatigue opacity/filter');
- assert.equal(states.recovery.food,17);assert.equal(states.recovery.energy,states.recovery.expectedEnergy);assert.equal(states.recovery.returns,1);assert.equal(states.recovery.bodyBottom,440);
- const replay=await page.evaluate(()=>{const rows=[];for(let i=0;i<8;i++){const s=tanyaRestart();rows.push({contacts:s.children.list.filter(o=>o.getData('tanyaContactShadow')).length,shadows:s.children.list.filter(o=>o.getData('tanyaFootShadow')).length,images:s.children.list.filter(o=>o.getData('tanyaVisual')).length,textures:s.textures.getTextureKeys().filter(k=>k==='tanya:stand-display').length,listeners:s.events.listenerCount('postupdate')})}return rows});
- assert.ok(replay.every(r=>r.images===1&&r.shadows===1&&r.contacts===1&&r.textures===1&&r.listeners===replay[0].listeners),'no replay image/event/texture leaks');
+ writeFileSync('/tmp/tanya-animation-state-probes.json',JSON.stringify(states,null,2));
+ const named=Object.fromEntries(states.samples.map(p=>[p.label,p]));
+ for(const p of states.samples){assert.equal(p.anchorError,0,p.label+' foot anchor');assert.deepEqual(p.body,[24,50,8,4]);assert.deepEqual(p.size,[192,192]);assert.deepEqual(p.origin,[.5,172/192]);assert.equal(p.anim,'tanya-'+p.state);assert.equal(p.shadowVisible,p.contactVisible)}
+ assert.equal(states.run.starts,0,'continuous run must not restart');assert.equal(states.run.frames.length,8,'eight-frame loop advances');
+ assert.equal(named.takeoff.state,'jump-start');assert.equal(named.rise.state,'jump');assert.equal(named.fall.state,'fall');assert.equal(named.land.state,'land');assert.equal(named['jump-immediately-after-land'].state,'jump-start');
+ assert.equal(named.tired.state,'run');assert.ok(Math.abs(named.tired.timeScale-85/240)<.001);assert.equal(named.tired.alpha,1);
+ assert.equal(named.bench.state,'idle');assert.ok(named.bench.visible);assert.equal(states.bench.uses,1);assert.ok(states.bench.energyAfter>states.bench.energyBefore+30);assert.equal(named['bench-exit'].state,'run');
+ assert.equal(named.pit.state,'fall');assert.equal(named.respawn.state,'run');assert.deepEqual(states.recovery,{energy:states.recovery.expectedEnergy,expectedEnergy:states.recovery.expectedEnergy,food:17,returns:1,bodyBottom:440});
+ assert.equal(named['high-platform-drop'].state,'fall');assert.equal(named['platform-fall-land'].state,'land');assert.equal(named['land-exit'].state,'run');
+ const replay=await page.evaluate(()=>{const rows=[];for(let i=0;i<8;i++){const s=tanyaRestart();rows.push({contacts:s.children.list.filter(o=>o.getData('tanyaContactShadow')).length,shadows:s.children.list.filter(o=>o.getData('tanyaFootShadow')).length,images:s.children.list.filter(o=>o.getData('tanyaVisual')).length,textures:s.textures.getTextureKeys().filter(k=>k==='tanya:animated-display').length,animations:s.anims.getAnimsFromTexture(art.displayKey).length,listeners:s.events.listenerCount('postupdate')})}return rows});
+ assert.ok(replay.every(r=>r.images===1&&r.shadows===1&&r.contacts===1&&r.textures===1&&r.animations===6&&r.listeners===replay[0].listeners),'no replay image/event/texture/animation leaks');
+ const debug=await page.evaluate(()=>{const s=game.scene.getScene('play'),v=s.tanyaVisual;v.setDebugEnabled(true);tanyaTick();const text=v.debugText.text,body=!!v.debugBody;v.setDebugEnabled(false);return{text,body,hidden:!v.debugBody.visible&&!v.debugText.visible}});
+ assert.match(debug.text,/tanya-run/);assert.match(debug.text,/energy/);assert.match(debug.text,/vy/);assert.ok(debug.body&&debug.hidden);
  const resize=[];
- for(const [width,height] of [[375,667],[430,932],[844,390],[390,844]]){
+ for(const [width,height] of [[375,667],[390,664],[430,932],[844,390],[390,844]]){
   await page.setViewportSize({width,height});await page.waitForTimeout(100);
-  resize.push(await page.evaluate(()=>{tanyaTick(2);const s=game.scene.getScene('play'),v=s.tanyaVisual.sprite,b=s.tanya.body;return{visual:[v.displayWidth,v.displayHeight],body:[b.width,b.height],anchorError:v.y-b.bottom}}));
+  resize.push(await page.evaluate(()=>{tanyaTick(2);const s=game.scene.getScene('play'),v=s.tanyaVisual.sprite,b=s.tanya.body;return{visual:[v.width,v.height,v.scale],body:[b.width,b.height],anchorError:v.y-b.bottom}}));
  }
- assert.ok(resize.every(r=>Math.abs(r.visual[0]-43.4148)<1e-9&&Math.abs(r.visual[1]-78.0208)<1e-9&&r.body[0]===24&&r.body[1]===50&&r.anchorError===0));
+ assert.ok(resize.every(r=>r.visual[0]===192&&r.visual[1]===192&&Math.abs(r.visual[2]-78.0208/133)<1e-9&&r.body[0]===24&&r.body[1]===50&&r.anchorError===0));
  mkdirSync('docs/tanya',{recursive:true});
  // Real input replay: inspect current art alongside terrain/pickups/hazards.
  const runs=JSON.parse(readFileSync('/tmp/tanya-v3-runs.json','utf8')),run=runs.find(r=>r.mode==='natural');
@@ -78,6 +98,6 @@ try {
  });
  await page.screenshot({path:'docs/tanya/tired.png'});
  assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);
- writeFileSync('docs/tanya/validation.json',JSON.stringify({contract,states,replay,resize,errors,failed},null,2)+'\n');
- console.log('PASS: independent visual/body, bottom anchor, run/jump/fall/tired/rest, recovery, resize, replay, readable portrait captures');
+ writeFileSync('docs/tanya/validation.json',JSON.stringify({contract,states,replay,debug,resize,errors,failed},null,2)+'\n');
+ console.log('PASS: 20-frame atlas, physics independence, stable run loop, jump-start/rise/fall/land, tired cadence, bench idle, recovery, debug, resize and portrait captures');
 }finally{await browser.close()}

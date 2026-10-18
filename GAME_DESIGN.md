@@ -1669,3 +1669,19 @@ for small sprite readability. Preserve outfit, palette, proportions,78.0208px
 visual height, soft neck/collar, foot shadows and all physics/gameplay.
 Source1024×1536; crop(131,70,780,1419) keeps the established horizontal
 anchor and includes the full new hair silhouette and boot baseline.
+
+
+## 44. Approved animation integration — presentation only
+
+Use the approved1536×1024,20-frame loose-hair Tanya sheet without regenerating
+art. Exact rectangle metadata replaces fractional4×5 slicing. Normalize drawing
+scale/foot registration once into cached192×192 visual frames; keep fixed visual
+scale0.5866225564 and idle height78.0208px. Source PNG remains unchanged.
+Physics carrier40×56/body24×50 offset8,4, camera, level, energy and input unchanged.
+Six animations: idle4@5fps, run8@12fps, jump-start2@24fps, jump2@8fps,
+fall2@8fps, land2@24fps. Run cadence follows actual speed; tired uses same art.
+Use grounded/velocity for transitions; land/start never delay physics or input.
+Bench rest uses idle, not a fabricated sitting pose. No separate tired/rest sheet
+exists. Retain grounded foot shadows; no procedural hair. Debug opt-in only via
+F3 or debugCharacter=1. Nine before/after full policies preserve every gameplay
+outcome; see docs/tanya/README.md. Manual phone animation review follows testing.

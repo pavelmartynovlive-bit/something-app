@@ -187,9 +187,12 @@ class PlayScene extends Phaser.Scene {
     if (!controls) controls = new TouchControls(this.game.canvas, hideHint);
     element('#food-goal').textContent = `Котику нужно: ${s.requiredFood}. ${s.bonusFood}+ — кошачий пир!`;
     this.tanya.setDepth(10).setVisible(false);
-    this.tanyaVisual = new TanyaVisual(this, this.tanya, () => ({
-      resting: this.restRemaining > 0, tired: this.exhausted, recovering: this.recoveryRemaining > 0,
-    }));
+    const owner = this;
+    this.tanyaVisual = new TanyaVisual(this, this.tanya, {
+      get resting() { return owner.restRemaining > 0; },
+      get recovering() { return owner.recoveryRemaining > 0; },
+      get energy() { return owner.energy; },
+    });
     for (const a of [...this.grannies, ...this.scooters, ...this.pigeons]) a.sprite.setDepth(8);
     for (const body of this.physics.world.staticBodies.entries) {
       const object = body.gameObject as Phaser.GameObjects.Sprite;

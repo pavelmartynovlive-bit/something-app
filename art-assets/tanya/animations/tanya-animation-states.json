@@ -1,0 +1,77 @@
+{
+  "animations": [
+    {
+      "key": "idle",
+      "frames": [
+        "idle-01",
+        "idle-02",
+        "idle-03",
+        "idle-04"
+      ],
+      "frameRate": 6,
+      "repeat": -1
+    },
+    {
+      "key": "run",
+      "frames": [
+        "run-01",
+        "run-02",
+        "run-03",
+        "run-04",
+        "run-05",
+        "run-06",
+        "run-07",
+        "run-08"
+      ],
+      "frameRate": 12,
+      "repeat": -1
+    },
+    {
+      "key": "jump-start",
+      "frames": [
+        "jump-start-01",
+        "jump-start-02"
+      ],
+      "frameRate": 12,
+      "repeat": 0
+    },
+    {
+      "key": "jump",
+      "frames": [
+        "jump-01",
+        "jump-02"
+      ],
+      "frameRate": 8,
+      "repeat": 0
+    },
+    {
+      "key": "fall",
+      "frames": [
+        "fall-01",
+        "fall-02"
+      ],
+      "frameRate": 8,
+      "repeat": 0
+    },
+    {
+      "key": "landing",
+      "frames": [
+        "landing-01",
+        "landing-02"
+      ],
+      "frameRate": 12,
+      "repeat": 0
+    }
+  ],
+  "registration": {
+    "sourceSize": [
+      192,
+      192
+    ],
+    "footAnchor": [
+      96,
+      172
+    ],
+    "status": "provisional; verify in-engine before replacing current production sprite"
+  }
+}

@@ -1,0 +1,336 @@
+{
+  "imageSize": [
+    1536,
+    1024
+  ],
+  "mode": "RGBA",
+  "frameCount": 20,
+  "grid": [
+    4,
+    5
+  ],
+  "frames": [
+    {
+      "name": "idle-01",
+      "cell": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 204
+      },
+      "opaqueBoundsInCell": [
+        164,
+        52,
+        268,
+        185
+      ],
+      "minimumOpaqueMargin": 19
+    },
+    {
+      "name": "idle-02",
+      "cell": {
+        "x": 384,
+        "y": 0,
+        "w": 384,
+        "h": 204
+      },
+      "opaqueBoundsInCell": [
+        143,
+        52,
+        245,
+        185
+      ],
+      "minimumOpaqueMargin": 19
+    },
+    {
+      "name": "idle-03",
+      "cell": {
+        "x": 768,
+        "y": 0,
+        "w": 384,
+        "h": 204
+      },
+      "opaqueBoundsInCell": [
+        133,
+        52,
+        238,
+        185
+      ],
+      "minimumOpaqueMargin": 19
+    },
+    {
+      "name": "idle-04",
+      "cell": {
+        "x": 1152,
+        "y": 0,
+        "w": 384,
+        "h": 204
+      },
+      "opaqueBoundsInCell": [
+        133,
+        52,
+        239,
+        185
+      ],
+      "minimumOpaqueMargin": 19
+    },
+    {
+      "name": "run-01",
+      "cell": {
+        "x": 0,
+        "y": 204,
+        "w": 384,
+        "h": 205
+      },
+      "opaqueBoundsInCell": [
+        167,
+        34,
+        282,
+        178
+      ],
+      "minimumOpaqueMargin": 27
+    },
+    {
+      "name": "run-02",
+      "cell": {
+        "x": 384,
+        "y": 204,
+        "w": 384,
+        "h": 205
+      },
+      "opaqueBoundsInCell": [
+        148,
+        36,
+        252,
+        178
+      ],
+      "minimumOpaqueMargin": 27
+    },
+    {
+      "name": "run-03",
+      "cell": {
+        "x": 768,
+        "y": 204,
+        "w": 384,
+        "h": 205
+      },
+      "opaqueBoundsInCell": [
+        138,
+        35,
+        245,
+        178
+      ],
+      "minimumOpaqueMargin": 27
+    },
+    {
+      "name": "run-04",
+      "cell": {
+        "x": 1152,
+        "y": 204,
+        "w": 384,
+        "h": 205
+      },
+      "opaqueBoundsInCell": [
+        127,
+        34,
+        258,
+        178
+      ],
+      "minimumOpaqueMargin": 27
+    },
+    {
+      "name": "run-05",
+      "cell": {
+        "x": 0,
+        "y": 409,
+        "w": 384,
+        "h": 205
+      },
+      "opaqueBoundsInCell": [
+        154,
+        26,
+        286,
+        173
+      ],
+      "minimumOpaqueMargin": 26
+    },
+    {
+      "name": "run-06",
+      "cell": {
+        "x": 384,
+        "y": 409,
+        "w": 384,
+        "h": 205
+      },
+      "opaqueBoundsInCell": [
+        140,
+        25,
+        255,
+        169
+      ],
+      "minimumOpaqueMargin": 25
+    },
+    {
+      "name": "run-07",
+      "cell": {
+        "x": 768,
+        "y": 409,
+        "w": 384,
+        "h": 205
+      },
+      "opaqueBoundsInCell": [
+        136,
+        25,
+        248,
+        173
+      ],
+      "minimumOpaqueMargin": 25
+    },
+    {
+      "name": "run-08",
+      "cell": {
+        "x": 1152,
+        "y": 409,
+        "w": 384,
+        "h": 205
+      },
+      "opaqueBoundsInCell": [
+        126,
+        26,
+        267,
+        168
+      ],
+      "minimumOpaqueMargin": 26
+    },
+    {
+      "name": "jump-start-01",
+      "cell": {
+        "x": 0,
+        "y": 614,
+        "w": 384,
+        "h": 205
+      },
+      "opaqueBoundsInCell": [
+        169,
+        30,
+        279,
+        155
+      ],
+      "minimumOpaqueMargin": 30
+    },
+    {
+      "name": "jump-start-02",
+      "cell": {
+        "x": 384,
+        "y": 614,
+        "w": 384,
+        "h": 205
+      },
+      "opaqueBoundsInCell": [
+        144,
+        25,
+        267,
+        160
+      ],
+      "minimumOpaqueMargin": 25
+    },
+    {
+      "name": "jump-01",
+      "cell": {
+        "x": 768,
+        "y": 614,
+        "w": 384,
+        "h": 205
+      },
+      "opaqueBoundsInCell": [
+        136,
+        17,
+        250,
+        164
+      ],
+      "minimumOpaqueMargin": 17
+    },
+    {
+      "name": "jump-02",
+      "cell": {
+        "x": 1152,
+        "y": 614,
+        "w": 384,
+        "h": 205
+      },
+      "opaqueBoundsInCell": [
+        143,
+        18,
+        254,
+        147
+      ],
+      "minimumOpaqueMargin": 18
+    },
+    {
+      "name": "fall-01",
+      "cell": {
+        "x": 0,
+        "y": 819,
+        "w": 384,
+        "h": 205
+      },
+      "opaqueBoundsInCell": [
+        158,
+        19,
+        273,
+        151
+      ],
+      "minimumOpaqueMargin": 19
+    },
+    {
+      "name": "fall-02",
+      "cell": {
+        "x": 384,
+        "y": 819,
+        "w": 384,
+        "h": 205
+      },
+      "opaqueBoundsInCell": [
+        144,
+        20,
+        258,
+        154
+      ],
+      "minimumOpaqueMargin": 20
+    },
+    {
+      "name": "landing-01",
+      "cell": {
+        "x": 768,
+        "y": 819,
+        "w": 384,
+        "h": 205
+      },
+      "opaqueBoundsInCell": [
+        129,
+        33,
+        254,
+        151
+      ],
+      "minimumOpaqueMargin": 33
+    },
+    {
+      "name": "landing-02",
+      "cell": {
+        "x": 1152,
+        "y": 819,
+        "w": 384,
+        "h": 205
+      },
+      "opaqueBoundsInCell": [
+        138,
+        7,
+        243,
+        153
+      ],
+      "minimumOpaqueMargin": 7
+    }
+  ],
+  "minimumOpaqueCellMargin": 7,
+  "runtimeGameModified": false
+}

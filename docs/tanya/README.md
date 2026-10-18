@@ -1,145 +1,117 @@
-# Tanya — static character integration
+# Tanya animated character integration
 
-> Latest phone request: loose shoulder-length hair, open forehead, no bangs,
-> no ponytail/hair tie or fine facial strands; simple cohesive brown silhouette.
-> Preserve soft warm neck/collar, palette, physics and existing ground shadows.
-> Previous approved simplifications: cleaner silhouette, cohesive ponytail, larger head/mittens/boots,
-> no backpack/straps/fur cuffs/tread details. Three dominant clothing colors:
-> hot pink, olive, orange. Mittens match the orange boots, soles match olive trousers;
-> the jacket center seam is removed. Overall size remains **43.4148×78.0208 world px** (scale0.3146).
-> Source crop: x131,y70,w780,h1419. Separate30.8×5.5px foot shadow (alpha0.14) and19.8×2.2px contact shadow (alpha0.18),
-> visible only while grounded and not resting/recovering; no physics. Body and
-> foot anchor unchanged. The original integration audit below is historical.
+The approved [20-frame PNG](../../public/assets/characters/tanya/animations/tanya-animation-sheet.png)
+replaces the static heroine through `TanyaVisual`. No regenerated artwork, movement,
+level data, hazards, energy, food, camera or collision changes are included.
 
-This pass changes presentation only. The current level, physics, energy, pickups,
-enemies and camera remain the technical base. No new animation is fabricated.
+## Asset and frame audit
 
-## Available art
+Original PNG:1536×1024 RGBA,4columns×5rows.1024 is not divisible by5, so the
+loader uses the exact rectangles from the source atlas, never naive grid slicing.
+Source copies in `art-assets/tanya/animations` and `public/assets/characters/tanya/animations`
+are byte-identical. `tanya-animation-data.json` records the SHA256 and registrations.
 
-- [tanya-stand.png](../../public/assets/characters/tanya/tanya-stand.png): transparent
-  1024×1536 PNG, prepared with GPT Image from the approved six-pose concept.
-- [Source concept](../../art-assets/tanya/concept-sheet.png): reference for future
-  production poses, not an animation sheet and never loaded by gameplay.
+The original atlas supplied provisional bounding-box centers, a3px transparent
+bottom margin and small drawing-scale variations (face height36–40 source pixels).
+`scripts/prepare-tanya-animation.mjs` derives registration from jacket-hem center,
+opaque sole baseline and a37px reference face height. Runtime performs uniform
+resampling only, once per texture manager, into one768×960 canvas atlas containing
+20 equal192×192 frames. The PNG is not redrawn, deformed or regenerated.
+No textures or animations are created each frame; replays reuse the same atlas
+and six global animations. Main-scene context getters avoid per-frame object creation.
 
-The repository contained only that concept sheet, not separate production frames.
-One isolated neutral right-facing pose is integrated. Do not treat the six
-concept drawings as a ready-made animation strip.
+| Animation | Source indices, zero-based | FPS | Playback |
+| --- | --- | --- | --- |
+|tanya-idle|0–3|5|loop|
+|tanya-run|4–11|12 nominal|loop, cadence follows actual horizontal speed|
+|tanya-jump-start|12–13|24|one shot, never delays takeoff|
+|tanya-jump|14–15|8|hold last while rising|
+|tanya-fall|16–17|8|hold last until contact|
+|tanya-land|18–19|24|~83ms, immediately interruptible by takeoff|
 
-## Audit / sizing contract
+At204px/s the run rate is10.2fps; at85px/s it is4.25fps. This affects animation
+only, not movement. No dedicated tired or sitting artwork is present. Zero energy
+uses the slower existing run cycle with no new tint/opacity. Bench rest uses idle
+as requested; it does not depict sitting. A genuine seated-rest animation remains
+an optional future asset. Some source run poses are visually similar; source art
+and limb drawing are preserved. Manual phone review remains necessary for feel.
 
-Before integration the visible proxy was40×56px, centered origin(.5,.5), body
-24×50px, body offset(8,4), scale1. Its settled feet are sprite.y+26, and both
-movement and the existing camera track this proxy. `tanya-sitting` is also40×56.
-Replacing either texture with a large PNG would change body/frame relationships.
+## Stable visual/physics contract
 
-The proxy therefore stays unchanged and becomes invisible. A separate
-`Phaser.GameObjects.Image`, with **no physics body**, follows the real body's
-`(center.x,bottom)` in post-update and pre-render. Collision never derives from
-PNG bounds. Camera/movement continue to reference the old carrier exclusively.
+- Existing invisible Arcade carrier:40×56, scale1, origin(.5,.5).
+- Existing body:24×50, offset(8,4), unchanged across every frame/state.
+- Separate animated `Phaser.GameObjects.Sprite`: **no physics body**.
+- Fixed virtual frame192×192; origin(.5,172/192), sole anchor(96,172).
+- Constant sprite scale **78.0208/133 =0.5866225564**.
+- Full virtual displayed rectangle112.6315×112.6315px includes transparent padding.
+- Visible idle height78.0208px; run silhouette77.43–83.89px due to pose extension,
+  not runtime scale switching. Crouching naturally reduces visible height.
+- Position always follows body.center.x/body.bottom in POST_UPDATE and PRE_RENDER.
+- Measured opaque sole error0px for all20 normalized frames; origin and scale stay
+  identical. Underpass geometry is not adjusted to the artwork.
+- Existing foot/contact shadows30.8×5.5 and19.8×2.2px remain presentation-only,
+  grounded-only, follow the same foot anchor, and mirror existing hit alpha.
 
-| Quantity | Current value |
-| --- | --- |
-| Original PNG |1024×1536|
-| Uniform source crop |x150,y49,w762,h1387; boot baseline1436|
-| Prepared cached texture |138×248, high-quality uniform resampling and symmetric transparent padding|
-| Phaser visual scale |0.25|
-| Rendered frame |**34.5×62 world pixels**|
-| Equivalent source-content scale |62/1387 =0.044700793|
-| Origin / direction |**(.5,1)**; facing right, no flip|
-| Physics carrier |40×56, centered origin, scale1; invisible|
-| Actual body |**24×50**, offset**(8,4)** on the carrier|
-| Body relative to visible frame |top-left offset**(5.25,12)** world pixels|
-| Foot anchor |visual bottom center = body center.x / body.bottom, error0 in probes|
-| Depth |10, same as the previous heroine; above enemies8 and pickups5|
+## Animation priority
 
-Height increases56→62 (+10.7%). Source proportions are preserved: the extra
-raster width is transparent padding, not horizontal stretching. The high-quality
-cached raster avoids harsh minification of a1536px illustration on a phone.
-Only one raster is prepared per TextureManager; replays reuse it.
+Only POST_UPDATE chooses animation state. PRE_RENDER updates positions/shadows
+and optional debug drawing, so animation is never restarted by the render pass.
+Recovering in a pit uses fall. Bench rest uses idle. Airborne upward movement
+uses jump-start on actual takeoff, then jump after its two frames; downward/zero
+vertical velocity uses fall immediately. Ground contact plays land once, then
+run/idle. A newly accepted jump interrupts land immediately. Walking off a ledge
+uses fall directly; respawn returns to run without a spurious takeoff/landing.
+Animations change only when this state changes. Input, coyote time, buffering,
+boost, gravity and motion do not wait for animation completion.
 
-The existing minimum platform-underpass clearance65px still exceeds the new62px
-visual by3px. The body stays50px high. Do not raise or move platforms to restore
-an old percentage rule automatically: this task explicitly preserves geometry.
-A wider hair/backpack silhouette is intentionally outside the compact body.
+## Opt-in debugging
 
-## Visual states and missing production assets
-
-| State | Current display | Needed later |
-| --- | --- | --- |
-|run|static neutral pose|tanya-run animation / aligned frames|
-|jump|same pose, follows actual upward motion|tanya-jump|
-|fall|same pose, follows actual downward motion|tanya-fall|
-|tired|same pose, no new tint/opacity effect|tanya-tired|
-|rest|standing image hidden only during the existing bench stop|**tanya-rest**, genuine sitting pose|
-
-Landing returns to the grounded state. A landing pose would also be useful later.
-No bobbing, fake walk cycle, variable jump, velocity/gravity change or animation-
-driven collider is introduced. Existing hit/fall transparency feedback is simply
-mirrored from the carrier; fatigue does not add filters or transparency.
-
-The bench still uses its original trigger, stop duration and energy restoration.
-With no valid sitting art, the standing image is hidden for that stop rather than
-squashed, stretched or shown as a new inconsistent placeholder. Existing rest
-feedback/energy HUD remains. It reappears when running resumes. This temporary
-rest-art limitation must be clear during manual phone testing.
-
-Future assets belong in the visual module's state mapping/preload. Their height
-and bottom anchors are presentation data; body dimensions and gameplay code do
-not need to change. All current states share a fixed foot anchor with no swaps
-of the physics carrier's shape.
+Default off. Use `?debugCharacter=1` (or append `&debugCharacter=1`) or press **F3**.
+The overlay displays animation/frame, velocityY, grounded/airborne, current energy
+and body dimensions; a green rectangle shows the real body. It does not enable
+physics debug globally or change the player/HUD/camera. Objects are allocated once
+when enabled and destroyed with the scene. Debug text refreshes at10Hz.
 
 ## Validation
 
-- `npm run test:character`: body/visual independence;100 consecutive sync calls
-  leave physics/resources/camera untouched; run/jump/fall/landing/tired/rest;
-  exact foot anchoring; pit return; eight replays without image/event leaks;
-  world dimensions retained at375×667,430×932,844×390 and390×844.
-- `node scripts/audit-v3.mjs`: nine actual60Hz full policies. Food, encounters,
-  falls/returns, bench/Lipton use and boosts match the pre-integration run.
-  Durations match within one fixed physics tick. See [runs.json](runs.json).
-- `node scripts/validate-collisions.mjs`: required normal/tired rises and gaps,
-  short one-way platforms, coyote/buffer, hazard masks/timing and endings.
-- `node scripts/validate-recovery.mjs`:18 anchors,40 ramp/frame-rate cases,
-  46 solid-ground drops, bench pocket. Automatic recovery remains intact.
-- `npm run test:fatigue`: speed limits, low-energy warning, boosted exhaustion,
-  midair transitions and bench/respawn restoration remain correct.
-- `node scripts/measure-jumps.mjs`: normal/tired standard and early boosted
-  trajectories; no movement constants changed.
-- `npm run test:presentation`: A/B/C HUD, touch and orientation guards.
-- `npm run build`: TypeScript / Vite /26-file PWA precache. Existing large-bundle
-  warning remains. `npm run preview -- --port 4173` then
-  `npm run test:character:production`: source PNG decode, production canvas,
-  service-worker cache and offline reload; no errors/missing resources.
+`npm run test:character` checks all20 frame sizes/baselines, fixed scale/body,
+100 presentation sync calls with no physics/camera/resource mutation, all8 run
+frames without restart, takeoff/rise/apex/fall/contact/land exit, immediate repeat
+jump, tired cadence, high-platform drop, bench, pit return, debug, eight restarts
+without animation/texture/event leaks, and five mobile/orientation viewport sizes.
+Real natural and collector input replays provide the portrait captures below.
 
-Automated natural route:44.12s,98 food,53.49 energy; collector41.90s,111 food,
-16.40 energy; zero-start89.60s,93 food,8.25 energy with one bench. Clean policies
-have zero hits/falls. Intentional collision still registers8 hits; intentional
-pit run still gives4 falls/4 returns. These are browser simulations, not manual
-phone playtesting or human animation-feel approval.
+`node scripts/audit-v3.mjs` completes nine full60Hz policies. Compared against
+an actual pre-change audit, every policy has identical food, final energy,
+collisions, bench/Lipton use, boosts, falls and recoveries; completion time matches
+to floating-point precision. Data: [animation-runs.json](animation-runs.json).
 
-## Portrait captures
+| Run | Time | Food | Final energy | Hits | Bench | Lipton | Falls/returns |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+|normal / collector|41.90s|111|16.395|0|0|3|0/0|
+|natural|44.12s|98|53.49|0|1|3|0/0|
+|safe lower route|44.52s|98|52.35|0|1|3|0/0|
+|zero-energy start|89.60s|93|8.245|0|1|3|0/0|
+|intentional collisions|82.90s|91|0|8|0|2|0/0|
+|intentional pit falls|50.58s|112|0|1|0|3|4/4|
+|platform miss|41.90s|100|16.395|0|0|3|0/0|
+|bench route|44.13s|108|53.4425|0|1|3|0/0|
 
-Captured by replaying actual natural/collector inputs, without repositioning the
-hero/camera or modifying geometry:
+`npm run build`: TypeScript/Vite/PWA precache. `npm run test:character:production`
+checks portrait production loading, original PNG1536×1024 +20-frame metadata,
+precache and offline reload. These are automated browser checks, not manual iPhone
+playtesting or a claim that generated frame art equals a hand-rigged animation.
 
-- [Trees / courtyard start](trees.png)
-- [Food](food.png)
-- [Houses / high jump](houses.png)
-- [Granny](granny.png)
-- [Light sky / downhill](light-sky.png)
-- [Scooter](scooter.png)
-- [Bench rest: missing sitting art fallback](rest.png)
-- [Lipton](lipton.png)
-- [Short platform](short-platform.png)
-- [Zero energy, unchanged static art](tired.png)
+## Captures and files
 
-Pink/orange separate from the blue-white courtyard and muted hazards without an
-added glow/shadow. Food and Lipton remain prominent. The static standing pose in
-air and missing sitting pose are deliberate first-stage limitations, not finished
-animations. Machine data: [validation.json](validation.json),
+[Courtyard/run](trees.png) · [food](food.png) · [houses](houses.png) ·
+[granny](granny.png) · [light sky](light-sky.png) · [scooter](scooter.png) ·
+[bench idle](rest.png) · [Lipton](lipton.png) · [short platform](short-platform.png) ·
+[zero energy](tired.png). Detailed checks: [validation.json](validation.json),
 [production-check.json](production-check.json).
 
-Changed runtime code: `src/tanya-visual.ts` and a small preload/create hookup in
-`src/main.ts`. Game update, collisions, jump/fatigue values, level data and camera
-logic are unchanged. Test scripts and this documentation are separate from game UI.
-Stop here for manual phone testing. This pass does not publish the game.
+Runtime changes: `src/tanya-visual.ts`, visual-context hookup only in `src/main.ts`.
+New production assets: `public/assets/characters/tanya/animations/*.png/json`.
+Metadata tool: `scripts/prepare-tanya-animation.mjs`; checks: `scripts/check-tanya.mjs`,
+`scripts/check-tanya-production.mjs`. Original static PNG is retained as history,
+but no longer loaded by the character module. Stop for phone testing after deployment.

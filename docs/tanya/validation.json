@@ -1,25 +1,250 @@
 {
   "contract": {
     "art": {
-      "key": "tanya:stand",
-      "file": "assets/characters/tanya/tanya-stand.png",
-      "sourceWidth": 1024,
-      "sourceHeight": 1536,
-      "frame": {
-        "x": 131,
-        "y": 70,
-        "width": 780,
-        "height": 1419
-      },
+      "key": "tanya:animation-source",
+      "file": "assets/characters/tanya/animations/tanya-animation-sheet.png",
+      "dataKey": "tanya:animation-data",
+      "dataFile": "assets/characters/tanya/animations/tanya-animation-data.json",
+      "sourceWidth": 1536,
+      "sourceHeight": 1024,
+      "frameSize": 192,
+      "footX": 96,
+      "footY": 172,
       "renderedHeight": 78.0208,
-      "rasterHeight": 248,
-      "rasterWidth": 138,
-      "displayKey": "tanya:stand-display"
+      "referenceHeight": 133,
+      "displayKey": "tanya:animated-display"
     },
-    "bitmap": {
-      "lastOpaqueRow": 247,
-      "bottomGap": 0
-    },
+    "frames": [
+      {
+        "name": "idle-01",
+        "width": 192,
+        "height": 192,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "bottomError": 0,
+        "opaqueHeight": 78.0208
+      },
+      {
+        "name": "idle-02",
+        "width": 192,
+        "height": 192,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "bottomError": 0,
+        "opaqueHeight": 78.0208
+      },
+      {
+        "name": "idle-03",
+        "width": 192,
+        "height": 192,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "bottomError": 0,
+        "opaqueHeight": 78.0208
+      },
+      {
+        "name": "idle-04",
+        "width": 192,
+        "height": 192,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "bottomError": 0,
+        "opaqueHeight": 76.26093233082706
+      },
+      {
+        "name": "run-01",
+        "width": 192,
+        "height": 192,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "bottomError": 0,
+        "opaqueHeight": 78.0208
+      },
+      {
+        "name": "run-02",
+        "width": 192,
+        "height": 192,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "bottomError": 0,
+        "opaqueHeight": 79.19404511278195
+      },
+      {
+        "name": "run-03",
+        "width": 192,
+        "height": 192,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "bottomError": 0,
+        "opaqueHeight": 79.19404511278195
+      },
+      {
+        "name": "run-04",
+        "width": 192,
+        "height": 192,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "bottomError": 0,
+        "opaqueHeight": 82.12715789473684
+      },
+      {
+        "name": "run-05",
+        "width": 192,
+        "height": 192,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "bottomError": 0,
+        "opaqueHeight": 83.88702556390976
+      },
+      {
+        "name": "run-06",
+        "width": 192,
+        "height": 192,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "bottomError": 0,
+        "opaqueHeight": 79.78066766917293
+      },
+      {
+        "name": "run-07",
+        "width": 192,
+        "height": 192,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "bottomError": 0,
+        "opaqueHeight": 82.12715789473684
+      },
+      {
+        "name": "run-08",
+        "width": 192,
+        "height": 192,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "bottomError": 0,
+        "opaqueHeight": 77.43417744360902
+      },
+      {
+        "name": "jump-start-01",
+        "width": 192,
+        "height": 192,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "bottomError": 0,
+        "opaqueHeight": 71.56795187969924
+      },
+      {
+        "name": "jump-start-02",
+        "width": 192,
+        "height": 192,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "bottomError": 0,
+        "opaqueHeight": 75.0876872180451
+      },
+      {
+        "name": "jump-01",
+        "width": 192,
+        "height": 192,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "bottomError": 0,
+        "opaqueHeight": 81.54053533834586
+      },
+      {
+        "name": "jump-02",
+        "width": 192,
+        "height": 192,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "bottomError": 0,
+        "opaqueHeight": 71.56795187969924
+      },
+      {
+        "name": "fall-01",
+        "width": 192,
+        "height": 192,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "bottomError": 0,
+        "opaqueHeight": 77.43417744360902
+      },
+      {
+        "name": "fall-02",
+        "width": 192,
+        "height": 192,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "bottomError": 0,
+        "opaqueHeight": 80.3672902255639
+      },
+      {
+        "name": "landing-01",
+        "width": 192,
+        "height": 192,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "bottomError": 0,
+        "opaqueHeight": 69.22146165413533
+      },
+      {
+        "name": "landing-02",
+        "width": 192,
+        "height": 192,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "bottomError": 0,
+        "opaqueHeight": 79.19404511278195
+      }
+    ],
+    "debug": false,
+    "animations": [
+      "tanya-idle",
+      "tanya-run",
+      "tanya-jump-start",
+      "tanya-jump",
+      "tanya-fall",
+      "tanya-land"
+    ],
     "carrier": {
       "width": 40,
       "height": 56,
@@ -31,12 +256,12 @@
       "visible": false
     },
     "visual": {
-      "width": 43.4148,
-      "height": 78.0208,
-      "scale": 0.3146,
+      "width": 112.63153082706765,
+      "height": 112.63153082706765,
+      "scale": 0.5866225563909774,
       "origin": [
         0.5,
-        1
+        0.8958333333333334
       ],
       "body": false,
       "flipX": false,
@@ -89,202 +314,395 @@
   "states": {
     "samples": [
       {
-        "contactVisible": true,
-        "contactBody": false,
-        "contactX": 0,
-        "contactY": -0.19999999999998863,
-        "shadowVisible": true,
-        "shadowBody": false,
-        "shadowX": 0,
-        "shadowY": -0.5,
         "label": "run",
         "state": "run",
+        "anim": "tanya-run",
+        "frame": "run-01",
+        "timeScale": 1,
         "visible": true,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "size": [
+          192,
+          192
+        ],
         "anchorError": 0,
-        "width": 24,
-        "height": 50,
-        "offset": [
+        "body": [
+          24,
+          50,
           8,
           4
         ],
-        "alpha": 1
+        "alpha": 1,
+        "shadowVisible": true,
+        "contactVisible": true
       },
       {
-        "contactVisible": false,
-        "contactBody": false,
-        "contactX": 0,
-        "contactY": -0.19999999999998863,
+        "label": "takeoff",
+        "state": "jump-start",
+        "anim": "tanya-jump-start",
+        "frame": "jump-start-01",
+        "timeScale": 1,
+        "visible": true,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "size": [
+          192,
+          192
+        ],
+        "anchorError": 0,
+        "body": [
+          24,
+          50,
+          8,
+          4
+        ],
+        "alpha": 1,
         "shadowVisible": false,
-        "shadowBody": false,
-        "shadowX": 0,
-        "shadowY": -0.5,
-        "label": "jump",
+        "contactVisible": false
+      },
+      {
+        "label": "rise",
         "state": "jump",
+        "anim": "tanya-jump",
+        "frame": "jump-01",
+        "timeScale": 1,
         "visible": true,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "size": [
+          192,
+          192
+        ],
         "anchorError": 0,
-        "width": 24,
-        "height": 50,
-        "offset": [
+        "body": [
+          24,
+          50,
           8,
           4
         ],
-        "alpha": 1
+        "alpha": 1,
+        "shadowVisible": false,
+        "contactVisible": false
       },
       {
-        "contactVisible": false,
-        "contactBody": false,
-        "contactX": 0,
-        "contactY": -0.19999999999998863,
-        "shadowVisible": false,
-        "shadowBody": false,
-        "shadowX": 0,
-        "shadowY": -0.5,
         "label": "fall",
         "state": "fall",
+        "anim": "tanya-fall",
+        "frame": "fall-01",
+        "timeScale": 1,
         "visible": true,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "size": [
+          192,
+          192
+        ],
         "anchorError": 0,
-        "width": 24,
-        "height": 50,
-        "offset": [
+        "body": [
+          24,
+          50,
           8,
           4
         ],
-        "alpha": 1
+        "alpha": 1,
+        "shadowVisible": false,
+        "contactVisible": false
       },
       {
-        "contactVisible": true,
-        "contactBody": false,
-        "contactX": 0,
-        "contactY": -0.19999999999998863,
-        "shadowVisible": true,
-        "shadowBody": false,
-        "shadowX": 0,
-        "shadowY": -0.5,
         "label": "land",
-        "state": "run",
+        "state": "land",
+        "anim": "tanya-land",
+        "frame": "landing-01",
+        "timeScale": 1,
         "visible": true,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "size": [
+          192,
+          192
+        ],
         "anchorError": 0,
-        "width": 24,
-        "height": 50,
-        "offset": [
+        "body": [
+          24,
+          50,
           8,
           4
         ],
-        "alpha": 1
+        "alpha": 1,
+        "shadowVisible": true,
+        "contactVisible": true
       },
       {
-        "contactVisible": true,
-        "contactBody": false,
-        "contactX": 0,
-        "contactY": -0.19999999999998863,
-        "shadowVisible": true,
-        "shadowBody": false,
-        "shadowX": 0,
-        "shadowY": -0.5,
+        "label": "jump-immediately-after-land",
+        "state": "jump-start",
+        "anim": "tanya-jump-start",
+        "frame": "jump-start-01",
+        "timeScale": 1,
+        "visible": true,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "size": [
+          192,
+          192
+        ],
+        "anchorError": 0,
+        "body": [
+          24,
+          50,
+          8,
+          4
+        ],
+        "alpha": 1,
+        "shadowVisible": false,
+        "contactVisible": false
+      },
+      {
         "label": "tired",
-        "state": "tired",
-        "visible": true,
-        "anchorError": 0,
-        "width": 24,
-        "height": 50,
-        "offset": [
-          8,
-          4
-        ],
-        "alpha": 1
-      },
-      {
-        "contactVisible": false,
-        "contactBody": false,
-        "contactX": 0,
-        "contactY": -0.20000000000004547,
-        "shadowVisible": false,
-        "shadowBody": false,
-        "shadowX": 0,
-        "shadowY": -0.5,
-        "label": "rest",
-        "state": "rest",
-        "visible": false,
-        "anchorError": 0,
-        "width": 24,
-        "height": 50,
-        "offset": [
-          8,
-          4
-        ],
-        "alpha": 1
-      },
-      {
-        "contactVisible": true,
-        "contactBody": false,
-        "contactX": 0,
-        "contactY": -0.20000000000004547,
-        "shadowVisible": true,
-        "shadowBody": false,
-        "shadowX": 0,
-        "shadowY": -0.5,
-        "label": "rest-exit",
         "state": "run",
+        "anim": "tanya-run",
+        "frame": "run-01",
+        "timeScale": 0.3541666666666667,
         "visible": true,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "size": [
+          192,
+          192
+        ],
         "anchorError": 0,
-        "width": 24,
-        "height": 50,
-        "offset": [
+        "body": [
+          24,
+          50,
           8,
           4
         ],
-        "alpha": 1
+        "alpha": 1,
+        "shadowVisible": true,
+        "contactVisible": true
       },
       {
-        "contactVisible": false,
-        "contactBody": false,
-        "contactX": 0,
-        "contactY": -0.19999999999998863,
+        "label": "bench",
+        "state": "idle",
+        "anim": "tanya-idle",
+        "frame": "idle-01",
+        "timeScale": 1,
+        "visible": true,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "size": [
+          192,
+          192
+        ],
+        "anchorError": 0,
+        "body": [
+          24,
+          50,
+          8,
+          4
+        ],
+        "alpha": 1,
         "shadowVisible": false,
-        "shadowBody": false,
-        "shadowX": 0,
-        "shadowY": -0.5,
+        "contactVisible": false
+      },
+      {
+        "label": "bench-exit",
+        "state": "run",
+        "anim": "tanya-run",
+        "frame": "run-01",
+        "timeScale": 1,
+        "visible": true,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "size": [
+          192,
+          192
+        ],
+        "anchorError": 0,
+        "body": [
+          24,
+          50,
+          8,
+          4
+        ],
+        "alpha": 1,
+        "shadowVisible": true,
+        "contactVisible": true
+      },
+      {
         "label": "pit",
         "state": "fall",
+        "anim": "tanya-fall",
+        "frame": "fall-01",
+        "timeScale": 1,
         "visible": true,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "size": [
+          192,
+          192
+        ],
         "anchorError": 0,
-        "width": 24,
-        "height": 50,
-        "offset": [
+        "body": [
+          24,
+          50,
           8,
           4
         ],
-        "alpha": 0.45
+        "alpha": 0.45,
+        "shadowVisible": false,
+        "contactVisible": false
       },
       {
-        "contactVisible": true,
-        "contactBody": false,
-        "contactX": 0,
-        "contactY": -0.19999999999998863,
-        "shadowVisible": true,
-        "shadowBody": false,
-        "shadowX": 0,
-        "shadowY": -0.5,
         "label": "respawn",
         "state": "run",
+        "anim": "tanya-run",
+        "frame": "run-01",
+        "timeScale": 1,
         "visible": true,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "size": [
+          192,
+          192
+        ],
         "anchorError": 0,
-        "width": 24,
-        "height": 50,
-        "offset": [
+        "body": [
+          24,
+          50,
           8,
           4
         ],
-        "alpha": 1
+        "alpha": 1,
+        "shadowVisible": true,
+        "contactVisible": true
+      },
+      {
+        "label": "high-platform-drop",
+        "state": "fall",
+        "anim": "tanya-fall",
+        "frame": "fall-01",
+        "timeScale": 1,
+        "visible": true,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "size": [
+          192,
+          192
+        ],
+        "anchorError": 0,
+        "body": [
+          24,
+          50,
+          8,
+          4
+        ],
+        "alpha": 1,
+        "shadowVisible": false,
+        "contactVisible": false
+      },
+      {
+        "label": "platform-fall-land",
+        "state": "land",
+        "anim": "tanya-land",
+        "frame": "landing-01",
+        "timeScale": 1,
+        "visible": true,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "size": [
+          192,
+          192
+        ],
+        "anchorError": 0,
+        "body": [
+          24,
+          50,
+          8,
+          4
+        ],
+        "alpha": 1,
+        "shadowVisible": true,
+        "contactVisible": true
+      },
+      {
+        "label": "land-exit",
+        "state": "run",
+        "anim": "tanya-run",
+        "frame": "run-01",
+        "timeScale": 1,
+        "visible": true,
+        "origin": [
+          0.5,
+          0.8958333333333334
+        ],
+        "size": [
+          192,
+          192
+        ],
+        "anchorError": 0,
+        "body": [
+          24,
+          50,
+          8,
+          4
+        ],
+        "alpha": 1,
+        "shadowVisible": true,
+        "contactVisible": true
       }
     ],
+    "run": {
+      "starts": 0,
+      "frames": [
+        "run-01",
+        "run-02",
+        "run-03",
+        "run-04",
+        "run-05",
+        "run-06",
+        "run-07",
+        "run-08"
+      ]
+    },
+    "bench": {
+      "uses": 1,
+      "rest": 2483.3333333333335,
+      "energyBefore": 0.24,
+      "energyAfter": 35.85999999999995
+    },
     "recovery": {
       "energy": 49.81,
       "expectedEnergy": 49.81,
       "food": 17,
       "returns": 1,
-      "bodyBottom": 440,
-      "ground": 440
+      "bodyBottom": 440
     }
   },
   "replay": [
@@ -293,6 +711,7 @@
       "shadows": 1,
       "images": 1,
       "textures": 1,
+      "animations": 6,
       "listeners": 2
     },
     {
@@ -300,6 +719,7 @@
       "shadows": 1,
       "images": 1,
       "textures": 1,
+      "animations": 6,
       "listeners": 2
     },
     {
@@ -307,6 +727,7 @@
       "shadows": 1,
       "images": 1,
       "textures": 1,
+      "animations": 6,
       "listeners": 2
     },
     {
@@ -314,6 +735,7 @@
       "shadows": 1,
       "images": 1,
       "textures": 1,
+      "animations": 6,
       "listeners": 2
     },
     {
@@ -321,6 +743,7 @@
       "shadows": 1,
       "images": 1,
       "textures": 1,
+      "animations": 6,
       "listeners": 2
     },
     {
@@ -328,6 +751,7 @@
       "shadows": 1,
       "images": 1,
       "textures": 1,
+      "animations": 6,
       "listeners": 2
     },
     {
@@ -335,6 +759,7 @@
       "shadows": 1,
       "images": 1,
       "textures": 1,
+      "animations": 6,
       "listeners": 2
     },
     {
@@ -342,14 +767,21 @@
       "shadows": 1,
       "images": 1,
       "textures": 1,
+      "animations": 6,
       "listeners": 2
     }
   ],
+  "debug": {
+    "text": "tanya-run / run-01\nvy 0.0 · grounded\nenergy 99.8 · body 24×50",
+    "body": true,
+    "hidden": true
+  },
   "resize": [
     {
       "visual": [
-        43.4148,
-        78.0208
+        192,
+        192,
+        0.5866225563909774
       ],
       "body": [
         24,
@@ -359,8 +791,9 @@
     },
     {
       "visual": [
-        43.4148,
-        78.0208
+        192,
+        192,
+        0.5866225563909774
       ],
       "body": [
         24,
@@ -370,8 +803,9 @@
     },
     {
       "visual": [
-        43.4148,
-        78.0208
+        192,
+        192,
+        0.5866225563909774
       ],
       "body": [
         24,
@@ -381,8 +815,21 @@
     },
     {
       "visual": [
-        43.4148,
-        78.0208
+        192,
+        192,
+        0.5866225563909774
+      ],
+      "body": [
+        24,
+        50
+      ],
+      "anchorError": 0
+    },
+    {
+      "visual": [
+        192,
+        192,
+        0.5866225563909774
       ],
       "body": [
         24,

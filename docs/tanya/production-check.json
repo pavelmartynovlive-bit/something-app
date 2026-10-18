@@ -1,14 +1,17 @@
 {
   "asset": {
     "cached": true,
-    "bytes": 1639018,
-    "width": 1024,
-    "height": 1536
+    "bytes": 1582920,
+    "width": 1536,
+    "height": 1024,
+    "frames": 20,
+    "animations": 6
   },
   "offline": {
     "ok": true,
-    "width": 1024,
-    "height": 1536
+    "width": 1536,
+    "height": 1024,
+    "frames": 20
   },
   "errors": [],
   "failed": []

@@ -341,3 +341,19 @@ Older exact platform/gap/tired-speed numbers above are historical.
 ## Latest fatigue feedback — 2026-10-18
 
 Zero-energy boost no longer bypasses85px/s fatigue;1–20 energy gives15% slower running and a yellow persistent warning. Geometry and resource balance unchanged. See [fatigue-feedback.md](docs/winter-environment/fatigue-feedback.md) for current envelopes, seven strict full-run results and regression checks. Earlier330px/s tired-boost numbers are historical. Manual phone playtesting remains pending.
+
+## Character animation integration (presentation-only)
+
+The approved20-frame Tanya sheet is now driven by a separate non-physics visual
+Sprite. Level data, jump/boost, fatigue, collision bodies and camera are unchanged.
+Exact source rectangles and one-time uniform scale/foot registration avoid sheet
+padding affecting collision or character scale. Real grounded/velocity state
+controls takeoff, rise, fall and short interruptible landing. Bench uses idle;
+zero-energy run cadence follows85px/s. See docs/tanya/README.md for all6 FPS ranges.
+
+Nine actual60Hz full runs before and after integration match food, energy, hits,
+bench/Lipton use, boosts, falls and returns exactly; elapsed times differ only by
+floating-point rounding. Natural44.12s/98food, collector41.90s/111food,
+zero-start89.60s/93food, pit-fall4/4 recoveries. All20 sole baselines measure0px
+error against the foot anchor; repeated jump can interrupt landing immediately.
+No level refinement is part of this change. Manual phone testing remains pending.

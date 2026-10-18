@@ -1,0 +1,338 @@
+{
+  "source": {
+    "width": 1536,
+    "height": 1024,
+    "sha256": "3baa439705cd945b75ad25f379fa6dc5835ea2cfb1460995b962383da7f0e711"
+  },
+  "frameSize": 192,
+  "footX": 96,
+  "footY": 172,
+  "referenceHeight": 133,
+  "referenceFaceHeight": 37,
+  "frames": [
+    {
+      "name": "idle-01",
+      "rect": {
+        "x": 161,
+        "y": 49,
+        "w": 110,
+        "h": 139
+      },
+      "normalize": 1,
+      "rootX": 71,
+      "footY": 136,
+      "measuredFaceHeight": 37
+    },
+    {
+      "name": "idle-02",
+      "rect": {
+        "x": 524,
+        "y": 49,
+        "w": 108,
+        "h": 139
+      },
+      "normalize": 1,
+      "rootX": 69,
+      "footY": 136,
+      "measuredFaceHeight": 37
+    },
+    {
+      "name": "idle-03",
+      "rect": {
+        "x": 898,
+        "y": 49,
+        "w": 111,
+        "h": 139
+      },
+      "normalize": 1,
+      "rootX": 73,
+      "footY": 136,
+      "measuredFaceHeight": 37
+    },
+    {
+      "name": "idle-04",
+      "rect": {
+        "x": 1282,
+        "y": 49,
+        "w": 112,
+        "h": 139
+      },
+      "normalize": 0.9736842105263158,
+      "rootX": 75,
+      "footY": 136,
+      "measuredFaceHeight": 38
+    },
+    {
+      "name": "run-01",
+      "rect": {
+        "x": 164,
+        "y": 235,
+        "w": 121,
+        "h": 150
+      },
+      "normalize": 0.925,
+      "rootX": 71,
+      "footY": 147,
+      "measuredFaceHeight": 40
+    },
+    {
+      "name": "run-02",
+      "rect": {
+        "x": 529,
+        "y": 237,
+        "w": 110,
+        "h": 148
+      },
+      "normalize": 0.9487179487179487,
+      "rootX": 70,
+      "footY": 145,
+      "measuredFaceHeight": 39
+    },
+    {
+      "name": "run-03",
+      "rect": {
+        "x": 903,
+        "y": 236,
+        "w": 113,
+        "h": 149
+      },
+      "normalize": 0.9487179487179487,
+      "rootX": 70,
+      "footY": 146,
+      "measuredFaceHeight": 39
+    },
+    {
+      "name": "run-04",
+      "rect": {
+        "x": 1276,
+        "y": 235,
+        "w": 137,
+        "h": 150
+      },
+      "normalize": 0.9736842105263158,
+      "rootX": 79,
+      "footY": 147,
+      "measuredFaceHeight": 38
+    },
+    {
+      "name": "run-05",
+      "rect": {
+        "x": 151,
+        "y": 432,
+        "w": 138,
+        "h": 153
+      },
+      "normalize": 0.9736842105263158,
+      "rootX": 93,
+      "footY": 150,
+      "measuredFaceHeight": 38
+    },
+    {
+      "name": "run-06",
+      "rect": {
+        "x": 521,
+        "y": 431,
+        "w": 121,
+        "h": 150
+      },
+      "normalize": 0.9487179487179487,
+      "rootX": 80,
+      "footY": 147,
+      "measuredFaceHeight": 39
+    },
+    {
+      "name": "run-07",
+      "rect": {
+        "x": 901,
+        "y": 431,
+        "w": 118,
+        "h": 154
+      },
+      "normalize": 0.9487179487179487,
+      "rootX": 71,
+      "footY": 151,
+      "measuredFaceHeight": 39
+    },
+    {
+      "name": "run-08",
+      "rect": {
+        "x": 1275,
+        "y": 432,
+        "w": 147,
+        "h": 148
+      },
+      "normalize": 0.925,
+      "rootX": 90,
+      "footY": 145,
+      "measuredFaceHeight": 40
+    },
+    {
+      "name": "jump-start-01",
+      "rect": {
+        "x": 166,
+        "y": 641,
+        "w": 116,
+        "h": 131
+      },
+      "normalize": 0.9736842105263158,
+      "rootX": 33,
+      "footY": 128,
+      "measuredFaceHeight": 38
+    },
+    {
+      "name": "jump-start-02",
+      "rect": {
+        "x": 525,
+        "y": 636,
+        "w": 129,
+        "h": 141
+      },
+      "normalize": 0.9487179487179487,
+      "rootX": 76,
+      "footY": 138,
+      "measuredFaceHeight": 39
+    },
+    {
+      "name": "jump-01",
+      "rect": {
+        "x": 901,
+        "y": 628,
+        "w": 120,
+        "h": 153
+      },
+      "normalize": 0.9487179487179487,
+      "rootX": 79,
+      "footY": 150,
+      "measuredFaceHeight": 39
+    },
+    {
+      "name": "jump-02",
+      "rect": {
+        "x": 1292,
+        "y": 629,
+        "w": 117,
+        "h": 135
+      },
+      "normalize": 0.9487179487179487,
+      "rootX": 40,
+      "footY": 132,
+      "measuredFaceHeight": 39
+    },
+    {
+      "name": "fall-01",
+      "rect": {
+        "x": 155,
+        "y": 835,
+        "w": 121,
+        "h": 138
+      },
+      "normalize": 1,
+      "rootX": 88,
+      "footY": 135,
+      "measuredFaceHeight": 37
+    },
+    {
+      "name": "fall-02",
+      "rect": {
+        "x": 525,
+        "y": 836,
+        "w": 120,
+        "h": 140
+      },
+      "normalize": 1.0277777777777777,
+      "rootX": 80,
+      "footY": 137,
+      "measuredFaceHeight": 36
+    },
+    {
+      "name": "landing-01",
+      "rect": {
+        "x": 894,
+        "y": 849,
+        "w": 131,
+        "h": 124
+      },
+      "normalize": 1,
+      "rootX": 85,
+      "footY": 121,
+      "measuredFaceHeight": 37
+    },
+    {
+      "name": "landing-02",
+      "rect": {
+        "x": 1287,
+        "y": 823,
+        "w": 111,
+        "h": 152
+      },
+      "normalize": 0.925,
+      "rootX": 70,
+      "footY": 149,
+      "measuredFaceHeight": 40
+    }
+  ],
+  "animations": [
+    {
+      "key": "tanya-idle",
+      "frames": [
+        "idle-01",
+        "idle-02",
+        "idle-03",
+        "idle-04"
+      ],
+      "frameRate": 5,
+      "repeat": -1
+    },
+    {
+      "key": "tanya-run",
+      "frames": [
+        "run-01",
+        "run-02",
+        "run-03",
+        "run-04",
+        "run-05",
+        "run-06",
+        "run-07",
+        "run-08"
+      ],
+      "frameRate": 12,
+      "repeat": -1
+    },
+    {
+      "key": "tanya-jump-start",
+      "frames": [
+        "jump-start-01",
+        "jump-start-02"
+      ],
+      "frameRate": 24,
+      "repeat": 0
+    },
+    {
+      "key": "tanya-jump",
+      "frames": [
+        "jump-01",
+        "jump-02"
+      ],
+      "frameRate": 8,
+      "repeat": 0
+    },
+    {
+      "key": "tanya-fall",
+      "frames": [
+        "fall-01",
+        "fall-02"
+      ],
+      "frameRate": 8,
+      "repeat": 0
+    },
+    {
+      "key": "tanya-land",
+      "frames": [
+        "landing-01",
+        "landing-02"
+      ],
+      "frameRate": 24,
+      "repeat": 0
+    }
+  ]
+}
