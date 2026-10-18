@@ -4,12 +4,6 @@ const requested = new URLSearchParams(location.search).get('view')?.toLowerCase(
 export const presentation: Presentation = requested === 'a' || requested === 'b' ? requested : 'c';
 document.body.dataset.view = presentation;
 
-for (const link of Array.from(document.querySelectorAll<HTMLAnchorElement>('#presentation-nav a'))) {
-  const url = new URL(location.href);
-  url.searchParams.set('view', link.dataset.view!);
-  link.href = url.href;
-  if (link.dataset.view === presentation) link.setAttribute('aria-current', 'page');
-}
 if (presentation === 'c') {
   document.querySelector<HTMLLinkElement>('link[rel="manifest"]')!.href =
     new URL('manifest-portrait.webmanifest', document.baseURI).href;

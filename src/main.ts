@@ -91,7 +91,7 @@ class PlayScene extends Phaser.Scene {
     clearTimeout(toastTimer);
     controls?.reset();
     this.makeTextures();
-    this.cameras.main.setBackgroundColor('#c7dfcf').setScroll(0, 0);
+    this.cameras.main.setBackgroundColor('#d5e7f8').setScroll(0, 0);
     this.framing = undefined;
     this.resize();
     this.scale.on('resize', this.resize, this);
@@ -594,7 +594,7 @@ class PlayScene extends Phaser.Scene {
 export const game = new Phaser.Game({
   type: Phaser.AUTO,
   parent: 'game',
-  backgroundColor: '#c7dfcf',
+  backgroundColor: '#d5e7f8',
   scale: { mode: Phaser.Scale.RESIZE, width: '100%', height: '100%' },
   physics: { default: 'arcade', arcade: { gravity: { x: 0, y: s.gravity }, debug: false } },
   input: { activePointers: 3, keyboard: true },
