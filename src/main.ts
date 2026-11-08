@@ -354,7 +354,8 @@ class PlayScene extends Phaser.Scene {
     camera.scrollY = Phaser.Math.Linear(camera.scrollY, targetY, 1 - Math.exp(-dt * 2.8));
     element('#distance').textContent = `${Math.min(100, Math.round(this.tanya.x / (s.levelWidth - 150) * 100))}% пути`;
     this.updateHud();
-    if (Math.abs(this.tanya.x - (s.levelWidth - 150)) < 80 && grounded) this.feedCat();
+    // Finish is a crossing, not a grounded overlap that a jump can skip.
+    if (this.tanya.x >= s.levelWidth - 150 - 80) this.feedCat();
   }
   private runSpeed() {
     return this.exhausted ? s.tiredSpeed : this.lowEnergy ? s.lowEnergySpeed : s.speed;
