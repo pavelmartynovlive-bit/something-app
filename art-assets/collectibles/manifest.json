@@ -1,0 +1,32 @@
+[
+  {
+    "file": "food.png",
+    "original": "ChatGPT Image Nov 8, 2026, 09_37_07 PM.png",
+    "sha256": "d94957f509d9cec9ed173af4cc572cd0ec3dcd955fd5747a8c61c345eff0f230",
+    "active": true
+  },
+  {
+    "file": "food-glow.png",
+    "original": "ChatGPT Image Nov 8, 2026, 09_37_11 PM.png",
+    "sha256": "221453b3182e7360c67c57b108023137b84511f5a0e9068befc2ecb321d3fefa",
+    "active": false
+  },
+  {
+    "file": "lipton-soft.png",
+    "original": "ChatGPT Image Nov 8, 2026, 09_37_13 PM.png",
+    "sha256": "659902be953b14f11862ed75cc024e559f7c807e76ba4bc01c44bae6f5a6f5af",
+    "active": false
+  },
+  {
+    "file": "lipton.png",
+    "original": "ChatGPT Image Nov 8, 2026, 09_37_15 PM.png",
+    "sha256": "28158532cedb15d69ad2b41c8859025c6e407222db6a3058582d55a4b854d3c6",
+    "active": true
+  },
+  {
+    "file": "lipton-glow.png",
+    "original": "ChatGPT Image Nov 8, 2026, 09_37_17 PM.png",
+    "sha256": "3b27b8bdb5ebc5715e65c635e52756e18fa4efa4ca0d8ff935af0969af5d706e",
+    "active": false
+  }
+]

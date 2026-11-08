@@ -14,6 +14,8 @@
     "test:environment": "node scripts/check-winter-environment.mjs",
     "test:fatigue": "node scripts/check-fatigue.mjs",
     "test:collectible-trust": "node scripts/audit-v3.mjs && node scripts/check-collectible-trust.mjs",
+    "test:collectible-visual": "node scripts/check-collectible-visual.mjs",
+    "test:collectible:production": "node scripts/check-collectible-production.mjs",
     "test:character:context": "node scripts/check-tanya-context.mjs",
     "test:character": "node scripts/check-tanya.mjs",
     "test:character:production": "node scripts/check-tanya-production.mjs",

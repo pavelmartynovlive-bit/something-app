@@ -1,0 +1,41 @@
+import { chromium } from 'playwright';
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+
+const files = ['food.png', 'lipton.png'];
+const hashes = files.map(file => createHash('sha256').update(readFileSync(`public/assets/collectibles/${file}`)).digest('hex'));
+const browser = await chromium.launch({ executablePath: '/usr/bin/chromium', args: ['--no-sandbox'] });
+try {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true });
+  const page = await context.newPage(), errors = [], failed = [];
+  page.on('pageerror', error => errors.push(error.message));
+  page.on('response', response => { if (response.status() >= 400) failed.push(response.url()); });
+  await page.goto(process.env.PRODUCTION_URL || 'http://localhost:4173/');
+  await page.waitForSelector('canvas');
+  await page.evaluate(() => navigator.serviceWorker.ready);
+  await page.waitForFunction(() => !!navigator.serviceWorker.controller);
+  const cached = await page.evaluate(async files => Promise.all(files.map(async file => {
+    const response = await caches.match(new URL(`assets/collectibles/${file}`, document.baseURI).href);
+    if (!response) throw Error(`PNG missing from offline cache: ${file}`);
+    const blob = await response.blob(), image = await createImageBitmap(blob);
+    return { file, width: image.width, height: image.height };
+  })), files);
+  assert.deepEqual(cached, [
+    { file: 'food.png', width: 1312, height: 1199 },
+    { file: 'lipton.png', width: 1024, height: 1536 },
+  ]);
+  await context.setOffline(true);
+  await page.reload();
+  await page.waitForSelector('canvas');
+  const offlineHashes = await page.evaluate(async files => Promise.all(files.map(async file => {
+    const response = await fetch(new URL(`assets/collectibles/${file}`, document.baseURI));
+    if (!response.ok) throw Error(`Offline PNG unavailable: ${file}`);
+    const hash = await crypto.subtle.digest('SHA-256', await response.arrayBuffer());
+    return Array.from(new Uint8Array(hash), byte => byte.toString(16).padStart(2, '0')).join('');
+  })), files);
+  assert.deepEqual(offlineHashes, hashes, 'offline originals are byte-for-byte identical');
+  assert.deepEqual(errors, []);
+  assert.deepEqual(failed, []);
+  console.log('PASS: production PNG precache, offline reload and original SHA-256 hashes');
+} finally { await browser.close(); }

@@ -6,6 +6,7 @@ import { presentation, cameraFrame } from './presentation';
 import { WinterParallaxBackground } from './winter-parallax-background';
 import { WinterEnvironment } from './winter-environment';
 import { TanyaVisual, tanyaArt } from './tanya-visual';
+import { CollectibleVisual } from './collectible-visual';
 import { tanyaInteractions as interaction, type BenchPhase, type PitFallZone, type TanyaHit } from './tanya-interactions';
 import './style.css';
 import './pwa';
@@ -75,7 +76,7 @@ class PlayScene extends Phaser.Scene {
   private winterEnvironment?: WinterEnvironment;
   constructor() { super('play'); }
 
-  preload() { WinterParallaxBackground.preload(this); WinterEnvironment.preload(this); TanyaVisual.preload(this); }
+  preload() { WinterParallaxBackground.preload(this); WinterEnvironment.preload(this); TanyaVisual.preload(this); CollectibleVisual.preload(this); }
 
   create() {
     this.energy = 100;
@@ -103,6 +104,7 @@ class PlayScene extends Phaser.Scene {
     clearTimeout(toastTimer);
     controls?.reset();
     this.makeTextures();
+    CollectibleVisual.prepare(this);
     this.cameras.main.setBackgroundColor('#d5e7f8').setScroll(0, 0);
     this.framing = undefined;
     this.resize();
@@ -176,6 +178,7 @@ class PlayScene extends Phaser.Scene {
     s.bottles.forEach(point => {
       const bottle = bottles.create(point.x, point.y, 'lipton') as Phaser.Physics.Arcade.Sprite;
       bottle.setSize(42, 52);
+      CollectibleVisual.apply(bottle, 'lipton');
     });
     this.physics.add.overlap(this.tanya, bottles, (_player, item) => {
       if (this.finished || this.pitFalling || this.recoveryRemaining > 0) return;
@@ -212,7 +215,10 @@ class PlayScene extends Phaser.Scene {
     for (const a of [...this.grannies, ...this.scooters, ...this.pigeons]) a.sprite.setDepth(8);
     for (const body of this.physics.world.staticBodies.entries) {
       const object = body.gameObject as Phaser.GameObjects.Sprite;
-      if (['food', 'lipton'].includes(object.texture?.key)) object.setDepth(5);
+      if (object.texture?.key === 'food') object.setDepth(5);
+      // A bottle and a packet share an authored pickup point at x=1580.
+      // Draw the narrow bottle in front so both PNGs remain recognizable.
+      if (object.texture?.key === 'lipton') object.setDepth(6);
     }
     this.updateHud();
   }
@@ -500,7 +506,10 @@ class PlayScene extends Phaser.Scene {
   }
   private createNewObjects(ground: Phaser.Physics.Arcade.StaticGroup) {
     const food = this.physics.add.staticGroup();
-    for (const point of s.food) food.create(point.x, point.y, 'food');
+    for (const point of s.food) {
+      const packet = food.create(point.x, point.y, 'food') as Phaser.Physics.Arcade.Sprite;
+      CollectibleVisual.apply(packet, 'food');
+    }
     this.physics.add.overlap(this.tanya, food, (_player, item) => {
       if (this.finished || this.pitFalling || this.recoveryRemaining > 0) return;
       const packet = item as Phaser.Physics.Arcade.Sprite;
