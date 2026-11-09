@@ -32,7 +32,7 @@ try {
       window.mobileTick = (n = 1) => { for (let i = 0; i < n; i++) game.headlessStep(mobileNow += 1000 / 60, 1000 / 60); };
       mobileTick(4);
     });
-    assert.equal(await page.locator('canvas').count(), 1);
+    assert.equal(await page.locator('#game canvas').count(), 1);
     if (blockGPU) {
       assert.equal(await page.evaluate(() => game.renderer.type), 1, 'iPhone runs on Canvas without a WebGL context');
       assert.ok(await page.evaluate(() => {
@@ -42,7 +42,7 @@ try {
         return colors.size > 30;
       }), 'iPhone canvas contains the painted winter scene, not just its background color');
     }
-    const bounds = await page.locator('canvas').boundingBox();
+    const bounds = await page.locator('#game canvas').boundingBox();
     await page.touchscreen.tap(bounds.x + bounds.width / 2, bounds.y + bounds.height * .65);
     await page.evaluate(() => mobileTick(6));
     assert.ok(await page.evaluate(() => game.scene.getScene('play').tanya.body.velocity.y < 0), `${name}: tap jumps`);

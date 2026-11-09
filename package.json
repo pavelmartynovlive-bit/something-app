@@ -18,6 +18,7 @@
     "test:collectible:production": "node scripts/check-collectible-production.mjs",
     "test:finish": "node scripts/check-finish.mjs",
     "test:mobile": "node scripts/check-mobile.mjs",
+    "test:npc-hud": "node scripts/check-npc-hud.mjs",
     "test:character:context": "node scripts/check-tanya-context.mjs",
     "test:character": "node scripts/check-tanya.mjs",
     "test:character:production": "node scripts/check-tanya-production.mjs",

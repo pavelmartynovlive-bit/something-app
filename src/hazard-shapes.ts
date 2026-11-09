@@ -1,5 +1,5 @@
-// Local rectangles follow the actual placeholder silhouette. The same regions
-// are used for every moving hazard; transparent sprite corners never deal damage.
+// Fixed gameplay regions on the original physics proxies. PNG artwork follows
+// these proxies separately; animation frames never resize the damage regions.
 export type DangerRect = { x: number; y: number; width: number; height: number };
 export const hazardShapes: Record<'scooter' | 'pigeons' | 'granny', DangerRect[]> = {
   scooter: [
@@ -36,7 +36,7 @@ export function touchesDanger(
 ) {
   // Arcade advances bodies before Scene.update and synchronizes sprites after
   // it. Use this frame's body pose for both actors, not the previous sprite pose.
-  // Current placeholder hazards have scale 1 and rotation 0.
+  // Physics proxies retain scale 1 and rotation 0.
   const left = sprite.body ? sprite.body.x - sprite.body.offset.x : sprite.x - sprite.width / 2;
   const top = sprite.body ? sprite.body.y - sprite.body.offset.y : sprite.y - sprite.height / 2;
   return hazardShapes[kind].some(rect => {

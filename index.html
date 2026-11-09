@@ -40,14 +40,18 @@
       }());
     </script>
     <main id="game" aria-label="Игра: Таня и голодный кот"></main>
-    <div id="hud">
-      <div class="energy-card"><span>Энергия <b id="energy-value">100</b></span><div class="energy-track" role="progressbar" aria-label="Энергия Тани" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><div id="energy-fill"></div></div><div id="energy-warning" role="status" hidden></div></div>
-      <div class="hud-right"><div class="goal food-panel" role="status"><div id="food-count">Корм: 0</div><div id="food-needed">Котику нужно: 80</div></div><button id="install" type="button">Установить</button><div class="goal">Покорми котика <span id="distance">→</span></div></div>
+    <div id="hud" aria-label="Энергия и корм">
+      <canvas id="hud-art" width="720" height="144" aria-hidden="true"></canvas>
+      <div class="hud-semantics">
+        <div>Энергия <b id="energy-value">100</b><div class="energy-track" role="progressbar" aria-label="Энергия Тани" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><div id="energy-fill"></div></div><div id="energy-warning" role="status" hidden></div></div>
+        <div role="status"><div id="food-count">Корм: 0</div><div id="food-needed">Котику нужно: 80</div></div>
+        <span id="distance">→</span>
+      </div>
     </div>
     <div id="hint"><div>Таня бежит сама<br>Тап — прыжок<br>Быстрый второй тап — выше и дальше<small><span id="food-goal">Собери корм для котика</span><br>На компьютере: Space / ↑ — те же нажатия</small></div></div>
     <div id="toast" role="status" aria-live="polite"></div>
     <div id="portrait"><span>↻</span>Удобнее играть горизонтально<small>Поверни телефон</small></div>
-    <div id="ending" hidden><div class="end-card"><div class="cat-icon">🐈</div><h1 id="end-title">Котик спасён ❤️</h1><p id="end-description">Таня дошла. Котик поел. Всё получилось.</p><button id="replay" type="button">Сыграть ещё раз</button></div></div>
+    <div id="ending" hidden><div class="end-card"><div class="cat-icon">🐈</div><h1 id="end-title">Котик спасён ❤️</h1><p id="end-description">Таня дошла. Котик поел. Всё получилось.</p><div class="end-actions"><button id="replay" type="button">Сыграть ещё раз</button><button id="install" type="button">Установить</button></div></div></div>
     <dialog id="install-dialog"><h2>Таня на телефоне</h2><p id="install-instructions"></p><p id="offline-status">Для установки открой игру по HTTPS-ссылке.</p><button id="install-close" type="button">Понятно</button></dialog>
     <script type="module" src="/src/main.ts"></script>
   </body>

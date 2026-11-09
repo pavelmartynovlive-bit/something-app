@@ -61,3 +61,17 @@ body[data-view="c"] #toast { max-width: calc(var(--portrait-frame-width) - 24px)
 @media (orientation: landscape) and (pointer: coarse) { body[data-view="c"] #portrait { display: flex; } }
 
 #energy-warning { margin-top: 5px; font-size: 10px; line-height: 1.2; color: #7a570e; }
+
+/* Two illustrated panels; live values are painted over the approved PNG frames. */
+#hud, body[data-view="c"] #hud {
+  display: block; top: max(12px, env(safe-area-inset-top)); bottom: auto;
+  left: 50%; right: auto; transform: translateX(-50%);
+  width: min(720px, calc(100vw - 24px));
+}
+body[data-view="c"] #hud { width: calc(var(--portrait-frame-width) - 24px); }
+#hud-art { display: block; width: 100%; height: auto; }
+.hud-semantics {
+  position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap;
+}
+.end-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }

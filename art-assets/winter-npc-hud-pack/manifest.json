@@ -1,0 +1,116 @@
+{
+  "assets": [
+    {
+      "name": "scooter-rider",
+      "file": "scooter-rider.png",
+      "width": 1312,
+      "height": 1199,
+      "alphaBounds128": [
+        203,
+        12,
+        1087,
+        1195
+      ],
+      "transparent": true,
+      "sha256": "32852548214e3fa2090783c769ef3ff2f48a80592a5421b8be732b284ddeffe7"
+    },
+    {
+      "name": "grandma-stroller",
+      "file": "grandma-stroller.png",
+      "width": 1312,
+      "height": 1199,
+      "alphaBounds128": [
+        56,
+        27,
+        1263,
+        1187
+      ],
+      "transparent": true,
+      "sha256": "c94d91ce90b41b51efc2ff6dd0a08122180a0f285add73f80753acc65168b16e"
+    },
+    {
+      "name": "pigeon-standing",
+      "file": "pigeon-standing.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds128": [
+        311,
+        68,
+        1217,
+        977
+      ],
+      "transparent": true,
+      "sha256": "1355af8939ecc6f803b57889afa0c78fee108670a4ef5f3707b895b439938b85"
+    },
+    {
+      "name": "pigeon-walking",
+      "file": "pigeon-walking.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds128": [
+        314,
+        71,
+        1219,
+        964
+      ],
+      "transparent": true,
+      "sha256": "729d8a21c975bee4598486286c2f7a55263ee553f1a2a25dc11014ce39f54cc8"
+    },
+    {
+      "name": "pigeon-startled",
+      "file": "pigeon-startled.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds128": [
+        229,
+        60,
+        1338,
+        989
+      ],
+      "transparent": true,
+      "sha256": "ed530bb88028f5c00d653be37e138b5f8591db6026d2dd34af6447cc8eb3af13"
+    },
+    {
+      "name": "pigeon-takeoff",
+      "file": "pigeon-takeoff.png",
+      "width": 1536,
+      "height": 1024,
+      "alphaBounds128": [
+        280,
+        37,
+        1290,
+        950
+      ],
+      "transparent": true,
+      "sha256": "79e4e1582872892e3253974ddb337d862cb06e4b3fb589a70450ddb34e5f23a1"
+    },
+    {
+      "name": "hud-normal",
+      "file": "hud-normal.png",
+      "width": 2172,
+      "height": 724,
+      "alphaBounds128": [
+        37,
+        156,
+        2136,
+        578
+      ],
+      "transparent": true,
+      "sha256": "0f45801f53d081e653239676171acc244a347a8894137b3a70910084eb0b8864"
+    },
+    {
+      "name": "hud-low-energy",
+      "file": "hud-low-energy.png",
+      "width": 2172,
+      "height": 724,
+      "alphaBounds128": [
+        33,
+        156,
+        2139,
+        581
+      ],
+      "transparent": true,
+      "sha256": "2162f3c68ce9c569ae82397331f8901f47e6a1667357b9fca03081954d2e45b3"
+    }
+  ]
+}

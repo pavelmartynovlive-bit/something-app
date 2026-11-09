@@ -7,6 +7,8 @@ import { WinterParallaxBackground } from './winter-parallax-background';
 import { WinterEnvironment } from './winter-environment';
 import { TanyaVisual, tanyaArt } from './tanya-visual';
 import { CollectibleVisual } from './collectible-visual';
+import { NpcVisual } from './npc-visual';
+import { GameHud } from './game-hud';
 import { trackLoading, loadingFailed, gameReady, useCanvasRenderer } from './loading';
 import { tanyaInteractions as interaction, type BenchPhase, type PitFallZone, type TanyaHit } from './tanya-interactions';
 import './style.css';
@@ -75,12 +77,14 @@ class PlayScene extends Phaser.Scene {
   private framing?: ReturnType<typeof cameraFrame>;
   private winterBackground?: WinterParallaxBackground;
   private winterEnvironment?: WinterEnvironment;
+  private npcVisuals: NpcVisual[] = [];
   constructor() { super('play'); }
 
   preload() {
     trackLoading(this.load);
     WinterParallaxBackground.preload(this); WinterEnvironment.preload(this);
     TanyaVisual.preload(this); CollectibleVisual.preload(this);
+    NpcVisual.preload(this); GameHud.preload(this);
   }
 
   create() {
@@ -105,12 +109,14 @@ class PlayScene extends Phaser.Scene {
     this.pigeons = [];
     this.finished = this.wasPortrait = false;
     this.grannies = [];
+    this.npcVisuals = [];
     ending.hidden = true;
     toast.classList.remove('visible');
     clearTimeout(toastTimer);
     controls?.reset();
     this.makeTextures();
     CollectibleVisual.prepare(this);
+    NpcVisual.prepare(this); GameHud.prepare(this);
     this.cameras.main.setBackgroundColor('#d5e7f8').setScroll(0, 0);
     this.framing = undefined;
     this.resize();
@@ -219,6 +225,9 @@ class PlayScene extends Phaser.Scene {
       get energy() { return owner.energy; },
     });
     for (const a of [...this.grannies, ...this.scooters, ...this.pigeons]) a.sprite.setDepth(8);
+    for (const granny of this.grannies) this.npcVisuals.push(NpcVisual.attach(this, granny.sprite, 'granny'));
+    for (const scooter of this.scooters) this.npcVisuals.push(NpcVisual.attach(this, scooter.sprite, 'scooter'));
+    for (const flock of this.pigeons) this.npcVisuals.push(NpcVisual.attach(this, flock.sprite, 'pigeons', flock));
     for (const body of this.physics.world.staticBodies.entries) {
       const object = body.gameObject as Phaser.GameObjects.Sprite;
       if (object.texture?.key === 'food') object.setDepth(5);
@@ -513,6 +522,7 @@ class PlayScene extends Phaser.Scene {
     warning.textContent = this.exhausted ? 'Таня устала' : 'Скоро Таня устанет';
     energyTrack.setAttribute('aria-valuetext', `${Math.ceil(this.energy)}%${warning.hidden ? '' : ` — ${warning.textContent}`}`);
     energyTrack.setAttribute('aria-valuenow', `${Math.ceil(this.energy)}`);
+    GameHud.render(this.energy, this.foodCount, s.requiredFood, this.exhausted || this.lowEnergy);
   }
   private createNewObjects(ground: Phaser.Physics.Arcade.StaticGroup) {
     const food = this.physics.add.staticGroup();

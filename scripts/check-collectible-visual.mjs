@@ -19,7 +19,7 @@ try {
     window.visual = await import(visualUrl);
   });
   await page.waitForFunction(() => game.scene.getScene('play')?.tanya?.body);
-  assert.equal(await page.locator('canvas').count(), 1, 'inspect the running game without creating a second instance');
+  assert.equal(await page.locator('#game canvas').count(), 1, 'inspect the running game without creating a second instance');
   const result = await page.evaluate(inputs => {
     game.loop.stop();
     let now = performance.now();
