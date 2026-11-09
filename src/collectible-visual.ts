@@ -40,12 +40,14 @@ export class CollectibleVisual {
       if (right < left) continue;
       const width = right - left + 1, height = bottom - top + 1;
       const scale = Math.min(art.width / width, art.height / height);
+      const drawWidth = width * scale * (art === collectibleArt.lipton ? 1.5 : 1);
+      const drawHeight = height * scale;
       const texture = scene.textures.createCanvas(art.displayKey, art.width, art.height)!;
       const context = texture.getContext();
       context.imageSmoothingEnabled = true; context.imageSmoothingQuality = 'high';
       context.drawImage(source, left, top, width, height,
-        (art.width - width * scale) / 2, (art.height - height * scale) / 2,
-        width * scale, height * scale);
+        (art.width - drawWidth) / 2, (art.height - drawHeight) / 2,
+        drawWidth, drawHeight);
       texture.refresh();
     }
   }
