@@ -1,4 +1,4 @@
-import { chromium } from 'playwright';
+import { chromium, devices } from 'playwright';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
@@ -7,12 +7,15 @@ const files = ['food.png', 'lipton.png'];
 const hashes = files.map(file => createHash('sha256').update(readFileSync(`public/assets/collectibles/${file}`)).digest('hex'));
 const browser = await chromium.launch({ executablePath: '/usr/bin/chromium', args: ['--no-sandbox'] });
 try {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true });
+  const context = await browser.newContext({ ...devices['iPhone 13'], userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/130.0.0.0 Mobile/15E148 Safari/604.1' });
   const page = await context.newPage(), errors = [], failed = [];
   page.on('pageerror', error => errors.push(error.message));
   page.on('response', response => { if (response.status() >= 400) failed.push(response.url()); });
   await page.goto(process.env.PRODUCTION_URL || 'http://localhost:4173/');
   await page.waitForSelector('canvas');
+  await page.waitForSelector('#loading', { state: 'hidden' });
+  await page.waitForFunction(() => document.querySelector('#distance').textContent.includes('%'));
+  assert.ok(await page.evaluate(() => !!document.querySelector('canvas').getContext('2d')), 'iPhone production uses the compatible Canvas renderer');
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.waitForFunction(() => !!navigator.serviceWorker.controller);
   const cached = await page.evaluate(async files => Promise.all(files.map(async file => {
@@ -23,11 +26,12 @@ try {
   })), files);
   assert.deepEqual(cached, [
     { file: 'food.png', width: 1312, height: 1199 },
-    { file: 'lipton.png', width: 1024, height: 1536 },
+    { file: 'lipton.png', width: 713, height: 2206 },
   ]);
   await context.setOffline(true);
   await page.reload();
   await page.waitForSelector('canvas');
+  await page.waitForSelector('#loading', { state: 'hidden' });
   const offlineHashes = await page.evaluate(async files => Promise.all(files.map(async file => {
     const response = await fetch(new URL(`assets/collectibles/${file}`, document.baseURI));
     if (!response.ok) throw Error(`Offline PNG unavailable: ${file}`);

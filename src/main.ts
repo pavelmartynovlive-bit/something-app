@@ -7,6 +7,7 @@ import { WinterParallaxBackground } from './winter-parallax-background';
 import { WinterEnvironment } from './winter-environment';
 import { TanyaVisual, tanyaArt } from './tanya-visual';
 import { CollectibleVisual } from './collectible-visual';
+import { trackLoading, loadingFailed, gameReady, useCanvasRenderer } from './loading';
 import { tanyaInteractions as interaction, type BenchPhase, type PitFallZone, type TanyaHit } from './tanya-interactions';
 import './style.css';
 import './pwa';
@@ -76,9 +77,14 @@ class PlayScene extends Phaser.Scene {
   private winterEnvironment?: WinterEnvironment;
   constructor() { super('play'); }
 
-  preload() { WinterParallaxBackground.preload(this); WinterEnvironment.preload(this); TanyaVisual.preload(this); CollectibleVisual.preload(this); }
+  preload() {
+    trackLoading(this.load);
+    WinterParallaxBackground.preload(this); WinterEnvironment.preload(this);
+    TanyaVisual.preload(this); CollectibleVisual.preload(this);
+  }
 
   create() {
+    if (loadingFailed()) return;
     this.energy = 100;
     this.exhausted = false;
     this.lowEnergy = false;
@@ -221,9 +227,12 @@ class PlayScene extends Phaser.Scene {
       if (object.texture?.key === 'lipton') object.setDepth(6);
     }
     this.updateHud();
+    gameReady();
+    this.time.delayedCall(2800, hideHint);
   }
 
   update(_time: number, delta: number) {
+    if (loadingFailed()) return;
     const now = this.time.now;
     const portrait = window.matchMedia('(pointer: coarse)').matches &&
       (presentation === 'c' ? window.innerWidth > window.innerHeight : window.innerHeight > window.innerWidth);
@@ -667,7 +676,7 @@ class PlayScene extends Phaser.Scene {
 }
 
 export const game = new Phaser.Game({
-  type: Phaser.AUTO,
+  type: useCanvasRenderer ? Phaser.CANVAS : Phaser.AUTO,
   parent: 'game',
   backgroundColor: '#d5e7f8',
   scale: { mode: Phaser.Scale.RESIZE, width: '100%', height: '100%' },
@@ -683,7 +692,6 @@ new ResizeObserver(() => {
   game.scale.getParentBounds();
   game.scale.refresh();
 }).observe(element('#game'));
-setTimeout(hideHint, 2800);
 element<HTMLButtonElement>('#replay').addEventListener('click', () => {
   controls.reset();
   game.scene.start('play');

@@ -21,12 +21,20 @@
     "file": "lipton.png",
     "original": "ChatGPT Image Nov 8, 2026, 09_37_15 PM.png",
     "sha256": "28158532cedb15d69ad2b41c8859025c6e407222db6a3058582d55a4b854d3c6",
-    "active": true
+    "active": false
   },
   {
     "file": "lipton-glow.png",
     "original": "ChatGPT Image Nov 8, 2026, 09_37_17 PM.png",
     "sha256": "3b27b8bdb5ebc5715e65c635e52756e18fa4efa4ca0d8ff935af0969af5d706e",
     "active": false
+  },
+  {
+    "file": "lipton-green-tea.png",
+    "original": "exec-092f9eea-4fb0-4011-95ae-f7e0f8009ed9.png",
+    "sha256": "43ae9857883ec0db2c372f673e70cc04f648701c507b2e48278247c9b7686b7f",
+    "active": true,
+    "publicFile": "lipton.png",
+    "description": "Cartoon green tea bottle styled from the user product photo: green cap, olive tea, leaf label."
   }
 ]

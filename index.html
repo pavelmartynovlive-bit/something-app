@@ -13,6 +13,32 @@
     <title>Таня и голодный кот</title>
   </head>
   <body>
+    <div id="loading" role="status" aria-live="polite" style="position:fixed;inset:0;z-index:100;display:grid;place-content:center;text-align:center;padding:24px;background:#d5e7f8;color:#29483e;font:16px system-ui">
+      <h2 id="loading-title">Загружаем игру…</h2>
+      <p id="loading-detail">Готовим зимний двор и Таню</p>
+      <button id="loading-retry" type="button" hidden>Попробовать ещё раз</button>
+    </div>
+    <script>
+      (function () {
+        var screen = document.getElementById('loading');
+        function failed() {
+          if (screen.hidden) return;
+          document.getElementById('loading-title').textContent = 'Не удалось запустить игру';
+          document.getElementById('loading-detail').textContent = 'Проверь интернет и попробуй ещё раз.';
+          document.getElementById('loading-retry').hidden = false;
+        }
+        window.addEventListener('error', failed);
+        window.addEventListener('unhandledrejection', failed);
+        document.getElementById('loading-retry').addEventListener('click', function () { location.reload(); });
+        var timeout = setTimeout(function () {
+          if (!screen.hidden) {
+            document.getElementById('loading-detail').textContent = 'Загрузка занимает больше времени. Можно подождать или попробовать ещё раз.';
+            document.getElementById('loading-retry').hidden = false;
+          }
+        }, 45000);
+        document.addEventListener('game:ready', function () { clearTimeout(timeout); });
+      }());
+    </script>
     <main id="game" aria-label="Игра: Таня и голодный кот"></main>
     <div id="hud">
       <div class="energy-card"><span>Энергия <b id="energy-value">100</b></span><div class="energy-track" role="progressbar" aria-label="Энергия Тани" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><div id="energy-fill"></div></div><div id="energy-warning" role="status" hidden></div></div>

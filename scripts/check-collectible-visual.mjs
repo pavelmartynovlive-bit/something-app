@@ -64,7 +64,7 @@ try {
   }, inputs);
   assert.deepEqual(result.assets, [
     { kind: 'food', width: 1312, height: 1199, displayWidth: 36, displayHeight: 40 },
-    { kind: 'lipton', width: 1024, height: 1536, displayWidth: 42, displayHeight: 52 },
+    { kind: 'lipton', width: 713, height: 2206, displayWidth: 42, displayHeight: 52 },
   ], 'uploaded original PNGs load and normalize into the original frame dimensions');
   assert.ok(result.applied);
   assert.ok(result.baselineFrames.length > 0 && result.baselineFrames.every(frame => frame === '__BASE'), `baseline uses procedural frames: ${JSON.stringify(result.baselineFrames)}`);
