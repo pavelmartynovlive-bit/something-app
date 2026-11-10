@@ -13,7 +13,10 @@ async function filesIn(path = '') {
   }));
   return files.flat();
 }
-const files = (await filesIn()).filter(name => name !== 'sw.js').sort();
+// Original editing sources are not needed offline; only prepared SFX are cached.
+const files = (await filesIn()).filter(name => name !== 'sw.js'
+  && !name.startsWith('assets/audio/source/')
+  && !name.endsWith('.md')).sort();
 const hash = createHash('sha256');
 for (const name of files) hash.update(name).update(await readFile(resolve(directory, name)));
 const version = hash.digest('hex').slice(0, 16);
@@ -22,8 +25,21 @@ const PREFIX = 'tanya:' + self.registration.scope + ':';
 const CACHE = PREFIX + '${version}';
 const FILES = ${JSON.stringify(files)};
 const urls = FILES.map(path => new URL(path, self.registration.scope).href);
+const optionalAudio = urls.filter(url => new URL(url).pathname.includes('/assets/audio/sfx/'));
+const required = urls.filter(url => !optionalAudio.includes(url));
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(urls)));
+  event.waitUntil(caches.open(CACHE).then(async cache => {
+    await cache.addAll(required);
+    // A missing optional sound must not prevent installing the playable game.
+    await Promise.all(optionalAudio.map(async url => {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 10000);
+      try {
+        const response = await fetch(url, { signal: controller.signal });
+        if (response.ok) await cache.put(url, response);
+      } catch {} finally { clearTimeout(timer); }
+    }));
+  }));
 });
 // Обновлённая версия активируется после закрытия старых вкладок игры.
 // Не перезагружаем и не меняем сборку посреди забега.

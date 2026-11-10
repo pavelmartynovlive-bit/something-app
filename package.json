@@ -22,7 +22,10 @@
     "test:character:context": "node scripts/check-tanya-context.mjs",
     "test:character": "node scripts/check-tanya.mjs",
     "test:character:production": "node scripts/check-tanya-production.mjs",
-    "test:character:framing": "node scripts/check-tanya-framing.mjs"
+    "test:character:framing": "node scripts/check-tanya-framing.mjs",
+    "test:audio": "node scripts/check-audio.mjs",
+    "audio:prepare": "python scripts/prepare-audio.py",
+    "test:audio:production": "node scripts/check-audio-production.mjs"
   },
   "dependencies": {
     "phaser": "3.90.0"

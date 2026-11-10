@@ -11,6 +11,7 @@ import { NpcVisual } from './npc-visual';
 import { GameHud } from './game-hud';
 import { trackLoading, loadingFailed, gameReady, useCanvasRenderer } from './loading';
 import { tanyaInteractions as interaction, type BenchPhase, type PitFallZone, type TanyaHit } from './tanya-interactions';
+import { audioManager } from './audio-manager';
 import './style.css';
 import './pwa';
 
@@ -37,6 +38,8 @@ class PlayScene extends Phaser.Scene {
   private tanyaVisual?: TanyaVisual;
   private keys!: Record<string, Phaser.Input.Keyboard.Key>;
   private grannies: { sprite: Phaser.Physics.Arcade.Sprite; left: number; right: number }[] = [];
+  private audioAirSince = -Infinity;
+  private audioLowestBottom = Infinity;
   private energy = 100;
   private exhausted = false;
   private lowEnergy = false;
@@ -89,6 +92,9 @@ class PlayScene extends Phaser.Scene {
 
   create() {
     if (loadingFailed()) return;
+    audioManager.start(); audioManager.resetRun();
+    this.audioAirSince = -Infinity; this.audioLowestBottom = Infinity;
+    this.events.once('shutdown', () => audioManager.resetRun());
     this.energy = 100;
     this.exhausted = false;
     this.lowEnergy = false;
@@ -196,6 +202,7 @@ class PlayScene extends Phaser.Scene {
       if (this.finished || this.pitFalling || this.recoveryRemaining > 0) return;
       const bottle = item as Phaser.Physics.Arcade.Sprite;
       const label = this.add.text(bottle.x, bottle.y - 25, `+${s.liptonEnergy}`, { fontSize: '22px', color: '#326544', fontStyle: 'bold' }).setOrigin(.5).setDepth(20);
+      audioManager.playLiptonPickup(bottle);
       bottle.destroy();
       this.liptonUses++;
       this.changeEnergy(s.liptonEnergy);
@@ -272,6 +279,7 @@ class PlayScene extends Phaser.Scene {
       this.beginFall(pit); this.updatePitFall(); return;
     }
     const grounded = body.blocked.down && body.velocity.y >= 0;
+    this.observeLanding(grounded, body);
     if (grounded) {
       this.lastGround = now; body.maxVelocity.y = 700;
       this.flightGravity = s.gravity; body.setGravityY(0);
@@ -319,6 +327,7 @@ class PlayScene extends Phaser.Scene {
     }
     const jumpVelocity = this.exhausted ? s.tiredJumpVelocity : s.jumpVelocity;
     if (this.restRemaining === 0 && now - this.bufferedJump <= s.jumpBufferMs && now - this.lastGround <= s.coyoteMs) {
+      audioManager.playJump();
       this.tanya.setVelocityY(-jumpVelocity);
       this.jumpStartedAt = now;
       this.takeoffFloor = body.bottom;
@@ -374,6 +383,20 @@ class PlayScene extends Phaser.Scene {
     this.updateHud();
     // Finish is a crossing, not a grounded overlap that a jump can skip.
     if (this.tanya.x >= s.levelWidth - 150 - 80) this.feedCat();
+  }
+  // Observe existing support state only; never change physics/contact resolution.
+  private observeLanding(grounded: boolean, body: Phaser.Physics.Arcade.Body) {
+    if (this.restRemaining > 0) {
+      this.audioAirSince = -Infinity; this.audioLowestBottom = Infinity; return;
+    }
+    if (!grounded) {
+      if (this.audioAirSince === -Infinity) this.audioAirSince = this.time.now;
+      this.audioLowestBottom = Math.min(this.audioLowestBottom, body.bottom);
+    } else {
+      if (this.audioAirSince !== -Infinity && this.time.now - this.audioAirSince >= 100
+        && body.bottom - this.audioLowestBottom >= 24) audioManager.playLanding();
+      this.audioAirSince = -Infinity; this.audioLowestBottom = Infinity;
+    }
   }
   private runSpeed() {
     return this.exhausted ? s.tiredSpeed : this.lowEnergy ? s.lowEnergySpeed : s.speed;
@@ -451,6 +474,7 @@ class PlayScene extends Phaser.Scene {
     body.setVelocityX(Math.min(interaction.pitDriftSpeed, Math.max(0, (zone.start + zone.width - 16 - body.center.x) * 10)));
     if (body.top < zone.killY - body.height) return;
     // Only now is every sprite pixel below the pit's occlusion boundary.
+    audioManager.playPitFall(zone);
     body.stop(); body.enable = false;
     this.recoveryRemaining = s.recoveryDelayMs;
     message('Ой, яма! Возвращаемся…', s.recoveryDelayMs);
@@ -485,6 +509,8 @@ class PlayScene extends Phaser.Scene {
     this.boostUsed=true; this.restRemaining=this.recoveryRemaining=0;
     this.tanya.setTexture('tanya').setAlpha(1);
     this.recoveries++; controls.reset();
+    this.audioAirSince = -Infinity; this.audioLowestBottom = Infinity;
+    audioManager.playRespawn();
     const camera=this.cameras.main,f=this.framing!;
     const inset=Math.max(camera.width/camera.zoom*f.anchorX,this.tanyaVisual?.cameraLeftInset ?? 0);
     camera.scrollX=Phaser.Math.Clamp(this.checkpoint-inset,0,s.levelWidth-camera.width/camera.zoom);
@@ -500,11 +526,13 @@ class PlayScene extends Phaser.Scene {
       : success ? `Корм: ${this.foodCount}. Котик сыт. Таня справилась! Для кошачьего пира нужно ${s.bonusFood} пакетиков.`
       : `Корм: ${this.foodCount}. Котику нужно: ${s.requiredFood}. Не хватило ${s.requiredFood - this.foodCount} пакетиков. Попробуй ещё раз и следуй за кормом.`;
     element('.cat-icon').textContent = feast ? '🐈🍽️🎉' : success ? '🐈❤️' : '🐈';
+    audioManager.playCatMeow();
     this.finished = true;
     this.tanya.setVelocity(0, 0).setAlpha(1).setFlipX(false);
     controls.reset();
     this.physics.pause();
     if (success) {
+      this.time.delayedCall(350, () => audioManager.playCatFeed());
       this.add.rectangle(s.levelWidth - 195, groundYAt(s.levelWidth - 150) - 7, feast ? 48 : 22, 10, 0xe5b83d);
       if (feast) this.add.text(s.levelWidth - 170, groundYAt(s.levelWidth - 150) - 110, 'Мур! А добавка будет?', { fontSize: '22px', color: '#29483e' }).setOrigin(.5);
     }
@@ -534,6 +562,7 @@ class PlayScene extends Phaser.Scene {
       if (this.finished || this.pitFalling || this.recoveryRemaining > 0) return;
       const packet = item as Phaser.Physics.Arcade.Sprite;
       const label = this.add.text(packet.x, packet.y - 25, '+1 корм', { fontSize: '18px', color: '#326544' }).setOrigin(.5).setDepth(20);
+      audioManager.playFoodPickup(packet);
       packet.destroy();
       this.foodCount++;
       this.tweens.add({ targets: label, y: label.y - 40, alpha: 0, duration: 750, onComplete: () => label.destroy() });
@@ -563,6 +592,7 @@ class PlayScene extends Phaser.Scene {
       const bench = item as Phaser.Physics.Arcade.Sprite;
       const body = this.tanya.body as Phaser.Physics.Arcade.Body;
       if (this.finished || this.pitFalling || this.recoveryRemaining > 0 || this.restRemaining > 0 || bench.getData('used') || this.energy >= s.benchEnergyThreshold || body.velocity.y < 0 || !(body.blocked.down && Math.abs(body.bottom - groundYAt(this.tanya.x)) < 3)) return;
+      audioManager.playBenchSit(bench);
       bench.setData('used', true);
       this.benchUses++;
       this.restRemaining = s.benchDurationMs;
@@ -590,6 +620,7 @@ class PlayScene extends Phaser.Scene {
     }
     for (const flock of this.pigeons) {
       if (!flock.flying && Math.abs(this.tanya.body!.bottom - flock.perchY) < 60 && Math.abs(flock.sprite.x - this.tanya.x) < s.pigeonTriggerDistance) {
+        audioManager.playPigeonTakeoff(flock);
         flock.flying = true;
         flock.lowFlightRemaining = .75;
         // Сначала вспархивают низко: без прыжка можно задеть стаю.
@@ -604,10 +635,11 @@ class PlayScene extends Phaser.Scene {
     }
     const player = this.tanya.body as Phaser.Physics.Arcade.Body;
     for (const granny of this.grannies) {
-      if (touchesDanger(player, granny.sprite, 'granny')) this.hit(s.grannyDamage, 'granny');
+      if (touchesDanger(player, granny.sprite, 'granny') && this.hit(s.grannyDamage, 'granny')) audioManager.playGrannyHit();
     }
     for (const scooter of this.scooters) {
       if (scooter.sprite.body!.enable && touchesDanger(player, scooter.sprite, 'scooter') && this.hit(s.scooterDamage, 'scooter')) {
+        audioManager.playScooterHit();
         this.slowUntil = this.time.now + s.scooterSlowMs;
         this.cameras.main.shake(90, .002);
       }
@@ -706,3 +738,7 @@ element<HTMLButtonElement>('#replay').addEventListener('click', () => {
   controls.reset();
   game.scene.start('play');
 });
+
+for (const id of ['replay', 'install', 'install-close', 'loading-retry']) {
+  document.getElementById(id)?.addEventListener('click', () => audioManager.playUIClick());
+}

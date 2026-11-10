@@ -1,0 +1,186 @@
+{
+  "license": "CC0 1.0",
+  "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "attributionRequired": false,
+  "status": "originals-verified-and-game-versions-prepared",
+  "sources": [
+    {
+      "id": 331381,
+      "file": "331381__qubodup__public-domain-jump-sound.wav",
+      "title": "Public Domain Jump Sound",
+      "author": "qubodup",
+      "output": "jump",
+      "url": "https://freesound.org/people/qubodup/sounds/331381/",
+      "sha256": "0e027d34aa57de56c4c31126e226c22bac55256fd059bf7d995174de7397b2af",
+      "sizeBytes": 26902,
+      "durationSeconds": 0.3
+    },
+    {
+      "id": 378058,
+      "file": "378058__bajko__sfx_snowball_hit-03.wav",
+      "title": "sfx_snowball_hit-03.wav",
+      "author": "bajko",
+      "output": "snow_land",
+      "url": "https://freesound.org/people/bajko/sounds/378058/",
+      "sha256": "2b3def0ce7f2246c85d1fb97bf2013289cac82fc4629c47d7eaf1b04cfc5ccd8",
+      "sizeBytes": 239222,
+      "durationSeconds": 0.830479
+    },
+    {
+      "id": 563465,
+      "file": "563465__nicholasdaryl__itempickup.wav",
+      "title": "ItemPickup.wav",
+      "author": "nicholasdaryl",
+      "output": "food_pickup",
+      "url": "https://freesound.org/people/nicholasdaryl/sounds/563465/",
+      "sha256": "979b435fbf4c874d2183fa3e6e7df4f94db39dee2c1a290df518995456ab1d2e",
+      "sizeBytes": 32300,
+      "durationSeconds": 0.365714
+    },
+    {
+      "id": 705750,
+      "file": "705750__richerlandtv__opening-water-bottle.mp3",
+      "title": "Opening Water Bottle",
+      "author": "RICHERlandTV",
+      "output": "lipton_bottle",
+      "url": "https://freesound.org/people/RICHERlandTV/sounds/705750/",
+      "sha256": "3b6bba33453bb7cf3793c2e2115d9677ef1cb1c3ea9c8ed51a9a99c58633473e",
+      "sizeBytes": 65827,
+      "durationSeconds": 1.619592
+    },
+    {
+      "id": 506939,
+      "file": "506939__nakhas__magic-spell-small-positive.wav",
+      "title": "Magic spell (small positive)",
+      "author": "Nakhas",
+      "output": "lipton_magic",
+      "url": "https://freesound.org/people/Nakhas/sounds/506939/",
+      "sha256": "c140d9065aa9771b0f9f3233fcbd418d85703c976f62a3dfb58180d9e651f880",
+      "sizeBytes": 889124,
+      "durationSeconds": 3.079542
+    },
+    {
+      "id": 523698,
+      "file": "523698__bobblyboo__sit-down.wav",
+      "title": "Sit down.wav",
+      "author": "Bobblyboo",
+      "output": "bench_sit",
+      "url": "https://freesound.org/people/Bobblyboo/sounds/523698/",
+      "sha256": "8bebc3313021ee2645d25cab38624fd2e19d6f07152b869d152c77910bc7f8e9",
+      "sizeBytes": 207512,
+      "durationSeconds": 1.176122
+    },
+    {
+      "id": 872227,
+      "file": "872227__koimematsuchiya__soft-impact-pillow-hit.wav",
+      "title": "Soft Impact - Pillow Hit",
+      "author": "KoimeMatsuchiya",
+      "output": "granny_hit",
+      "url": "https://freesound.org/people/KoimeMatsuchiya/sounds/872227/",
+      "sha256": "51c09e044f10621da78d4b37eb86479a0c848e36a2d5771a0315e99da2be3ef1",
+      "sizeBytes": 38192,
+      "durationSeconds": 0.396146
+    },
+    {
+      "id": 566117,
+      "file": "566117__speedyvelcro__plastic-toy-car-crash-impact.wav",
+      "title": "Plastic Toy Car Crash / Impact",
+      "author": "SpeedyVelcro",
+      "output": "scooter_hit",
+      "url": "https://freesound.org/people/SpeedyVelcro/sounds/566117/",
+      "sha256": "cdbcdb1adbbec3719b33a5ad03f3a347ad722006c98f580f25762259796c4e0b",
+      "sizeBytes": 38916,
+      "durationSeconds": 0.219887
+    },
+    {
+      "id": 701283,
+      "file": "701283__5ro4__pigeons-flying-wings-noise.wav",
+      "title": "pigeons flying wings noise.wav",
+      "author": "5ro4",
+      "output": "pigeon_takeoff",
+      "url": "https://freesound.org/people/5ro4/sounds/701283/",
+      "sha256": "f8a8c7d1225267f0a792506b54f5f8d45c03197dced9c7f4a6dc028a20b2e55c",
+      "sizeBytes": 331982,
+      "durationSeconds": 3.763469
+    },
+    {
+      "id": 167081,
+      "file": "167081__julien_matthey__jm_impact_01b-snow-on-cement.wav",
+      "title": "JM_IMPACT_01b - Snow on cement.wav",
+      "author": "Julien_Matthey",
+      "output": "pit_snow",
+      "url": "https://freesound.org/people/Julien_Matthey/sounds/167081/",
+      "sha256": "28ea1c1fec9de1fd8d7275858131e1eacf0ab101ce01ec3e096f0cf970f97db3",
+      "sizeBytes": 212698,
+      "durationSeconds": 1.204694
+    },
+    {
+      "id": 450856,
+      "file": "450856__kyles__ice-drill-pull-out-of-hole-gushy-splash-with-slush-and-snow-nice-detail.wav",
+      "title": "ice drill pull out of hole gushy splash with slush and snow nice detail.wav",
+      "author": "kyles",
+      "output": "pit_slush",
+      "url": "https://freesound.org/people/kyles/sounds/450856/",
+      "sha256": "26b0de266f17d43cea4057b0b206bcf9ed942eca214c17b0518b119abf654d19",
+      "sizeBytes": 427914,
+      "durationSeconds": 2.961292
+    },
+    {
+      "id": 714257,
+      "file": "714257__qubodup__puff-of-smoke.wav",
+      "title": "Puff of Smoke",
+      "author": "qubodup",
+      "output": "respawn",
+      "url": "https://freesound.org/people/qubodup/sounds/714257/",
+      "sha256": "40e8376034dd7ea445950265dfd1716bd9ae3a6da411087278bb287def49b284",
+      "sizeBytes": 96282,
+      "durationSeconds": 0.500625
+    },
+    {
+      "id": 362652,
+      "file": "362652__trngle__cat-meow.wav",
+      "title": "Cat meow",
+      "author": "TRNGLE",
+      "output": "cat_meow_01",
+      "url": "https://freesound.org/people/TRNGLE/sounds/362652/",
+      "sha256": "37a49ce291b6afbb1778a788a5782afab8fc549f4828de359dc8e40e69dd7269",
+      "sizeBytes": 227706,
+      "durationSeconds": 1.166667
+    },
+    {
+      "id": 110011,
+      "file": "110011__tuberatanka__cat-meow.wav",
+      "title": "cat meow",
+      "author": "tuberatanka",
+      "output": "cat_meow_02",
+      "url": "https://freesound.org/people/tuberatanka/sounds/110011/",
+      "sha256": "56156f06313e1e5fb834a68313d668f3b7282ae137e9d8770c75b18619517e39",
+      "sizeBytes": 272496,
+      "durationSeconds": 1.544512
+    },
+    {
+      "id": 534270,
+      "file": "534270__patchytherat__pouring-cat-food-into-bowl.wav",
+      "title": "pouring cat food into bowl.wav",
+      "author": "patchytherat",
+      "output": "cat_feed",
+      "url": "https://freesound.org/people/patchytherat/sounds/534270/",
+      "sha256": "f56fd67c552e3615ef192e9cd7b9d0fce5d5d0c7be37fe90a95a3c98dbfb2045",
+      "sizeBytes": 323516,
+      "durationSeconds": 1.68475
+    },
+    {
+      "id": 528561,
+      "file": "528561__jummit__soft-ui-button-click.ogg",
+      "title": "Soft UI Button Click",
+      "author": "Jummit",
+      "output": "ui_click",
+      "url": "https://freesound.org/people/Jummit/sounds/528561/",
+      "sha256": "31ab1addf6248123d106bff6ddeba9c8dcbc8e5eb5ff6a15bb8cf41dc107f16c",
+      "sizeBytes": 5124,
+      "durationSeconds": 0.238413
+    }
+  ],
+  "receivedDate": "2026-11-10",
+  "archiveSha256": "c9b8ec57d87bc9c3fa40464c9ed62741703e7d8e1c697aa91bdb157e37fb9c7b"
+}
