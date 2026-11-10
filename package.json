@@ -25,7 +25,8 @@
     "test:character:framing": "node scripts/check-tanya-framing.mjs",
     "test:audio": "node scripts/check-audio.mjs",
     "audio:prepare": "python scripts/prepare-audio.py",
-    "test:audio:production": "node scripts/check-audio-production.mjs"
+    "test:audio:production": "node scripts/check-audio-production.mjs",
+    "test:loading": "node scripts/check-loading-recovery.mjs"
   },
   "dependencies": {
     "phaser": "3.90.0"

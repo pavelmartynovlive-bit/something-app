@@ -43,7 +43,12 @@ document.querySelector('#install-close')!.addEventListener('click', () => dialog
 // В режиме разработки worker не регистрируется, чтобы не кешировать исходники Vite.
 if (import.meta.env.PROD && 'serviceWorker' in navigator && window.isSecureContext) {
   status.textContent = 'Готовим игру для запуска без интернета…';
-  window.addEventListener('load', async () => {
+  // Never compete with the game's critical PNG preload. The ready listener is
+  // registered before PlayScene starts loading, including on cached fast starts.
+  const pageLoaded = document.readyState === 'complete' ? Promise.resolve()
+    : new Promise<void>(resolve => window.addEventListener('load', () => resolve(), { once: true }));
+  const playable = new Promise<void>(resolve => document.addEventListener('game:ready', () => resolve(), { once: true }));
+  void Promise.all([pageLoaded, playable]).then(async () => {
     try {
       const base = new URL(import.meta.env.BASE_URL, document.baseURI);
       await navigator.serviceWorker.register(new URL('sw.js', base), { scope: base.pathname });

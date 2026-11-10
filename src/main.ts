@@ -721,6 +721,8 @@ export const game = new Phaser.Game({
   type: useCanvasRenderer ? Phaser.CANVAS : Phaser.AUTO,
   parent: 'game',
   backgroundColor: '#d5e7f8',
+  // Bound stalled mobile requests and avoid saturating all browser connections.
+  loader: { maxParallelDownloads: 6, timeout: 25000, maxRetries: 1 },
   scale: { mode: Phaser.Scale.RESIZE, width: '100%', height: '100%' },
   physics: { default: 'arcade', arcade: { gravity: { x: 0, y: s.gravity }, debug: false } },
   input: { activePointers: 3, keyboard: true },

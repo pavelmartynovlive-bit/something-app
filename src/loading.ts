@@ -9,10 +9,11 @@ let failed = false;
 function progressChanged(progress: number) {
   if (!failed) detail.textContent = `${Math.round(progress * 100)}% — загружаем зимний двор`;
 }
-function assetFailed() {
+function assetFailed(file: Phaser.Loader.File) {
   failed = true;
   title.textContent = 'Не удалось загрузить игру';
-  detail.textContent = 'Проверь интернет и попробуй ещё раз.';
+  const name = file?.src?.split('/').pop()?.split('?')[0];
+  detail.textContent = `Не загрузился ресурс${name ? ` ${name}` : ''}. Проверь интернет и попробуй ещё раз.`;
   retry.hidden = false;
 }
 export function trackLoading(loader: Phaser.Loader.LoaderPlugin) {

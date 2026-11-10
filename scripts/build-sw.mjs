@@ -29,7 +29,11 @@ const optionalAudio = urls.filter(url => new URL(url).pathname.includes('/assets
 const required = urls.filter(url => !optionalAudio.includes(url));
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(async cache => {
-    await cache.addAll(required);
+    // Limit background work: cache.addAll launches every large PNG at once.
+    let next = 0;
+    await Promise.all(Array.from({ length: 3 }, async () => {
+      while (next < required.length) await cache.add(required[next++]);
+    }));
     // A missing optional sound must not prevent installing the playable game.
     await Promise.all(optionalAudio.map(async url => {
       const controller = new AbortController();
