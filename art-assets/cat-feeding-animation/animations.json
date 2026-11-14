@@ -1,0 +1,55 @@
+{
+  "animations": {
+    "idle": {
+      "frames": [
+        "idle_00",
+        "idle_01",
+        "idle_02",
+        "idle_03"
+      ],
+      "frameRate": 4,
+      "repeat": -1
+    },
+    "sniff": {
+      "frames": [
+        "sniff_00",
+        "sniff_01",
+        "sniff_02",
+        "sniff_03"
+      ],
+      "frameRate": 6,
+      "repeat": 0
+    },
+    "eat": {
+      "frames": [
+        "eat_00",
+        "eat_01",
+        "eat_02",
+        "eat_03"
+      ],
+      "frameRate": 5,
+      "repeat": -1
+    },
+    "happy": {
+      "frames": [
+        "happy_00",
+        "happy_01",
+        "happy_02"
+      ],
+      "frameRate": 4,
+      "repeat": 0
+    }
+  },
+  "sequence": [
+    "idle",
+    "sniff",
+    "eat",
+    "happy"
+  ],
+  "sequenceTimingMs": {
+    "idle": 2000,
+    "sniff": 667,
+    "eat": 3200,
+    "happy": 1500
+  }
+}

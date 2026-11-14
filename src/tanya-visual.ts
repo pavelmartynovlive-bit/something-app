@@ -5,6 +5,7 @@ import { tanyaInteractions as interaction, type BenchPhase, type PitFallZone, ty
 export type TanyaVisualState = 'idle' | 'run' | 'jump-start' | 'jump' | 'fall' | 'land' | 'bench-sit' | 'bench-idle' | 'bench-stand' | 'pit-fall' | 'hit-granny' | 'hit-scooter';
 export type TanyaVisualContext = {
   readonly resting: boolean;
+  readonly finale?: boolean;
   readonly recovering: boolean;
   readonly benchPhase: BenchPhase;
   readonly pitFalling: boolean;
@@ -106,7 +107,8 @@ export class TanyaVisual {
     const grounded = body.blocked.down && body.velocity.y >= 0;
     const recovering = this.context.recovering || this.context.pitFalling;
     let next: TanyaVisualState;
-    if (recovering) { next = 'pit-fall'; this.hitReaction = null; }
+    if (this.context.finale) { next = 'idle'; this.hitReaction = null; }
+    else if (recovering) { next = 'pit-fall'; this.hitReaction = null; }
     else if (this.context.benchPhase !== 'none') {
       next = this.context.benchPhase === 'sit' ? 'bench-sit' : this.context.benchPhase === 'stand' ? 'bench-stand' : 'bench-idle';
       this.hitReaction = null;

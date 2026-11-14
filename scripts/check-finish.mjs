@@ -45,7 +45,7 @@ try {
       }
       const finishX = scene.tanya.x, falls = scene.falls, recoveries = scene.recoveries;
       const airborne = !body.blocked.down;
-      for (let i = 0; i < fps * 2; i++) { key(i % 2 === 0); tick(delta); } key(false);
+      for (let i = 0; i < fps * 4.5; i++) { key(i % 2 === 0); tick(delta); } key(false);
       results.push({ fps, mode, food, finalFood: scene.foodCount, prematurelyFinished, finished: scene.finished, finishX,
         airborne, boosts: scene.boostsUsed, falls, recoveries,
         stable: scene.tanya.x === finishX && scene.falls === falls && scene.recoveries === recoveries,
@@ -62,9 +62,10 @@ try {
     assert.ok(row.finishX < 10730 && row.stable && row.endingVisible, `stay in level and show ending: ${label}`);
     assert.equal(row.falls, 0, `no end-of-level fall: ${label}`);
     assert.equal(row.recoveries, 0, `no end-of-level recovery: ${label}`);
+    if (row.food >= 80) assert.ok(!row.airborne, `successful finale grounds Tanya: ${label}`);
     assert.equal(row.finalFood, row.food, `preserve food count: ${label}`);
     if (row.mode.includes('boost')) assert.equal(row.boosts, 1, `actual boost: ${label}`);
-    if (row.mode !== 'run') assert.ok(row.airborne, `finish during the jump: ${label}`);
+    if (row.mode !== 'run' && row.food < 80) assert.ok(row.airborne, `finish during the jump: ${label}`);
     assert.equal(row.title, row.food < 80 ? 'Котику не хватило корма' : row.food >= 103 ? 'Кошачий пир! 🐈🎉' : 'Котик накормлен ❤️', `preserve food outcomes: ${label}`);
   }
   assert.ok(!results.restart.finished && results.restart.food === 0 && results.restart.x < 150 && results.restart.endingHidden);

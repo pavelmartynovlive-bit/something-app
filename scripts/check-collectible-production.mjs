@@ -8,6 +8,7 @@ const expected = [
   { file: 'collectibles/food.png', width: 1312, height: 1199 },
   { file: 'collectibles/lipton.png', width: 713, height: 2206 },
   ...pack.assets.map(a => ({ file: `${a.name.startsWith('hud-') ? 'hud' : 'npcs'}/${a.file}`, width: a.width, height: a.height })),
+  ...['idle', 'sniff', 'eat', 'happy'].map(name => ({ file: `characters/cat/cat-${name}-strip-320.png`, width: name === 'happy' ? 960 : 1280, height: 320 })),
 ];
 const files = expected.map(a => a.file);
 const hashes = files.map(file => createHash('sha256').update(readFileSync(`public/assets/${file}`)).digest('hex'));
@@ -44,5 +45,5 @@ try {
   assert.deepEqual(offlineHashes, hashes, 'offline originals are byte-for-byte identical');
   assert.deepEqual(errors, []);
   assert.deepEqual(failed, []);
-  console.log(`PASS: ${files.length} production PNGs (collectibles, NPCs and HUD), offline startup and original SHA-256 hashes`);
+  console.log(`PASS: ${files.length} production PNGs (collectibles, NPCs, HUD and cat finale), offline startup and original SHA-256 hashes`);
 } finally { await browser.close(); }

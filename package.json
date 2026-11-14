@@ -28,7 +28,8 @@
     "test:audio:production": "node scripts/check-audio-production.mjs",
     "test:loading": "node scripts/check-loading-recovery.mjs",
     "test:music": "node scripts/check-music.mjs",
-    "test:music:production": "node scripts/check-music-production.mjs"
+    "test:music:production": "node scripts/check-music-production.mjs",
+    "test:cat-finale": "node scripts/check-cat-finale.mjs"
   },
   "dependencies": {
     "phaser": "3.90.0"

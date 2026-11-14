@@ -90,6 +90,8 @@ try {
         frames.push([scene.tanya.x, scene.tanya.y, scene.energy, scene.foodCount, scene.liptonUses, scene.benchUses,
           scene.falls, scene.recoveries, scene.boostsUsed, scene.finished]);
       }
+      // Finale cues now happen during the feeding reward, after autorun stops.
+      for (let i = 0; i < 270; i++) tick();
       return { frames, finished: scene.finished, calls };
     };
     const silent = run(false), audible = run(true);

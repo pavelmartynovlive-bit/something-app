@@ -9,6 +9,7 @@ import { TanyaVisual, tanyaArt } from './tanya-visual';
 import { CollectibleVisual } from './collectible-visual';
 import { NpcVisual } from './npc-visual';
 import { GameHud } from './game-hud';
+import { CatFinale } from './cat-finale';
 import { trackLoading, loadingFailed, gameReady, useCanvasRenderer } from './loading';
 import { tanyaInteractions as interaction, type BenchPhase, type PitFallZone, type TanyaHit } from './tanya-interactions';
 import { audioManager } from './audio-manager';
@@ -77,6 +78,7 @@ class PlayScene extends Phaser.Scene {
   private liptonUses = 0;
   private benchSprites: Phaser.Physics.Arcade.Sprite[] = [];
   private finished = false;
+  private catFinale!: CatFinale;
   private wasPortrait = false;
   private framing?: ReturnType<typeof cameraFrame>;
   private winterBackground?: WinterParallaxBackground;
@@ -88,7 +90,7 @@ class PlayScene extends Phaser.Scene {
     trackLoading(this.load);
     WinterParallaxBackground.preload(this); WinterEnvironment.preload(this);
     TanyaVisual.preload(this); CollectibleVisual.preload(this);
-    NpcVisual.preload(this); GameHud.preload(this);
+    NpcVisual.preload(this); GameHud.preload(this); CatFinale.preload(this);
   }
 
   create() {
@@ -218,14 +220,17 @@ class PlayScene extends Phaser.Scene {
     }
     this.createNewObjects(ground);
     const catX = s.levelWidth - 150;
-    this.add.image(catX, groundYAt(catX) - 22, 'cat').setDepth(8);
-    this.add.text(catX, groundYAt(catX) - 75, 'Мяу…', { fontSize: '22px', color: '#29483e' }).setOrigin(.5);
+    this.catFinale = new CatFinale(this, catX, groundYAt(catX), () => {
+      message(this.foodCount >= s.bonusFood ? 'Кошачий пир! Кот требует звезду Мишлен.' : 'Таня покормила котика', 1800);
+      ending.hidden = false;
+    });
     if (!controls) controls = new TouchControls(this.game.canvas, hideHint);
     element('#food-goal').textContent = `Котику нужно: ${s.requiredFood}. ${s.bonusFood}+ — кошачий пир!`;
     this.tanya.setDepth(10).setVisible(false);
     const owner = this;
     this.tanyaVisual = new TanyaVisual(this, this.tanya, {
       get resting() { return owner.restRemaining > 0; },
+      get finale() { return owner.finished && owner.foodCount >= s.requiredFood; },
       get benchPhase() { return owner.benchPhase; },
       get pitFalling() { return owner.pitFalling; },
       get pitZone() { return owner.fallZone; },
@@ -263,7 +268,13 @@ class PlayScene extends Phaser.Scene {
       this.physics.resume();
       this.wasPortrait = false;
     }
-    if (this.finished) return;
+    this.catFinale.update(delta);
+    if (this.finished) {
+      controls.reset();
+      Phaser.Input.Keyboard.JustDown(this.keys.SPACE); Phaser.Input.Keyboard.JustDown(this.keys.UP);
+      if (this.catFinale.state !== 'waiting') this.frameFinale(delta);
+      return;
+    }
     const dt = Math.min(delta, 50) / 1000;
     const body = this.tanya.body as Phaser.Physics.Arcade.Body;
     if (this.recoveryRemaining > 0) {
@@ -519,6 +530,7 @@ class PlayScene extends Phaser.Scene {
     message('Снова бежим!',900);
   }
   private feedCat() {
+    if (this.finished) return;
     const success = this.foodCount >= s.requiredFood;
     const feast = this.foodCount >= s.bonusFood;
     element('#end-title').textContent = feast ? 'Кошачий пир! 🐈🎉' : success ? 'Котик накормлен ❤️' : 'Котику не хватило корма';
@@ -527,19 +539,40 @@ class PlayScene extends Phaser.Scene {
       : success ? `Корм: ${this.foodCount}. Котик сыт. Таня справилась! Для кошачьего пира нужно ${s.bonusFood} пакетиков.`
       : `Корм: ${this.foodCount}. Котику нужно: ${s.requiredFood}. Не хватило ${s.requiredFood - this.foodCount} пакетиков. Попробуй ещё раз и следуй за кормом.`;
     element('.cat-icon').textContent = feast ? '🐈🍽️🎉' : success ? '🐈❤️' : '🐈';
-    audioManager.playCatMeow();
     this.finished = true;
     this.tanya.setVelocity(0, 0).setAlpha(1).setFlipX(false);
     controls.reset();
     this.physics.pause();
+    hideHint();
     if (success) {
-      this.time.delayedCall(350, () => audioManager.playCatFeed());
-      this.add.rectangle(s.levelWidth - 195, groundYAt(s.levelWidth - 150) - 7, feast ? 48 : 22, 10, 0xe5b83d);
-      if (feast) this.add.text(s.levelWidth - 170, groundYAt(s.levelWidth - 150) - 110, 'Мур! А добавка будет?', { fontSize: '22px', color: '#29483e' }).setOrigin(.5);
+      // The existing finish crossing is unchanged. Only after it has fired do
+      // we settle the unchanged 24x50 body onto the final safe ground.
+      const body = this.tanya.body as Phaser.Physics.Arcade.Body;
+      const x = s.levelWidth - 150 - 82, floor = groundYAt(x);
+      body.reset(x, floor - 26);
+      body.position.set(x - body.halfWidth, floor - body.height);
+      body.prev.copy(body.position); body.prevFrame.copy(body.position); body.updateCenter();
+      body.setVelocity(0, 0); body.allowGravity = false;
+      body.blocked.down = body.touching.down = true;
+      this.lastGround = this.bufferedJump = this.jumpStartedAt = -Infinity;
+      toast.classList.remove('visible'); clearTimeout(toastTimer);
+      this.catFinale.enter();
+    } else {
+      audioManager.playCatMeow();
+      message('Нужно ещё немного корма', 1800);
+      this.time.delayedCall(1600, () => { ending.hidden = false; });
     }
-    message(feast ? 'Кошачий пир! Кот требует звезду Мишлен.' : success ? 'Таня покормила котика' : 'Нужно ещё немного корма', 1800);
-    this.time.delayedCall(1600, () => { ending.hidden = false; });
   }
+  private frameFinale(delta: number) {
+    const camera = this.cameras.main, viewWidth = camera.width / camera.zoom;
+    const left = this.tanya.x - (this.tanyaVisual?.cameraLeftInset ?? 45);
+    const right = this.catFinale.sprite.getBounds().right;
+    const target = Phaser.Math.Clamp((left + right) / 2 - viewWidth / 2, 0, Math.max(0, s.levelWidth - viewWidth));
+    const blend = 1 - Math.exp(-Math.min(delta, 100) / 1000 * 5);
+    camera.scrollX = Phaser.Math.Linear(camera.scrollX, target, blend);
+    camera.scrollY = Phaser.Math.Linear(camera.scrollY, this.framing!.baseY, blend);
+  }
+
   private updateHud() {
     element('#food-count').textContent = `Корм: ${this.foodCount}`;
     element('#food-needed').textContent = `Котику нужно: ${s.requiredFood}`;
@@ -686,11 +719,6 @@ class PlayScene extends Phaser.Scene {
     ctx.drawImage(this.textures.get('bottle-base').getSourceImage() as HTMLCanvasElement, 0, 0);
     ctx.fillStyle = '#645024'; ctx.font = 'bold 9px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('LIPTON', 21, 33);
     bottle.refresh();
-    g.fillStyle(0xd29a59).fillRoundedRect(9, 20, 32, 24, 8).fillCircle(27, 16, 14);
-    g.fillTriangle(14, 9, 15, 0, 24, 9).fillTriangle(29, 9, 40, 0, 40, 14);
-    g.lineStyle(6, 0xd29a59).lineBetween(10, 34, 2, 20);
-    g.fillStyle(0x4b483a).fillCircle(23, 15, 2).fillCircle(33, 15, 2);
-    g.generateTexture('cat', 48, 46).clear();
     g.fillStyle(0xf0d2ac).fillCircle(20, 25, 10);
     g.fillStyle(0x705745).fillRect(10, 15, 20, 6);
     g.fillStyle(0x446b55).fillRoundedRect(8, 33, 23, 15, 4);

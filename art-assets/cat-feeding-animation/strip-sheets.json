@@ -1,0 +1,54 @@
+{
+  "idle": {
+    "file": "cat-idle-strip-320.png",
+    "frameWidth": 320,
+    "frameHeight": 320,
+    "frameCount": 4,
+    "frameRate": 4,
+    "repeat": -1,
+    "origin": {
+      "x": 0.5,
+      "y": 0.9375
+    },
+    "sha256": "7065130697fc41232dc420e11ae9492d56550d581269446958a98e686786f1f9"
+  },
+  "sniff": {
+    "file": "cat-sniff-strip-320.png",
+    "frameWidth": 320,
+    "frameHeight": 320,
+    "frameCount": 4,
+    "frameRate": 6,
+    "repeat": 0,
+    "origin": {
+      "x": 0.5,
+      "y": 0.9375
+    },
+    "sha256": "219735c54dd0947382ae498f0eb6e2a0ae5f85076a8d38a76b1f6b63ef8a932d"
+  },
+  "eat": {
+    "file": "cat-eat-strip-320.png",
+    "frameWidth": 320,
+    "frameHeight": 320,
+    "frameCount": 4,
+    "frameRate": 5,
+    "repeat": -1,
+    "origin": {
+      "x": 0.5,
+      "y": 0.9375
+    },
+    "sha256": "19c0b2a92cb7c9678aa7dccb2a5f2272a849096f74c9fb03ca3ae43a27f77e1a"
+  },
+  "happy": {
+    "file": "cat-happy-strip-320.png",
+    "frameWidth": 320,
+    "frameHeight": 320,
+    "frameCount": 3,
+    "frameRate": 4,
+    "repeat": 0,
+    "origin": {
+      "x": 0.5,
+      "y": 0.9375
+    },
+    "sha256": "2e0d4d98dd49a5394f52eab580feac35d5fe790bd4e7240807b3cbf80befb454"
+  }
+}
