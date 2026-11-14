@@ -22,11 +22,12 @@ export class AudioManager {
   private unlocked = false;
   private unlock = () => {
     const context = this.context;
-    if (!context || document.hidden) return;
+    if (!context || document.hidden || (this.unlocked && context.state === 'running')) return;
     // resume() must be called synchronously inside the real user gesture.
     void context.resume().then(() => {
       this.unlocked = context.state === 'running';
       if (!this.unlocked) return;
+      document.dispatchEvent(new Event('game:audio-unlocked'));
       const silent = context.createBufferSource();
       silent.buffer = context.createBuffer(1, 1, context.sampleRate);
       silent.connect(context.destination); silent.start();
@@ -64,6 +65,8 @@ export class AudioManager {
         .catch(() => {}).finally(() => clearTimeout(timeout));
     }
   }
+  get audioContext() { return this.context; }
+  get isUnlocked() { return this.unlocked && this.context?.state === 'running'; }
   resetRun() { this.stopVoices(true); this.last.clear(); this.seen.clear(); }
   private stopVoices(preserveUI = false) {
     for (const voice of [...this.voices]) {

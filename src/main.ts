@@ -14,6 +14,7 @@ import { tanyaInteractions as interaction, type BenchPhase, type PitFallZone, ty
 import { audioManager } from './audio-manager';
 import './style.css';
 import './pwa';
+import './music-player';
 
 const element = <T extends HTMLElement>(id: string) => document.querySelector<T>(id)!;
 const hudValue = element('#energy-value');

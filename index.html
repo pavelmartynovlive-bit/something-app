@@ -48,6 +48,21 @@
         <span id="distance">→</span>
       </div>
     </div>
+    <aside id="music-player" aria-label="Музыка для сравнения" hidden>
+      <button id="music-open" type="button" aria-expanded="false" aria-controls="music-panel">♪ <span id="music-current">Pixel Meadow · спокойно</span> <span aria-hidden="true">⌃</span></button>
+      <div id="music-panel" hidden>
+        <label class="hud-semantics" for="music-track">Фоновая музыка</label>
+        <select id="music-track">
+          <option value="pixel-meadow-calm">1. Pixel Meadow · спокойно</option>
+          <option value="pixel-meadow">2. Pixel Meadow · с мелодией</option>
+          <option value="bitcade-overworld">3. Overworld · бодро</option>
+        </select>
+        <div class="music-volume-label"><label for="music-volume">Громкость музыки</label><output id="music-volume-value" for="music-volume">35%</output></div>
+        <input id="music-volume" type="range" min="0" max="100" value="35" step="1" />
+        <div class="music-actions"><button id="music-enabled" type="button" aria-pressed="true">Выключить музыку</button><a href="%BASE_URL%audio-credits.html" target="_blank" rel="noopener">Авторы и лицензии</a></div>
+        <div id="music-status" role="status" aria-live="polite">Музыка начнётся после касания</div>
+      </div>
+    </aside>
     <div id="hint"><div>Таня бежит сама<br>Тап — прыжок<br>Быстрый второй тап — выше и дальше<small><span id="food-goal">Собери корм для котика</span><br>На компьютере: Space / ↑ — те же нажатия</small></div></div>
     <div id="toast" role="status" aria-live="polite"></div>
     <div id="portrait"><span>↻</span>Удобнее играть горизонтально<small>Поверни телефон</small></div>

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "pixel-meadow-calm",
+    "title": "Pixel Meadow · спокойно",
+    "author": "Spaceyyy",
+    "originalFile": "pixel-meadow-calm.ogg",
+    "originalSHA256": "f1f4bb9bbd3e3335d85605ed242e694a2b9a183e5c5747a6039469bdd2bc6523",
+    "duration": 48.0
+  },
+  {
+    "id": "pixel-meadow",
+    "title": "Pixel Meadow · с мелодией",
+    "author": "Spaceyyy",
+    "originalFile": "pixel-meadow.ogg",
+    "originalSHA256": "11801b0dc0aa16ded87217f1bf7c564f7b7d468112f225740467b09857b1fe3d",
+    "duration": 48.0
+  },
+  {
+    "id": "bitcade-overworld",
+    "title": "Overworld · бодро",
+    "author": "Schniersky / Bitcade Audio",
+    "originalFile": "Bitcade-Music-02-Overworld.wav",
+    "originalSHA256": "03326d54182d80efc4afb92e7dfa7b1f1204a7aa6a595a1ca1ba71c20778f0de",
+    "duration": 51.2
+  }
+]

@@ -25,7 +25,7 @@ const PREFIX = 'tanya:' + self.registration.scope + ':';
 const CACHE = PREFIX + '${version}';
 const FILES = ${JSON.stringify(files)};
 const urls = FILES.map(path => new URL(path, self.registration.scope).href);
-const optionalAudio = urls.filter(url => new URL(url).pathname.includes('/assets/audio/sfx/'));
+const optionalAudio = urls.filter(url => new URL(url).pathname.includes('/assets/audio/'));
 const required = urls.filter(url => !optionalAudio.includes(url));
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(async cache => {

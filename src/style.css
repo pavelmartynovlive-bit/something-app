@@ -75,3 +75,25 @@ body[data-view="c"] #hud { width: calc(var(--portrait-frame-width) - 24px); }
   clip-path: inset(50%); white-space: nowrap;
 }
 .end-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+
+/* Compact audition controls, separate from the two gameplay HUD blocks. */
+#music-player {
+  position: fixed; z-index: 30; bottom: max(10px, env(safe-area-inset-bottom));
+  left: 50%; transform: translateX(-50%); width: min(340px, calc(100vw - 24px));
+  border-radius: 14px; color: #29483e; background: #f6f8eff5;
+  box-shadow: 0 3px 14px #24453724; overflow: hidden; font-size: 12px;
+  touch-action: manipulation;
+}
+#music-open { display: flex; align-items: center; gap: 8px; width: 100%; padding: 9px 12px;
+  background: transparent; color: #29483e; font-size: 12px; text-align: left; }
+#music-current { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#music-panel { padding: 3px 12px 12px; }
+#music-track { display: block; width: 100%; min-height: 34px; margin: 2px 0 7px;
+  border: 1px solid #bccfc1; border-radius: 8px; background: #fff; color: #29483e; font: inherit; font-size: 13px; }
+.music-volume-label, .music-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+#music-volume { width: 100%; height: 22px; margin: 2px 0 5px; accent-color: #568968; touch-action: pan-x; }
+#music-enabled { padding: 7px 10px; font-size: 12px; }
+.music-actions a { color: #466b54; font-size: 10px; }
+#music-status { min-height: 15px; margin-top: 5px; font-size: 10px; color: #607b68; }
+#music-track:focus-visible, #music-volume:focus-visible { outline: 2px solid #e5b83d; outline-offset: 2px; }
+@media (max-height: 400px) { #music-player { left: auto; right: 10px; transform: none; width: 280px; bottom: 8px; } }

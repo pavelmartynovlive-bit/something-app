@@ -42,3 +42,28 @@ Rebuild with `python scripts/prepare-audio.py` (Python, numpy, ffmpeg).
 Exact boundaries, fades, gains, durations, output SHA-256 hashes and signal levels
 are recorded in `art-assets/audio/processing.json`. Runtime master volume and
 event gains are in `src/audio-manager.ts`.
+
+## Background music audition (three tracks supplied by the user)
+
+| Original filename | Title | Author | Source | License | Attribution required |
+|---|---|---|---|---|---|
+| `pixel-meadow-calm.ogg` | Pixel Meadow (calm) | Spaceyyy | https://aquumgifts.itch.io/cozy-chiptune | Author's royalty-free game asset license (not CC0) | No |
+| `pixel-meadow.ogg` | Pixel Meadow | Spaceyyy | https://aquumgifts.itch.io/cozy-chiptune | Author's royalty-free game asset license (not CC0) | No |
+| `Bitcade-Music-02-Overworld.wav` | 02 Overworld | Schniersky / Bitcade Audio | https://schniersky.itch.io/bitcade-free-music-pack | CC BY 4.0 | Yes |
+
+Spaceyyy permits personal/commercial games and modifying/cutting/combining the
+music, and prohibits standalone asset redistribution or claiming authorship:
+https://aquumgifts.github.io/cozy-game-assets/cozy-chiptune/#license
+Only the free-demo Pixel Meadow full/calm tracks are used from that pack.
+CC BY 4.0 permits commercial games and modifications with attribution, a license
+link and an indication of changes: https://creativecommons.org/licenses/by/4.0/
+Required Bitcade credit: Music: Bitcade Audio — https://schniersky.itch.io/bitcade (CC BY 4.0).
+
+All three stream files are game assets in `public/assets/audio/music/` (OGG and
+MP3 fallback for older iOS/Safari); the two supplied OGG streams remain byte-identical.
+MP3 variants and the Overworld OGG are re-encoded, with no composition changes.
+In-game playback applies a separate music gain and switch crossfade. User upload
+source filenames/hashes and durations are in `art-assets/audio/music/manifest.json`.
+The permanent player link opens `public/audio-credits.html` with attribution for
+all three tracks, the licenses and changes. Music is optional, loads after scene
+startup, and can be switched/muted without muting game SFX.

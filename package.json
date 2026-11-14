@@ -26,7 +26,9 @@
     "test:audio": "node scripts/check-audio.mjs",
     "audio:prepare": "python scripts/prepare-audio.py",
     "test:audio:production": "node scripts/check-audio-production.mjs",
-    "test:loading": "node scripts/check-loading-recovery.mjs"
+    "test:loading": "node scripts/check-loading-recovery.mjs",
+    "test:music": "node scripts/check-music.mjs",
+    "test:music:production": "node scripts/check-music-production.mjs"
   },
   "dependencies": {
     "phaser": "3.90.0"
